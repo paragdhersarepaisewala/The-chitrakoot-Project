@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gallery;
 use App\Models\GalleryItem;
 use Illuminate\Http\Request;
 

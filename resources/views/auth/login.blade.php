@@ -1,56 +1,177 @@
 @extends('layouts.app')
 
-@section('title', 'सदस्य लॉगिन | श्री कामदगिरि पीठम् सेवा ट्रस्ट')
+@section('title', 'सदस्य प्रवेश · Devotee Login | श्री कामदगिरि पीठम् सेवा ट्रस्ट')
+@section('meta_description', 'श्री कामदगिरि पीठम् सेवा ट्रस्ट के सदस्य एवं भक्त पोर्टल में प्रवेश करें। ऑनलाइन पूजा, गौसेवा दान एवं चित्रकूट तीर्थ यात्रा विवरण का अवलोकन करें।')
 
 @section('content')
 
-  <section class="section" style="padding-top: 150px; background: var(--paper); min-height: 80vh;">
-    <div class="container" style="max-width: 480px;">
+<style>
+  .auth-portal-section {
+    min-height: 100vh;
+    padding-top: 150px;
+    padding-bottom: 90px;
+    background: linear-gradient(180deg, #FAF4ED 0%, #F5ECE0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .auth-card-glass {
+    background: #FFFDFC;
+    border: 1.5px solid rgba(180, 83, 9, 0.2);
+    border-radius: 20px;
+    padding: clamp(30px, 5vw, 44px);
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 16px 45px rgba(130, 70, 20, 0.08);
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+  }
+  .auth-input-group {
+    margin-bottom: 20px;
+  }
+  .auth-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: #78350F;
+    margin-bottom: 8px;
+    font-family: var(--dev);
+  }
+  .auth-input {
+    width: 100%;
+    padding: 13px 16px;
+    background: #FAF4ED;
+    border: 1.5px solid rgba(180, 83, 9, 0.22);
+    border-radius: 12px;
+    font-size: 14.5px;
+    color: #2B1A12;
+    box-sizing: border-box;
+    transition: all .2s ease;
+    font-family: var(--sans, sans-serif);
+  }
+  .auth-input:focus {
+    outline: none;
+    border-color: #D95D0F;
+    background: #FFFDFC;
+    box-shadow: 0 0 0 3px rgba(217, 93, 15, 0.15);
+  }
+  .btn-auth-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #D95D0F 0%, #B45309 100%);
+    color: #FFFDFC;
+    border: none;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--dev);
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(217, 93, 15, 0.28);
+    transition: all .2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-auth-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(217, 93, 15, 0.38);
+    background: linear-gradient(135deg, #E86514 0%, #C25B0E 100%);
+  }
+  .demo-fill-btn {
+    background: rgba(180, 83, 9, 0.08);
+    border: 1px dashed rgba(180, 83, 9, 0.35);
+    color: #B45309;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .demo-fill-btn:hover {
+    background: rgba(180, 83, 9, 0.18);
+    color: #78350F;
+  }
+</style>
 
-      <div style="background: #fff; border: 1px solid var(--line); padding: 40px; box-shadow: 0 15px 45px rgba(0,0,0,.06);">
+<section class="auth-portal-section">
+  <div class="auth-card-glass">
 
-        <div style="text-align: center; margin-bottom: 30px;">
-          <div class="eyebrow" style="justify-content: center;">Member Login</div>
-          <h1 style="font: 500 32px var(--dev); color: var(--brown); margin-top: 10px;">सदस्य लॉगिन</h1>
-        </div>
+    <!-- Temple Logo / Emblem Header -->
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; background: linear-gradient(135deg, #D95D0F, #B45309); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(217,93,15,0.3);">
+        <svg width="26" height="26" viewBox="0 0 50 58" fill="none" stroke="#fff" stroke-width="2.5">
+          <path d="M5 51V28L25 7l20 21v23"/>
+          <path d="M13 51V31l12-12 12 12v20"/>
+          <path d="M20 51V35h10v16"/>
+          <path d="M2 52h46"/>
+          <path d="M25 7V2"/>
+        </svg>
+      </div>
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #B45309;">
+        DEVOTEE & MEMBER ACCESS
+      </span>
+      <h1 style="font-size: 26px; font-weight: 700; font-family: var(--dev); color: #2B1A12; margin: 6px 0 4px;">
+        भक्त व सदस्य प्रवेश
+      </h1>
+      <p style="font-size: 13.5px; color: rgba(43,26,18,0.7); margin: 0; font-family: var(--dev);">
+        श्री कामदगिरि पीठम् सेवा ट्रस्ट · चित्रकूट धाम
+      </p>
+    </div>
 
-        @if($errors->any())
-          <div style="background: #ffebee; color: #c62828; padding: 12px; margin-bottom: 20px; font: 500 13px var(--dev); border-left: 3px solid #c62828;">
-            {{ $errors->first() }}
-          </div>
-        @endif
+    @if(session('success'))
+      <div style="background: rgba(46, 125, 50, 0.12); border: 1.5px solid #2e7d32; color: #1b5e20; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600;">
+        {{ session('success') }}
+      </div>
+    @endif
 
-        <form action="{{ url('/login') }}" method="POST">
-          @csrf
+    @if($errors->any())
+      <div style="background: rgba(198, 40, 40, 0.1); border: 1.5px solid #c62828; color: #b71c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600;">
+        {{ $errors->first() }}
+      </div>
+    @endif
 
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; font: 600 10px var(--sans); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px;">ईमेल (Email Address)</label>
-            <input type="email" name="email" value="{{ old('email') }}" required style="width: 100%; padding: 12px; border: 1px solid var(--line); font: 500 14px var(--dev);">
-          </div>
+    <form action="{{ url('/login') }}" method="POST">
+      @csrf
 
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; font: 600 10px var(--sans); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px;">पासवर्ड (Password)</label>
-            <input type="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid var(--line); font: 500 14px var(--dev);">
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <label style="display: flex; align-items: center; gap: 8px; font: 500 12px var(--sans); cursor: pointer;">
-              <input type="checkbox" name="remember"> Remember Me
-            </label>
-          </div>
-
-          <button type="submit" class="btn primary" style="width: 100%; justify-content: center; font-size: 10px; padding: 14px;">
-            लॉगिन करें (Login)
-          </button>
-        </form>
-
-        <div style="text-align: center; margin-top: 25px; font: 500 12px var(--dev); color: rgba(45,36,30,.7);">
-          खाता नहीं है? <a href="{{ url('/register') }}" style="color: var(--brown); font-weight: 700;">सदस्यता पंजीकरण करें (Register)</a>
-        </div>
-
+      <div class="auth-input-group">
+        <label class="auth-label">ईमेल पता (Email Address)</label>
+        <input type="email" name="email" id="loginEmail" value="{{ old('email') }}" required placeholder="your.email@example.com" class="auth-input">
       </div>
 
+      <div class="auth-input-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label class="auth-label" style="margin-bottom: 0;">पासवर्ड (Password)</label>
+          <a href="{{ route('password.request') }}" style="color: #B45309; text-decoration: none; font-size: 12px; font-weight: 700;">Forgot Password?</a>
+        </div>
+        <input type="password" name="password" id="loginPassword" required placeholder="••••••••" class="auth-input">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px; color: rgba(43,26,18,0.8);">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" name="remember" style="accent-color: #D95D0F; width: 16px; height: 16px;">
+          <span>Remember me</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn-auth-submit" style="white-space: nowrap;">
+        <span>Sign In &rarr;</span>
+      </button>
+    </form>
+
+    <div style="margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(180,83,9,0.18); text-align: center; font-size: 13.5px; color: rgba(43,26,18,0.75);">
+      Don't have an account? 
+      <a href="{{ url('/register') }}" style="color: #B45309; font-weight: 700; text-decoration: none; margin-left: 4px;">
+        Register &rarr;
+      </a>
     </div>
-  </section>
+
+  </div>
+</section>
 
 @endsection

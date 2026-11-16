@@ -2,19 +2,21 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Cause;
-use App\Models\SevaProject;
 use App\Models\Destination;
+use App\Models\EmailTemplate;
 use App\Models\Event;
+use App\Models\Gallery;
+use App\Models\GalleryItem;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
-use App\Models\OrganizationSetting;
-use App\Models\EmailTemplate;
 use App\Models\LeadershipProfile;
+use App\Models\OrganizationSetting;
+use App\Models\Post;
+use App\Models\SevaProject;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -154,7 +156,7 @@ class DatabaseSeeder extends Seeder
                 'summary_en' => 'Uniting the community through sacred celebrations, satsang discourses, and cultural heritage festivals.',
                 'description_hi' => 'कामदगिरि परिक्रमा एवं रामघाट तट पर भव्य धार्मिक अनुष्ठान, कथा, संत समागम और दीपदान का आयोजन किया जाता है।',
                 'description_en' => 'Organizing grand spiritual discourses, holy recitations, Sant Samagam, and evening Mandakini Deepotsav.',
-                'featured_image' => 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=85',
+                'featured_image' => 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80',
                 'cause_id' => $eventCause->id,
                 'sort_order' => 3,
                 'is_published' => true,
@@ -211,8 +213,8 @@ class DatabaseSeeder extends Seeder
 
         foreach ($destinations as $dest) {
             Destination::firstOrCreate(['slug' => $dest['slug']], array_merge($dest, [
-                'description_hi' => $dest['summary_hi'] . ' यह चित्रकूट धाम का अत्यंत प्राचीन एवं पूजनीय स्थान है।',
-                'description_en' => $dest['summary_en'] . ' A revered heritage destination in Chitrakoot Dham.',
+                'description_hi' => $dest['summary_hi'].' यह चित्रकूट धाम का अत्यंत प्राचीन एवं पूजनीय स्थान है।',
+                'description_en' => $dest['summary_en'].' A revered heritage destination in Chitrakoot Dham.',
                 'is_published' => true,
             ]));
         }
@@ -260,17 +262,63 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 9. Leadership Profiles (Placeholders as instructed in agent.md)
+        // 9. Leadership Profiles (Multiple trustees with photo, designation, description)
         LeadershipProfile::firstOrCreate(
             ['name_en' => 'Pujya Peethadhishwar Swami Ji'],
             [
                 'name_hi' => 'पूज्य पीठाधीश्वर स्वामी जी',
-                'title_hi' => 'पीठाधीश्वर, श्री कामदगिरि पीठम्',
-                'title_en' => 'Peethadhishwar, Shri Kamadgiri Peetham',
+                'title_hi' => 'सर्वोच्च संरक्षक एवं पीठाधीश्वर',
+                'title_en' => 'Chief Patron & Peethadhishwar',
                 'role_category' => 'peethadhishwar',
-                'bio_hi' => 'श्री कामदगिरि पीठम् के पूज्य पीठाधीश्वर जी के पावन मार्गदर्शन में ट्रस्ट द्वारा सनातन धर्म, शिक्षा एवं समाज सेवा के प्रकल्प संचालित हो रहे हैं।',
+                'photo_path' => '/assets/uploads/temple-lotus-logo.png',
+                'bio_hi' => 'चित्रकूट की पावन मंदाकिनी और कामदगिरि की अखंड तपोनिष्ठा को आत्मसात कर महाराज श्री के दिव्य सान्निध्य में श्री कामदगिरि पीठम् सेवा ट्रस्ट द्वारा गौशाला, वैदिक गुरुकुल, नित्य अन्नक्षेत्र एवं धर्म-संस्कृति के पुनरुत्थान का पावन कार्य निरंतर गतिमान है।',
                 'bio_en' => 'Guiding the spiritual vision, cultural preservation, and charitable missions of Shri Kamadgiri Peetham Sewa Trust.',
                 'sort_order' => 1,
+                'is_active' => true,
+            ]
+        );
+
+        LeadershipProfile::firstOrCreate(
+            ['name_en' => 'Dr. Ramanuj Das Shastri'],
+            [
+                'name_hi' => 'डॉ. रामानुज दास शास्त्री',
+                'title_hi' => 'मुख्य प्रबंध न्यासी (Managing Trustee)',
+                'title_en' => 'Chief Managing Trustee',
+                'role_category' => 'trustee',
+                'photo_path' => null,
+                'bio_hi' => 'ट्रस्ट के समस्त कानूनी, वैधानिक अनुपालन, प्रशासनिक प्रबंधन एवं सामाजिक सेवा प्रकल्पों के निष्पक्ष व पारदर्शी संचालन हेतु उत्तरदायी।',
+                'bio_en' => 'Responsible for statutory compliance, governance integrity, and overall charitable administration.',
+                'sort_order' => 2,
+                'is_active' => true,
+            ]
+        );
+
+        LeadershipProfile::firstOrCreate(
+            ['name_en' => 'Acharya Vishnu Prasad Chaturvedi'],
+            [
+                'name_hi' => 'आचार्य विष्णुप्रसाद चतुर्वेदी',
+                'title_hi' => 'महासचिव एवं गुरुकुल प्राचार्य',
+                'title_en' => 'General Secretary & Gurukul Principal',
+                'role_category' => 'trustee',
+                'photo_path' => null,
+                'bio_hi' => 'ऋषिकुल संस्कृत वेद पाठशाला के पठन-पाठन, बटुक दीक्षा, गौशाला गौसेवा एवं नित्य अन्नक्षेत्र भंडारा का प्रत्यक्ष पर्यवेक्षण।',
+                'bio_en' => 'Overseeing Gurukul Vedic education, Gaushala operations, and daily Annakshetra community feasts.',
+                'sort_order' => 3,
+                'is_active' => true,
+            ]
+        );
+
+        LeadershipProfile::firstOrCreate(
+            ['name_en' => 'Shri Shyamsunder Tripathi'],
+            [
+                'name_hi' => 'श्री श्यामसुंदर त्रिपाठी',
+                'title_hi' => 'वित्त एवं लेखा न्यासी (Treasurer)',
+                'title_en' => 'Trustee - Finance & Accounts',
+                'role_category' => 'trustee',
+                'photo_path' => null,
+                'bio_hi' => 'ट्रस्ट के आय-व्यय, ऑडिट, दान प्राप्तियों की १००% पारदर्शिता एवं वैधानिक वित्तीय प्रबंधन के निष्ठावान संरक्षक।',
+                'bio_en' => 'Safeguarding financial transparency, donation reconciliation, and statutory audits.',
+                'sort_order' => 4,
                 'is_active' => true,
             ]
         );
@@ -287,7 +335,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 11. Blog Posts
-        \App\Models\Post::firstOrCreate(
+        Post::firstOrCreate(
             ['slug' => 'chitrakoot-mahatmya-aur-kamadgiri-parikrama'],
             [
                 'title_hi' => 'चित्रकूट माहात्म्य: कामदगिरि परिक्रमा का आध्यात्मिक एवं वैज्ञानिक महत्व',
@@ -304,7 +352,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        \App\Models\Post::firstOrCreate(
+        Post::firstOrCreate(
             ['slug' => 'gaushala-protection-and-sanatan-sanskriti'],
             [
                 'title_hi' => 'गौ सेवा और भारतीय वैदिक संस्कृति: करुणा को कर्म में बदलने का मार्ग',
@@ -321,7 +369,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        \App\Models\Post::firstOrCreate(
+        Post::firstOrCreate(
             ['slug' => 'gurukul-education-and-sanskrit-revival'],
             [
                 'title_hi' => 'गुरुकुल शिक्षा पद्धति और संस्कृत भाषा का पुनरुत्थान',
@@ -339,7 +387,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 12. Galleries & Items
-        $gallery = \App\Models\Gallery::firstOrCreate(
+        $gallery = Gallery::firstOrCreate(
             ['slug' => 'chitrakoot-dham-heritage-gallery'],
             [
                 'title_hi' => 'चित्रकूट धाम पवित्र दर्शनीय स्थल',
@@ -361,15 +409,21 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($photos as $idx => $photo) {
-            \App\Models\GalleryItem::firstOrCreate([
+            GalleryItem::firstOrCreate([
                 'gallery_id' => $gallery->id,
                 'media_path' => $photo['image_url'],
             ], [
                 'item_type' => 'image',
-                'caption_hi' => $photo['title_hi'] . ' - ' . $photo['caption'],
+                'caption_hi' => $photo['title_hi'].' - '.$photo['caption'],
                 'caption_en' => $photo['category'],
                 'sort_order' => $idx + 1,
             ]);
         }
+
+        $this->call([
+            NavigationMenuSeeder::class,
+            PoojaAndSeoSeeder::class,
+            TestArticlesSeeder::class,
+        ]);
     }
 }

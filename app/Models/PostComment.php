@@ -18,6 +18,10 @@ class PostComment extends Model
         'is_approved',
     ];
 
+    protected $casts = [
+        'is_approved' => 'boolean',
+    ];
+
     public function post()
     {
         return $this->belongsTo(Post::class);

@@ -10,6 +10,8 @@ class Receipt extends Model
         'donation_id',
         'receipt_number',
         'donor_name',
+        'donor_email',
+        'donor_phone',
         'amount',
         'cause_title',
         'donation_type',

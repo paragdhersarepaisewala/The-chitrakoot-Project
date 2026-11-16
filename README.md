@@ -1,23 +1,71 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Shri Kamadgiri Peetham Sewa Trust — Digital Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A production-oriented Laravel website and digital service platform for **Shri Kamadgiri Peetham Sewa Trust, Chitrakoot Dham**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Running Locally for Testing & Development
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The local server is currently **active and running** at:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+
+### Quick Start (1-Click)
+- **Windows / Batch**: Double-click `serve.bat` or run `.\serve.bat` in command prompt.
+- **PowerShell**: Run `.\serve.ps1` in PowerShell.
+
+Both scripts automatically detect Laragon's PHP (`C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64\php.exe`) or system PHP and start the Artisan server immediately.
+
+---
+
+### Manual Terminal Commands (PowerShell)
+
+If `php` is not yet recognized globally in your current PowerShell window, run:
+
+```powershell
+# 1. Add Laragon PHP & Composer to your current session PATH:
+$env:PATH += ";C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64;C:\laragon\bin\composer"
+
+# 2. Run the server:
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Or execute artisan directly using Laragon's PHP path:
+```powershell
+& "C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64\php.exe" artisan serve --host=127.0.0.1 --port=8000
+```
+
+---
+
+## 🔐 Admin Credentials (Default Seeder)
+
+- **Admin Login URL**: `http://127.0.0.1:8000/login`
+- **Email**: `admin@kamadgiripeetham.org`
+- **Password**: `password123`
+- **Role**: `super_admin` (Full CMS access: Blogs, Causes, Gallery, Settings, SMTP, Users, Receipts)
+
+---
+
+## 🧪 Running Automated Tests
+
+Run the test suite at any time:
+```powershell
+& "C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64\php.exe" artisan test
+```
+
+---
+
+## 🌐 Main Website Modules & URLs
+
+- **Homepage**: `http://127.0.0.1:8000/`
+- **Seva Projects**: `http://127.0.0.1:8000/seva`
+- **Chitrakoot Guide**: `http://127.0.0.1:8000/chitrakoot`
+- **Events**: `http://127.0.0.1:8000/events`
+- **Blog & News**: `http://127.0.0.1:8000/blog`
+- **Gallery Magazine**: `http://127.0.0.1:8000/gallery`
+- **Online Donations**: `http://127.0.0.1:8000/donate`
+- **Member Registration (Multi-step OTP)**: `http://127.0.0.1:8000/register`
+- **Admin Dashboard**: `http://127.0.0.1:8000/admin`
+
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 

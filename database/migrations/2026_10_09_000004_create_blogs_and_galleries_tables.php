@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('posts')) {
+        if (! Schema::hasTable('posts')) {
             Schema::create('posts', function (Blueprint $table) {
                 $table->id();
                 $table->string('title_hi');
@@ -27,7 +27,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('post_comments')) {
+        if (! Schema::hasTable('post_comments')) {
             Schema::create('post_comments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');

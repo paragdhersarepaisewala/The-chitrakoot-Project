@@ -13,6 +13,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
         'role',
         'approval_status',
@@ -25,6 +26,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'email_otp',
     ];
 
     protected function casts(): array
@@ -52,11 +54,22 @@ class User extends Authenticatable
         return $this->hasMany(Donation::class);
     }
 
+    public function volunteerApplications()
+    {
+        return $this->hasMany(VolunteerApplication::class);
+    }
+
+    public function poojaBookings()
+    {
+        return $this->hasMany(PoojaBooking::class);
+    }
+
     public function hasRole(string ...$roles): bool
     {
         if ($this->role === 'super_admin') {
             return true;
         }
+
         return in_array($this->role, $roles, true);
     }
 }

@@ -25,7 +25,7 @@ return new class extends Migration
                 'media_editor',
                 'viewer',
                 'donor',
-                'member'
+                'member',
             ])->default('donor');
             $table->enum('approval_status', ['pending', 'approved', 'rejected'])->default('approved');
             $table->boolean('is_active')->default(true);

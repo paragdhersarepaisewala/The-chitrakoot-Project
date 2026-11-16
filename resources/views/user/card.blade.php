@@ -54,8 +54,8 @@
           <p style="font: 400 15px/1.8 var(--dev); color: rgba(43,35,29,.75); max-width: 500px; margin: 0 auto 30px;">
             पहला दान अथवा योगदान देने पर आपको आधिकारिक **Supporter Card** प्रदान किया जाएगा। ३ लगातार माह तक नियमित मासिक दान पर **Active Member Card** प्राप्त होता है।
           </p>
-          <a href="{{ url('/donate') }}" class="btn primary" style="padding: 14px 28px; font-size: 11px;">
-            पहला योगदान दें (Make a Donation)
+          <a href="{{ url('/donate') }}" class="btn primary" style="padding: 12px 28px; font-size: 12px; border-radius: 9999px; white-space: nowrap;">
+            Donate Now
           </a>
         </div>
       @else

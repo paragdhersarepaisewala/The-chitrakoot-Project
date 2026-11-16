@@ -4,10 +4,10 @@ namespace App\Models; // Or App\Services
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Models\Donation;
 use App\Models\Membership;
 use App\Models\MembershipStatusHistory;
-use App\Models\Donation;
+use App\Models\User;
 use Carbon\Carbon;
 
 class MembershipService
@@ -21,7 +21,7 @@ class MembershipService
         $membership = Membership::firstOrCreate(
             ['user_id' => $user->id],
             [
-                'membership_id' => 'SKP-MEM-' . strtoupper(str()->random(6)),
+                'membership_id' => 'SKP-MEM-'.strtoupper(str()->random(6)),
                 'status' => 'inactive',
                 'consecutive_qualifying_months' => 0,
             ]
