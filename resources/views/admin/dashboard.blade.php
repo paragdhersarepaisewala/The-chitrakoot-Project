@@ -282,9 +282,15 @@
     
     <!-- Left: Recent Verified Donations -->
     <div class="table-box">
-      <div class="table-head-bar">
+      <div class="table-head-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <span class="table-title">Recent Verified Donations</span>
-        <a href="{{ route('admin.causes') }}" style="font-size: 11.5px; font-weight: 700; color: var(--sand);">View All Causes &rarr;</a>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <a href="{{ route('admin.donations.exportCsv') }}" style="display: inline-flex; align-items: center; gap: 5px; background: #166534; color: #ffffff; padding: 5px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-decoration: none; box-shadow: 0 2px 6px rgba(22,101,52,0.2);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export 80G CSV</span>
+          </a>
+          <a href="{{ route('admin.causes') }}" style="font-size: 11.5px; font-weight: 700; color: var(--sand);">View Causes &rarr;</a>
+        </div>
       </div>
 
       <div style="overflow-x: auto;">

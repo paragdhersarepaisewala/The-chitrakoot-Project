@@ -2,7 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Destination;
 use App\Models\Event;
+use App\Models\OrganizationSetting;
+use App\Models\PoojaService;
+use App\Models\Post;
+use App\Models\SevaProject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -162,5 +167,85 @@ class PublicPagesTest extends TestCase
         $response->assertSee('॥ पावन पूजा एवं हवन संकल्प ॥');
         $response->assertSee('घर बैठे चित्रकूट धाम में वैदिक पूजा व हवन का पावन संकल्प लें');
         $response->assertSee('/pooja/book');
+    }
+
+    public function test_event_detail_page_loads_with_single_h1_and_meta()
+    {
+        $events = Event::where('is_published', true)->get();
+        $this->assertNotEmpty($events, 'Seeded events must exist');
+
+        foreach ($events as $event) {
+            $response = $this->get('/events/'.$event->slug);
+            $response->assertStatus(200);
+            $response->assertSee($event->title_hi);
+            $response->assertSee('आयोजन स्थल');
+
+            $content = $response->getContent();
+            $this->assertEquals(1, substr_count($content, '<h1'), 'Event detail page must contain exactly one <h1> heading for slug: '.$event->slug);
+        }
+    }
+
+    public function test_feed_xml_returns_valid_rss_with_content_type()
+    {
+        $response = $this->get('/feed.xml');
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+        $response->assertSee('<rss version="2.0"', false);
+        $response->assertSee('<channel>', false);
+    }
+
+    public function test_all_public_directory_and_detail_routes_return_200()
+    {
+        // Enable pooja packages for directory testing
+        OrganizationSetting::getSettings()->update(['is_pooja_packages_enabled' => true]);
+
+        $routes = [
+            '/',
+            '/about',
+            '/leadership',
+            '/contact',
+            '/seva',
+            '/chitrakoot',
+            '/events',
+            '/pooja',
+            '/pooja/book',
+            '/donate',
+            '/gallery',
+            '/blog',
+            '/volunteer',
+            '/privacy-policy',
+            '/login',
+            '/register',
+            '/forgot-password',
+        ];
+
+        foreach ($routes as $route) {
+            $response = $this->get($route);
+            if ($response->status() !== 200) {
+                $this->fail("Route {$route} returned {$response->status()} instead of 200 (Redirected to: {$response->headers->get('Location')})");
+            }
+            $response->assertStatus(200);
+        }
+
+        // Test dynamic detail routes
+        $seva = SevaProject::where('is_published', true)->first();
+        if ($seva) {
+            $this->get('/seva/'.$seva->slug)->assertStatus(200);
+        }
+
+        $dest = Destination::where('is_published', true)->first();
+        if ($dest) {
+            $this->get('/chitrakoot/'.$dest->slug)->assertStatus(200);
+        }
+
+        $pooja = PoojaService::where('is_active', true)->first();
+        if ($pooja) {
+            $this->get('/pooja/'.$pooja->slug)->assertStatus(200);
+        }
+
+        $post = Post::where('status', 'published')->first();
+        if ($post) {
+            $this->get('/blog/'.$post->slug)->assertStatus(200);
+        }
     }
 }

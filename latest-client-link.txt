@@ -1,0 +1,14 @@
+﻿================================================================================
+   SHRI KAMADGIRI PEETHAM SEWA TRUST - LIVE CLIENT DEMO LINK
+================================================================================
+
+PUBLIC DEMO LINK:  https://drain-caution-musician-students.trycloudflare.com
+STATUS:            ONLINE & ACTIVE
+GENERATED AT:      2026-11-16 13:53:18
+LOCAL SERVER:      http://127.0.0.1:8000
+
+Instructions:
+1. Send this link to your client via WhatsApp, Email, Slack, or SMS.
+2. The site is running live from your machine through Cloudflare's global edge.
+3. Keep the host-online terminal window open for the link to remain active.
+================================================================================

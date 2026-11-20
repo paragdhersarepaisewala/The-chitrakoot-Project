@@ -139,6 +139,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/notifications/poll', [NotificationCenterController::class, 'adminPoll'])->name('admin.notifications.poll');
         Route::post('/api/notifications/mark-seen', [NotificationCenterController::class, 'adminMarkSeen'])->name('admin.notifications.markSeen');
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/donations/export-csv', [AdminController::class, 'exportDonationsCsv'])->name('admin.donations.exportCsv');
         Route::post('/flush-cache', [AdminController::class, 'flushCache'])->name('admin.flushCache');
 
         Route::get('/sevas', [AdminController::class, 'sevas'])->name('admin.sevas');

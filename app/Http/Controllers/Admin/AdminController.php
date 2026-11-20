@@ -73,6 +73,75 @@ class AdminController extends Controller
         ));
     }
 
+    /**
+     * Export verified and historical donations as CSV for 80G tax audits & filings.
+     */
+    public function exportDonationsCsv(Request $request)
+    {
+        $query = Donation::with(['user', 'cause', 'receipt']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('financial_year')) {
+            $parts = explode('-', (string) $request->query('financial_year'));
+            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
+                $start = $parts[0].'-04-01 00:00:00';
+                $end = $parts[1].'-03-31 23:59:59';
+                $query->whereBetween('created_at', [$start, $end]);
+            }
+        }
+
+        $donations = $query->latest('created_at')->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="donations_80g_export_'.date('Y-m-d_His').'.csv"',
+        ];
+
+        ActivityLog::log(auth()->user()?->name ?? 'Admin', 'export_csv', 'Exported '.$donations->count().' donations for 80G filing.');
+
+        $callback = function () use ($donations) {
+            $file = fopen('php://output', 'w');
+            fwrite($file, "\xEF\xBB\xBF"); // UTF-8 BOM for Microsoft Excel
+
+            fputcsv($file, [
+                'Receipt Number',
+                'Date',
+                'Donor Name',
+                'Donor Email',
+                'Donor Phone',
+                'Amount (INR)',
+                'Cause / Seva',
+                'Donation Type',
+                'Payment Gateway',
+                'Payment ID',
+                'Status',
+            ]);
+
+            foreach ($donations as $donation) {
+                fputcsv($file, [
+                    $donation->receipt_number ?: ($donation->receipt?->receipt_number ?: 'N/A'),
+                    $donation->paid_at ? $donation->paid_at->format('Y-m-d H:i') : $donation->created_at->format('Y-m-d H:i'),
+                    $donation->donor_name ?: ($donation->user?->name ?: 'Devotee Supporter'),
+                    $donation->donor_email ?: ($donation->user?->email ?: 'N/A'),
+                    $donation->donor_phone ?: ($donation->user?->phone ?: 'N/A'),
+                    number_format($donation->amount, 2, '.', ''),
+                    $donation->cause?->title ?: 'General Seva',
+                    $donation->donation_type ?: 'General',
+                    $donation->payment_gateway ?: 'Razorpay',
+                    $donation->gateway_payment_id ?: 'N/A',
+                    ucfirst($donation->status),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function flushCache()
     {
         try {
