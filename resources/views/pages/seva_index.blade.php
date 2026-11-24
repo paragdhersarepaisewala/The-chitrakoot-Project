@@ -53,7 +53,7 @@
 
           <!-- 16:9 Aspect Ratio Media Banner -->
           <div class="mobile-card-media">
-            <img src="{{ $seva->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+            <img src="{{ $seva->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
               alt="{{ $seva->title_hi }}" loading="lazy">
             <span class="mobile-category-badge">
               {{ $seva->category === 'education' ? 'गुरुकुल शिक्षा' : ($seva->category === 'seva' ? 'गौ संरक्षण' : 'सांस्कृतिक सेवा') }}
@@ -166,7 +166,7 @@
 
               <!-- Card Image with Hover Zoom & Badges -->
               <div class="desktop-card-image-wrap">
-                <img src="{{ $seva->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+                <img src="{{ $seva->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
                   alt="{{ $seva->title_hi }}" loading="lazy">
                 <span class="desktop-card-badge">
                   {{ $seva->category === 'education' ? 'वैदिक गुरुकुल' : ($seva->category === 'seva' ? 'गौसेवा प्रकल्प' : 'सांस्कृतिक अनुष्ठान') }}

@@ -240,43 +240,10 @@
           <form action="{{ url('/register/verify-otp') }}" method="POST">
             @csrf
 
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 24px;">
               <label class="reg-label" style="text-align: center; display: block;">6-DIGIT SECURITY OTP</label>
-              <input type="text" name="otp" id="otpField" required maxlength="6" placeholder="849201" style="width: 100%; padding: 14px; background: #FAF4ED; border: 1.5px solid #D95D0F; color: #D95D0F; font-size: 26px; font-weight: 800; letter-spacing: .4em; text-align: center; border-radius: 12px; box-sizing: border-box;">
+              <input type="text" name="otp" id="otpField" required maxlength="6" placeholder="••••••" autocomplete="one-time-code" style="width: 100%; padding: 14px; background: #FAF4ED; border: 1.5px solid #D95D0F; color: #D95D0F; font-size: 26px; font-weight: 800; letter-spacing: .4em; text-align: center; border-radius: 12px; box-sizing: border-box;">
             </div>
-
-            @php
-              $isSmtpConfigured = $isSmtpConfigured ?? \App\Models\OrganizationSetting::getSettings()->isSmtpConfigured();
-              preg_match('/(?:Testing|Test|Dev) OTP:\s*([0-9]{6})/i', session('success') ?? '', $otpMatches);
-              $detectedOtp = $otpMatches[1] ?? ($userOtp ?? '');
-            @endphp
-
-            @if(! $isSmtpConfigured)
-              <div style="background: rgba(217, 93, 15, 0.08); border: 1.5px dashed #D95D0F; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; text-align: center;">
-                <div style="font-size: 11px; font-weight: 800; color: #B45309; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
-                  ⚙️ Testing Mode (SMTP Server Not Attached)
-                </div>
-                <p style="font-size: 12.5px; color: #7A4B29; margin: 0 0 10px;">
-                  SMTP सर्वर संलग्न होने तक अस्थायी OTP बाईपास सक्रिय है।
-                </p>
-                @if($detectedOtp)
-                  <div style="margin-bottom: 10px;">
-                    <button type="button" onclick="document.getElementById('otpField').value = '{{ $detectedOtp }}'" style="background: linear-gradient(135deg, #D95D0F 0%, #B45309 100%); color: #fff; border: none; padding: 8px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(217,93,15,0.25);">
-                      ⚡ Auto-fill Testing Code ({{ $detectedOtp }})
-                    </button>
-                  </div>
-                @endif
-                <div>
-                  <form action="{{ route('register.bypass_otp') }}" method="POST" style="display: inline-block;">
-                    @csrf
-                    <input type="hidden" name="email" value="{{ $email ?? auth()->user()?->email }}">
-                    <button type="submit" style="background: #fff; border: 1px solid #D95D0F; color: #D95D0F; padding: 6px 16px; border-radius: 9999px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                      Bypass OTP Verification (Testing Mode) &rarr;
-                    </button>
-                  </form>
-                </div>
-              </div>
-            @endif
 
             <button type="submit" class="btn-reg-submit" style="margin-bottom: 6px; white-space: nowrap;">
               <span>Verify OTP &rarr;</span>

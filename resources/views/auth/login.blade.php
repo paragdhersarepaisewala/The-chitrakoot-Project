@@ -82,21 +82,7 @@
     box-shadow: 0 14px 28px rgba(217, 93, 15, 0.38);
     background: linear-gradient(135deg, #E86514 0%, #C25B0E 100%);
   }
-  .demo-fill-btn {
-    background: rgba(180, 83, 9, 0.08);
-    border: 1px dashed rgba(180, 83, 9, 0.35);
-    color: #B45309;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .15s ease;
-  }
-  .demo-fill-btn:hover {
-    background: rgba(180, 83, 9, 0.18);
-    color: #78350F;
-  }
+
 </style>
 
 <section class="auth-portal-section">

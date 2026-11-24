@@ -49,7 +49,7 @@
                 style="display: block; font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px;">Image
                 URL</label>
               <input type="text" name="image_url" required
-                value="/uploads/temple-test-photo-1792032209.webp"
+                value="/uploads/kamadgiri-temple-crest-emblem-1792267739.webp"
                 style="width: 100%; padding: 10px; border: 1px solid var(--line); font: 500 13px var(--sans);">
             </div>
 

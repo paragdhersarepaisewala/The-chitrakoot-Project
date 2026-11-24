@@ -20,7 +20,7 @@
         <!-- LEFT / TOP: Pooja Details -->
         <div class="pooja-details-col">
           <div class="pooja-media-banner">
-            <img src="{{ $pooja->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+            <img src="{{ $pooja->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
               alt="{{ $pooja->title_hi }}" loading="lazy">
           </div>
 

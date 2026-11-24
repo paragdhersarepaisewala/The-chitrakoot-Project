@@ -76,14 +76,8 @@ class AuthController extends Controller
 
         EmailNotificationService::sendPasswordResetOtp($user, $otp);
 
-        $orgSettings = OrganizationSetting::getSettings();
-        $flashMsg = "पासवर्ड रीसेट सुरक्षा कोड {$user->email} पर भेज दिया गया है।";
-        if (! $orgSettings->isSmtpConfigured()) {
-            $flashMsg .= " (Testing OTP: {$otp})";
-        }
-
         return redirect('/reset-password?email='.urlencode($user->email))
-            ->with('success', $flashMsg);
+            ->with('success', "पासवर्ड रीसेट सुरक्षा कोड {$user->email} पर भेज दिया गया है।");
     }
 
     public function showResetPassword(Request $request)
@@ -126,16 +120,8 @@ class AuthController extends Controller
     {
         $step = (int) $request->get('step', 1);
         $email = $request->get('email');
-        $orgSettings = OrganizationSetting::getSettings();
-        $isSmtpConfigured = $orgSettings->isSmtpConfigured();
 
-        $userOtp = null;
-        if (! $isSmtpConfigured && $step === 2) {
-            $currentUser = auth()->user() ?: ($email ? User::where('email', $email)->first() : null);
-            $userOtp = $currentUser?->email_otp;
-        }
-
-        return view('auth.register', compact('step', 'email', 'isSmtpConfigured', 'userOtp'));
+        return view('auth.register', compact('step', 'email'));
     }
 
     // Step 1: Account Creation & Send OTP
@@ -181,16 +167,8 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        $orgSettings = OrganizationSetting::getSettings();
-        $isSmtpConfigured = $orgSettings->isSmtpConfigured();
-
-        $flashMsg = "Verification OTP has been sent to {$user->email}.";
-        if (! $isSmtpConfigured) {
-            $flashMsg .= " (Testing OTP: {$otp})";
-        }
-
         return redirect('/register?step=2&email='.urlencode($user->email))
-            ->with('success', $flashMsg);
+            ->with('success', "Verification OTP has been sent to {$user->email}. Please check your inbox.");
     }
 
     // Step 2: Verify OTP
@@ -249,46 +227,8 @@ class AuthController extends Controller
 
         EmailNotificationService::sendRegistrationOtp($user, $otp);
 
-        $orgSettings = OrganizationSetting::getSettings();
-        $isSmtpConfigured = $orgSettings->isSmtpConfigured();
-
-        $flashMsg = "A new verification OTP has been sent to {$user->email}.";
-        if (! $isSmtpConfigured) {
-            $flashMsg .= " (Testing OTP: {$otp})";
-        }
-
         return redirect('/register?step=2&email='.urlencode($user->email))
-            ->with('success', $flashMsg);
-    }
-
-    // Step 2: Temporary Testing Bypass (Only available when SMTP server is not attached)
-    public function bypassOtp(Request $request)
-    {
-        $orgSettings = OrganizationSetting::getSettings();
-        if ($orgSettings->isSmtpConfigured()) {
-            return back()->withErrors(['otp' => 'SMTP server is configured and attached. Real email OTP verification is required.']);
-        }
-
-        $user = auth()->user();
-        if (! $user && $request->filled('email')) {
-            $user = User::where('email', $request->email)->first();
-        }
-
-        if (! $user) {
-            return redirect('/register');
-        }
-
-        $user->update([
-            'email_verified_at' => now(),
-            'email_otp' => null,
-            'email_otp_expires_at' => null,
-        ]);
-
-        if (! auth()->check()) {
-            Auth::login($user);
-        }
-
-        return redirect('/register?step=3')->with('success', 'Temporary OTP bypass applied (SMTP not configured). Please complete your profile details.');
+            ->with('success', "A new verification OTP has been sent to {$user->email}.");
     }
 
     // Step 3: Complete Profile Details & Photo

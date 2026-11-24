@@ -2245,11 +2245,11 @@ class AdminController extends Controller
         $settings->update($data);
         EmailNotificationService::configureRuntimeMailer($settings);
 
-        ActivityLog::log('Email CMS', 'smtp_update', 'Updated outgoing SMTP server credentials. Live SMTP status: '.($isConfigured ? 'Active' : 'Testing Mode'));
+        ActivityLog::log('Email CMS', 'smtp_update', 'Updated outgoing SMTP server credentials. Live SMTP status: '.($isConfigured ? 'Active' : 'Pending'));
 
         $msg = $isConfigured
             ? 'SMTP server configuration saved successfully. Real outgoing SMTP delivery is active.'
-            : 'SMTP server settings saved in testing mode.';
+            : 'SMTP server settings saved (host details pending).';
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => $msg]);

@@ -39,7 +39,7 @@
             onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 40px rgba(130,70,20,0.12)'"
             onmouseout="this.style.transform='none'; this.style.boxShadow='0 10px 30px rgba(130,70,20,0.05)'">
             <div style="height: 220px; position: relative; overflow: hidden; background: #FAF4ED;">
-              <img src="{{ $post->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+              <img src="{{ $post->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
                 alt="{{ $post->title_hi }}"
                 style="width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease;"
                 onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">

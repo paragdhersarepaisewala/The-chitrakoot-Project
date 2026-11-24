@@ -170,8 +170,7 @@ class EmailNotificationService
 
                 Log::info("Email notification sent live [{$slug}] to {$recipientEmail}");
             } else {
-                // Testing simulation mode (SMTP not yet attached or configured)
-                Log::info("Email notification simulated [{$slug}] to {$recipientEmail}: Subject: {$subject}");
+                Log::info("Email notification queued/simulated [{$slug}] to {$recipientEmail}: Subject: {$subject}");
 
                 EmailLog::create([
                     'template_slug' => $slug,
@@ -179,10 +178,9 @@ class EmailNotificationService
                     'recipient_name' => $recipientName,
                     'subject' => $subject,
                     'status' => 'simulated',
-                    'error_message' => 'Simulated in Testing Mode (SMTP credentials not yet attached).',
+                    'error_message' => 'Outgoing SMTP server credentials are not yet configured in Trust settings.',
                     'metadata' => [
                         'simulated' => true,
-                        'otp' => $placeholders['{otp}'] ?? null,
                     ],
                 ]);
             }

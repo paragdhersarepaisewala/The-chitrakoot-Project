@@ -72,7 +72,7 @@
           <div
             style="border-radius: 24px; overflow: hidden; border: 2px solid rgba(180, 83, 9, 0.22); box-shadow: 0 16px 40px rgba(180, 83, 9, 0.12);">
             <img
-              src="{{ !empty($homeSettings['about_photo_1_url']) ? $homeSettings['about_photo_1_url'] : ($orgSettings->hero_banner_path ?: asset('uploads/temple-test-photo-1792032209.webp')) }}"
+              src="{{ !empty($homeSettings['about_photo_1_url']) ? $homeSettings['about_photo_1_url'] : ($orgSettings->hero_banner_path ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp')) }}"
               alt="{{ $orgSettings->org_name ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट चित्रकूट धाम' }}" loading="lazy"
               style="width: 100%; height: 380px; object-fit: cover; display: block;">
           </div>

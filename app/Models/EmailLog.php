@@ -42,7 +42,7 @@ class EmailLog extends Model
                 'bg' => '#fef3c7',
                 'color' => '#b45309',
                 'border' => '#fde68a',
-                'label' => 'Simulated (Testing)',
+                'label' => 'Logged (Unsent)',
                 'icon' => '⚡',
             ],
             'stopped' => [

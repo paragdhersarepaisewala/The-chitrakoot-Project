@@ -122,7 +122,7 @@
 
       <div class="auth-input-group">
         <label class="auth-label">6-अंकीय सुरक्षा कोड (Verification OTP Code) *</label>
-        <input type="text" name="otp" required maxlength="6" placeholder="749216" class="auth-input" style="font-family: monospace; font-size: 20px; letter-spacing: 6px; text-align: center;">
+        <input type="text" name="otp" required maxlength="6" placeholder="••••••" autocomplete="one-time-code" class="auth-input" style="font-family: monospace; font-size: 20px; letter-spacing: 6px; text-align: center;">
       </div>
 
       <div class="auth-input-group">

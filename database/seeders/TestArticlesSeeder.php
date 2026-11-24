@@ -26,9 +26,7 @@ class TestArticlesSeeder extends Seeder
 
 [gallery images="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1609342122563-a43ac8917a3a?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80" cols="2" caption="चित्रकूट धाम — रामघाट, कामदगिरि, गुरुकुल एवं गौशाला दर्शन"]
 
-<p>नीचे दिए गए दिव्य वीडियो में आप रामघाट पर सायं काल संपन्न होने वाली मां मंदाकिनी की महाआरती और कामदगिरि परिक्रमा के मनोहारी दृश्यों का दर्शन कर सकते हैं:</p>
-
-[video src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" caption="चित्रकूट धाम — दिव्य महाआरती व पावन कामदगिरि परिक्रमा दर्शन"]
+<p>नीचे दिए गए दिव्य दर्शन में आप रामघाट पर सायं काल संपन्न होने वाली मां मंदाकिनी की महाआरती और कामदगिरि परिक्रमा के मनोहारी दृश्यों का दर्शन कर सकते हैं।</p>
 
 <h2>परिक्रमा के पावन नियम एवं सावधानियां</h2>
 <p>परिक्रमा करते समय मन में निरंतर श्रीराम नाम का जप करना चाहिए। परिक्रमा मार्ग को स्वच्छ एवं प्लास्टिक-मुक्त रखने का संकल्प प्रत्येक तीर्थयात्री को लेना चाहिए। ट्रस्ट द्वारा परिक्रमा मार्ग पर तीर्थयात्रियों हेतु शीतल पेयजल एवं विश्राम की निःशुल्क व्यवस्था की जाती है।</p>
@@ -48,7 +46,7 @@ HTML;
                 'featured_image' => 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1600&q=90',
                 'featured_image_caption' => 'चित्रकूट धाम — कामदगिरि परिक्रमा एवं मंदाकिनी नदी का विहंगम दृश्य',
                 'featured_image_alt' => 'कामदगिरि परिक्रमा चित्रकूट धाम',
-                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'video_url' => null,
                 'tags' => 'कामदगिरि, परिक्रमा, चित्रकूट, रामघाट, मंदाकिनी, कामतानाथ',
                 'focus_keyword' => 'कामदगिरि',
                 'seo_score' => 95,
@@ -74,8 +72,6 @@ HTML;
 
 [gallery images="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=800&q=80,https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80" cols="2" caption="गौशाला नित्य सेवा एवं गौ-ग्रास वितरण"]
 
-[video src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" caption="कामधेनु गौशाला चित्रकूट — नित्य सेवा दर्शन"]
-
 <p>आप भी अपने जन्मदिन, विवाह वर्षगांठ या पूर्वजों की पुण्यतिथि पर एक दिन का गौ-ग्रास संकल्प लेकर इस पुनीत कार्य में सहभागी बन सकते हैं।</p>
 HTML;
 
@@ -91,7 +87,7 @@ HTML;
                 'featured_image' => 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=1600&q=90',
                 'featured_image_caption' => 'कामधेनु गौशाला — देशी गौवंश संरक्षण',
                 'featured_image_alt' => 'गौसेवा चित्रकूट धाम',
-                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'video_url' => null,
                 'tags' => 'गौसेवा, गौशाला, चित्रकूट, कामधेनु, सनातन धर्म',
                 'focus_keyword' => 'गौसेवा',
                 'seo_score' => 92,

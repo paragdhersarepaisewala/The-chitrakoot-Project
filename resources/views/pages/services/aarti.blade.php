@@ -9,7 +9,7 @@
   <section class="section"
     style="padding-top: 140px; padding-bottom: 70px; background: linear-gradient(180deg, #FAF4ED 0%, #FBF7F0 100%); color: #2B1A12; position: relative; overflow: hidden; border-bottom: 1px solid rgba(180, 83, 9, 0.15);">
     <div
-      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/temple-test-photo-1792032209.webp') }}'); background-position: center; background-size: cover; opacity: 0.08; filter: blur(3px);">
+      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}'); background-position: center; background-size: cover; opacity: 0.08; filter: blur(3px);">
     </div>
     <div class="container" style="position: relative; z-index: 2; text-align: center; max-width: 880px;">
 

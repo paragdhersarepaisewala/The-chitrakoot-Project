@@ -9,7 +9,7 @@
   <section class="section"
     style="padding-top: 150px; padding-bottom: 70px; background: linear-gradient(180deg, #FAF4ED 0%, #FBF7F0 100%); color: #2B1A12; position: relative; overflow: hidden; border-bottom: 1px solid rgba(180, 83, 9, 0.15);">
     <div
-      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/temple-test-photo-1792032209.webp') }}'); background-position: center; background-size: cover; opacity: 0.08; filter: blur(3px);">
+      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}'); background-position: center; background-size: cover; opacity: 0.08; filter: blur(3px);">
     </div>
     <div class="container" style="position: relative; z-index: 2; text-align: center; max-width: 860px;">
       <h1 style="font: 700 clamp(32px, 4.5vw, 56px) var(--dev); color: #2B1A12; margin: 16px 0 18px;">
@@ -31,7 +31,7 @@
             style="background: #FFFDFC; border: 1px solid rgba(180, 83, 9, 0.18); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 30px rgba(130, 70, 20, 0.05); display: flex; flex-direction: column; transition: transform .3s ease, box-shadow .3s ease;">
 
             <div style="position: relative; height: 220px; overflow: hidden;">
-              <img src="{{ $pooja->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+              <img src="{{ $pooja->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
                 alt="{{ $pooja->title_hi }}" style="width: 100%; height: 100%; object-fit: cover;">
               <div
                 style="position: absolute; top: 14px; right: 14px; background: rgba(255, 253, 252, 0.95); backdrop-filter: blur(8px); border: 1px solid rgba(180, 83, 9, 0.25); color: #B45309; padding: 5px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">

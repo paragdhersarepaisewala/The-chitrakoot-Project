@@ -1432,7 +1432,7 @@
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
                 @foreach($sevas as $seva)
                   @php
-                    $campaignImg = $seva->featured_image ?: ($seva->cause?->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp'));
+                    $campaignImg = $seva->featured_image ?: ($seva->cause?->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp'));
                     $catLabel = match (strtolower($seva->category ?? '')) {
                       'education' => 'वैदिक गुरुकुल शिक्षा',
                       'seva' => 'कामदगिरि गौशाला',

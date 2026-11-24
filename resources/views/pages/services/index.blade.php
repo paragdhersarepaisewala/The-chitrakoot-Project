@@ -9,7 +9,7 @@
   <section class="section"
     style="padding-top: 140px; padding-bottom: 70px; background: linear-gradient(180deg, #FAF4ED 0%, #FBF7F0 100%); color: #2B1A12; position: relative; overflow: hidden; border-bottom: 1px solid rgba(180, 83, 9, 0.15);">
     <div
-      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/temple-test-photo-1792032209.webp') }}'); background-position: center; background-size: cover; opacity: 0.07; filter: blur(3px);">
+      style="position: absolute; inset: 0; background-image: url('{{ !empty($homeSettings['pooja_banner_url']) ? $homeSettings['pooja_banner_url'] : asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}'); background-position: center; background-size: cover; opacity: 0.07; filter: blur(3px);">
     </div>
     <div class="container" style="position: relative; z-index: 2; text-align: center; max-width: 900px;">
 
@@ -247,7 +247,7 @@
           <div class="reveal"
             style="background: #FFFDFC; border: 1px solid rgba(180, 83, 9, 0.18); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column;">
             <div style="position: relative; height: 200px; overflow: hidden;">
-              <img src="{{ $pooja->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}"
+              <img src="{{ $pooja->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}"
                 alt="{{ $pooja->title_hi }}" style="width: 100%; height: 100%; object-fit: cover;">
               <div
                 style="position: absolute; top: 12px; right: 12px; background: rgba(255, 253, 252, 0.95); backdrop-filter: blur(8px); border: 1px solid rgba(180, 83, 9, 0.25); color: #B45309; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">

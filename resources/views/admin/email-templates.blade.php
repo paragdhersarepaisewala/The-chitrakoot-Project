@@ -511,7 +511,7 @@
         </div>
         <div class="stat-value"
           style="font-size: 17px; font-weight: 800; color: {{ $stats['is_smtp_configured'] ? '#16a34a' : '#d97706' }};">
-          {{ $stats['is_smtp_configured'] ? 'Live SMTP Attached' : 'Testing Simulation Mode' }}
+          {{ $stats['is_smtp_configured'] ? 'Live SMTP Attached' : 'SMTP Not Configured' }}
         </div>
         <div class="stat-sub">Host: {{ $settings->smtp_host ?: 'Not Set' }} (Port {{ $settings->smtp_port ?: '587' }})
         </div>
@@ -1167,8 +1167,7 @@
             style="background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 20px;">🟢</span>
             <div>
-              <strong>Live SMTP Server Active:</strong> Testing temporary OTP is disabled. Devotees receive authentic
-              verification codes and receipts directly into their inbox.
+              <strong>Live SMTP Server Active:</strong> Outgoing emails, verification OTP codes, and donation receipts are delivered directly to devotees' inboxes.
             </div>
           </div>
         @else
@@ -1176,8 +1175,7 @@
             style="background: #fffbeb; border: 1.5px dashed #f59e0b; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 20px;">🟡</span>
             <div>
-              <strong>Testing Simulation Mode Active:</strong> Outgoing SMTP credentials are not yet saved. Emails are
-              simulated and logged. Saving valid SMTP credentials below enables live email delivery.
+              <strong>Outgoing SMTP Not Configured:</strong> Outgoing SMTP credentials are not yet saved. Saving valid SMTP credentials below activates live email delivery.
             </div>
           </div>
         @endif

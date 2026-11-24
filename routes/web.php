@@ -120,7 +120,6 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register/step-1', [AuthController::class, 'registerStep1'])->middleware('throttle:10,1');
 Route::post('/register/verify-otp', [AuthController::class, 'verifyOtp'])->middleware('throttle:10,1');
 Route::post('/register/resend-otp', [AuthController::class, 'resendOtp'])->name('register.resend_otp')->middleware('throttle:5,1');
-Route::post('/register/bypass-otp', [AuthController::class, 'bypassOtp'])->name('register.bypass_otp');
 Route::post('/register/complete-profile', [AuthController::class, 'completeProfile'])->middleware('throttle:10,1');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

@@ -103,7 +103,7 @@
       <div style="margin-bottom: 22px;">
         <label class="form-label">Banner Image URL *</label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" name="image_path" id="cause_add_img" required value="/uploads/temple-test-photo-1792032209.webp" placeholder="/uploads/..." class="form-input" style="flex: 1; font-size: 12px;">
+          <input type="text" name="image_path" id="cause_add_img" required value="/uploads/kamadgiri-temple-crest-emblem-1792267739.webp" placeholder="/uploads/..." class="form-input" style="flex: 1; font-size: 12px;">
           <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#cause_add_img' })" class="action-btn teal" style="padding: 7px 12px; font-size: 10px;">REUSE</button>
         </div>
       </div>

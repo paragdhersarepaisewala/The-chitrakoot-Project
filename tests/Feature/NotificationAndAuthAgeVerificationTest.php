@@ -216,7 +216,7 @@ class NotificationAndAuthAgeVerificationTest extends TestCase
         $response->assertRedirect('/dashboard');
     }
 
-    public function test_temporary_otp_bypass_available_when_smtp_not_configured(): void
+    public function test_registration_requires_real_otp_and_never_exposes_testing_otp(): void
     {
         $settings = OrganizationSetting::getSettings();
         $settings->update([
@@ -224,71 +224,53 @@ class NotificationAndAuthAgeVerificationTest extends TestCase
             'smtp_host' => null,
         ]);
 
-        $user = User::factory()->create([
-            'email' => 'bypasstest@example.com',
-            'email_verified_at' => null,
-            'email_otp' => '654321',
-            'role' => 'donor',
+        $dob = now()->subYears(22)->format('Y-m-d');
+        $regResponse = $this->post('/register/step-1', [
+            'name' => 'Real Devotee',
+            'email' => 'realdevotee@kamadgiripeetham.org',
+            'date_of_birth' => $dob,
+            'password' => 'DivineKamadgiri#2026',
+            'password_confirmation' => 'DivineKamadgiri#2026',
         ]);
 
-        // Step 2 page renders testing mode banner and bypass option
-        $response = $this->actingAs($user)->get('/register?step=2&email=bypasstest@example.com');
+        $regResponse->assertRedirect();
+        $this->assertStringNotContainsString('Testing OTP', session('success') ?? '');
+
+        $user = User::where('email', 'realdevotee@kamadgiripeetham.org')->first();
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->email_otp);
+
+        // Step 2 page must NEVER render testing mode banner, auto-fill code, or bypass button
+        $response = $this->actingAs($user)->get('/register?step=2&email=realdevotee@kamadgiripeetham.org');
         $response->assertStatus(200);
-        $response->assertSee('Testing Mode (SMTP Server Not Attached)');
-        $response->assertSee('Auto-fill Testing Code');
-        $response->assertSee('Bypass OTP Verification');
+        $response->assertDontSee('Testing Mode (SMTP Server Not Attached)');
+        $response->assertDontSee('Auto-fill Testing Code');
+        $response->assertDontSee('Bypass OTP Verification');
+        $response->assertDontSee($user->email_otp);
 
-        // Can bypass OTP and proceed to step 3
-        $bypassResponse = $this->actingAs($user)->post('/register/bypass-otp', [
-            'email' => 'bypasstest@example.com',
+        // Invalid OTP must fail
+        $invalidAttempt = $this->actingAs($user)->post('/register/verify-otp', [
+            'otp' => '000000',
         ]);
+        $invalidAttempt->assertSessionHasErrors('otp');
 
-        $bypassResponse->assertRedirect('/register?step=3');
+        // Valid OTP verifies the user
+        $validAttempt = $this->actingAs($user)->post('/register/verify-otp', [
+            'otp' => $user->email_otp,
+        ]);
+        $validAttempt->assertRedirect('/register?step=3');
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
         $this->assertNull($user->email_otp);
     }
 
-    public function test_saving_smtp_settings_auto_removes_testing_otp_and_disables_bypass(): void
+    public function test_otp_bypass_route_does_not_exist(): void
     {
-        $admin = User::factory()->create(['role' => 'super_admin']);
-
-        // Admin saves SMTP configuration
-        $response = $this->actingAs($admin)->post(route('admin.updateSmtpConfig'), [
-            'smtp_host' => 'smtp.liveprovider.com',
-            'smtp_port' => 587,
-            'smtp_username' => 'admin@kamadgiripeetham.org',
-            'smtp_password' => 'secret123',
-            'smtp_encryption' => 'tls',
-            'smtp_from_address' => 'noreply@kamadgiripeetham.org',
-            'smtp_from_name' => 'Shri Kamadgiri Peetham Sewa Trust',
+        $user = User::factory()->create(['email_verified_at' => null]);
+        $response = $this->actingAs($user)->post('/register/bypass-otp', [
+            'email' => $user->email,
         ]);
 
-        $response->assertSessionHas('success');
-
-        $settings = OrganizationSetting::getSettings();
-        $this->assertTrue($settings->isSmtpConfigured());
-
-        $user = User::factory()->create([
-            'email' => 'realdevotee@example.com',
-            'email_verified_at' => null,
-            'email_otp' => '789123',
-            'role' => 'donor',
-        ]);
-
-        // Step 2 must NO LONGER render temporary testing banner, testing OTP, or bypass button
-        $step2Response = $this->actingAs($user)->get('/register?step=2&email=realdevotee@example.com');
-        $step2Response->assertStatus(200);
-        $step2Response->assertDontSee('Testing Mode (SMTP Server Not Attached)');
-        $step2Response->assertDontSee('Auto-fill Testing Code');
-        $step2Response->assertDontSee('Bypass OTP Verification');
-
-        // Bypassing is rejected
-        $bypassAttempt = $this->actingAs($user)->post('/register/bypass-otp', [
-            'email' => 'realdevotee@example.com',
-        ]);
-        $bypassAttempt->assertSessionHasErrors('otp');
-        $user->refresh();
-        $this->assertNull($user->email_verified_at);
+        $response->assertStatus(404);
     }
 }

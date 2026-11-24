@@ -81,7 +81,7 @@
       <label class="form-label" style="color: var(--brown);">About Page Sacred Photo / Banner</label>
       <div style="display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items: center;">
         <div style="width: 120px; height: 80px; border-radius: 8px; overflow: hidden; background: #eee; border: 1px solid var(--line);">
-          <img src="{{ !empty($settings['about_photo_1_url']) ? $settings['about_photo_1_url'] : ($orgSettings->hero_banner_path ?: asset('uploads/temple-test-photo-1792032209.webp')) }}" alt="About Photo" style="width: 100%; height: 100%; object-fit: cover;">
+          <img src="{{ !empty($settings['about_photo_1_url']) ? $settings['about_photo_1_url'] : ($orgSettings->hero_banner_path ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp')) }}" alt="About Photo" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
         <div>
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">

@@ -32,7 +32,7 @@
 
       <!-- Featured Image -->
       <div style="margin-bottom: 45px; border-radius: 20px; overflow: hidden; box-shadow: 0 16px 40px rgba(130,70,20,0.08); border: 1px solid rgba(180,83,9,0.18);">
-        <img src="{{ $post->featured_image ?: asset('uploads/temple-test-photo-1792032209.webp') }}" alt="{{ $post->title_hi }}" style="width: 100%; max-height: 500px; object-fit: cover;">
+        <img src="{{ $post->featured_image ?: asset('uploads/kamadgiri-temple-crest-emblem-1792267739.webp') }}" alt="{{ $post->title_hi }}" style="width: 100%; max-height: 500px; object-fit: cover;">
       </div>
 
       <!-- Article Content -->
