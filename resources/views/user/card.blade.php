@@ -47,12 +47,28 @@
         padding-left: 14px !important;
         padding-right: 14px !important;
       }
+      .card-title-h1 {
+        font-size: clamp(20px, 5.5vw, 26px) !important;
+        line-height: 1.3 !important;
+      }
       #printableCard {
         padding: 20px 16px !important;
         border-radius: 14px !important;
+        margin-bottom: 22px !important;
+      }
+      .card-header-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 14px !important;
+        padding-bottom: 16px !important;
+        margin-bottom: 18px !important;
+      }
+      .card-header-badge {
+        align-self: flex-start !important;
       }
       .card-user-row {
         gap: 14px !important;
+        margin-bottom: 18px !important;
       }
       .card-photo-box {
         width: 72px !important;
@@ -61,6 +77,15 @@
       .card-user-name {
         font-size: 18px !important;
       }
+      .card-footer-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding-top: 14px !important;
+      }
+      .card-footer-right {
+        text-align: left !important;
+      }
       .card-actions-wrap {
         flex-direction: column !important;
         gap: 10px !important;
@@ -68,7 +93,12 @@
       }
       .card-actions-wrap .btn {
         width: 100% !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         text-align: center !important;
+        box-sizing: border-box !important;
       }
     }
   </style>
@@ -92,9 +122,9 @@
         </div>
       @else
 
-        <div style="text-align: center; margin-bottom: 30px;">
-          <a href="{{ url('/dashboard') }}" class="underlink" style="font-size: 10px; margin-bottom: 10px;">← Return to My Account</a>
-          <h1 style="font: 600 32px var(--dev); color: var(--deep); margin: 5px 0 0;">
+        <div style="text-align: center; margin-bottom: 26px;">
+          <a href="{{ url('/dashboard') }}" class="underlink" style="font-size: 11px; margin-bottom: 10px; display: inline-block;">← Return to My Account</a>
+          <h1 class="card-title-h1" style="font: 600 clamp(20px, 5.5vw, 30px) var(--dev); color: var(--deep); margin: 5px 0 0;">
             {{ $cardType === 'membership' ? 'आधिकारिक सदस्यता कार्ड (Active Member Card)' : 'आधिकारिक समर्थक कार्ड (Supporter Card)' }}
           </h1>
         </div>
@@ -110,7 +140,7 @@
           </div>
 
           <!-- Card Header -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 20px; margin-bottom: 25px;">
+          <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 20px; margin-bottom: 25px;">
             <div style="display: flex; align-items: center; gap: 12px;">
               <div style="width: 36px; height: 42px;">
                 <svg viewBox="0 0 50 58" style="width:100%; height:100%; fill:none; stroke:var(--sand2); stroke-width:1.5;">
@@ -124,7 +154,7 @@
             </div>
 
             <!-- Card Badge -->
-            <div style="background: {{ $cardType === 'membership' ? 'var(--sand)' : 'rgba(255,255,255,.12)' }}; color: #fff; padding: 6px 14px; border-radius: 20px; font: 700 9px var(--sans); letter-spacing: .15em; text-transform: uppercase;">
+            <div class="card-header-badge" style="background: {{ $cardType === 'membership' ? 'var(--sand)' : 'rgba(255,255,255,.12)' }}; color: #fff; padding: 6px 14px; border-radius: 20px; font: 700 9px var(--sans); letter-spacing: .15em; text-transform: uppercase;">
               {{ $cardType === 'membership' ? 'GOLD ACTIVE MEMBER' : 'SUPPORTER' }}
             </div>
           </div>
@@ -160,12 +190,12 @@
           </div>
 
           <!-- Card Footer -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,.15); padding-top: 18px; font: 500 10px var(--sans); color: rgba(255,255,255,.6);">
+          <div class="card-footer-row" style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,.15); padding-top: 18px; font: 500 10px var(--sans); color: rgba(255,255,255,.6);">
             <div>
               <span>Verified Status: </span>
               <strong style="color: #81c784;">OFFICIAL SEWA TRUST DONOR</strong>
             </div>
-            <div style="text-align: right;">
+            <div class="card-footer-right" style="text-align: right;">
               <span style="display: block; font: 600 9px var(--serif); color: var(--sand2);">Shri Kamadgiri Peetham Sewa Trust</span>
               <span>Chitrakoot Dham, India</span>
             </div>

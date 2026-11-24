@@ -209,8 +209,577 @@
       display: none;
     }
 
+    .modal-drag-handle {
+      display: none;
+    }
+
+    /* Desktop Dashboard Master Architecture */
+    .dashboard-grid {
+      display: grid !important;
+      grid-template-columns: 360px minmax(0, 1fr) !important;
+      gap: 28px !important;
+      align-items: start !important;
+    }
+
+    .dashboard-header-card {
+      background: #FFFDF9 !important;
+      border: 1.5px solid rgba(180, 83, 9, 0.22) !important;
+      border-radius: 20px !important;
+      padding: 26px 30px !important;
+      margin-bottom: 28px !important;
+      box-shadow: 0 12px 35px rgba(130, 70, 20, 0.05) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+    }
+
+    .header-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .dashboard-user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .dashboard-avatar-medallion {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8F1719 0%, #B45309 100%);
+      color: #FFFDF9;
+      border: 3px solid #FEF3C7;
+      box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25);
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      font-weight: 700;
+      font-family: var(--serif);
+      flex-shrink: 0;
+    }
+
+    .dashboard-avatar-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #FEF3C7;
+      box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25);
+      flex-shrink: 0;
+    }
+
+    .dashboard-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .dashboard-role-badge {
+      background: rgba(180, 83, 9, 0.12);
+      border: 1px solid rgba(180, 83, 9, 0.3);
+      color: #92400E;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    .dashboard-devotee-pill {
+      background: #FEF3C7;
+      color: #78350F;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-family: var(--dev);
+    }
+
+    .dashboard-title {
+      font: 700 clamp(22px, 2.5vw, 28px) var(--dev);
+      color: #2B1A12;
+      margin: 4px 0 6px;
+      line-height: 1.25;
+    }
+
+    .dashboard-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #6B7280;
+    }
+
+    .dashboard-meta-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .devotee-stats-bar {
+      background: #FAF5EE;
+      border: 1px solid rgba(180, 83, 9, 0.14);
+      border-radius: 14px;
+      padding: 14px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stat-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-icon {
+      font-size: 22px;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(180, 83, 9, 0.1);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .stat-num {
+      font: 700 16px var(--dev);
+      color: #2B1A12;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #78350F;
+      margin-top: 2px;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(180, 83, 9, 0.15);
+    }
+
+    .sacred-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid rgba(180, 83, 9, 0.16);
+      margin-bottom: 18px;
+    }
+
+    .sacred-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sacred-title-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(180, 83, 9, 0.12);
+      color: #92400E;
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .sacred-card-title {
+      font: 700 17px var(--dev);
+      color: #2B1A12;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .sacred-card-subtitle {
+      font-size: 11px;
+      color: #78350F;
+      font-weight: 600;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .btn-micro-edit {
+      background: rgba(180, 83, 9, 0.08);
+      border: 1px solid rgba(180, 83, 9, 0.25);
+      color: #B45309;
+      border-radius: 9999px;
+      padding: 5px 14px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .btn-micro-edit:hover {
+      background: #FEF3C7;
+      border-color: #B45309;
+      transform: translateY(-1px);
+    }
+
+    .profile-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-item {
+      background: #FAF5EE;
+      border: 1px solid rgba(180, 83, 9, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .profile-item:hover {
+      background: #FEF3C7;
+      border-color: rgba(180, 83, 9, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .profile-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(180, 83, 9, 0.1);
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .profile-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-item-content strong {
+      font-size: 10.5px;
+      color: #78350F;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: block;
+      margin-bottom: 2px;
+      line-height: 1.2;
+    }
+
+    .profile-item-content span {
+      font-size: 13.5px;
+      color: #2B1A12;
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
+      display: block;
+    }
+
+    .devotee-royal-card {
+      background: linear-gradient(135deg, #241A14 0%, #3D2B1F 50%, #1A120D 100%) !important;
+      border: 1.5px solid #D4B996 !important;
+      border-radius: 18px !important;
+      padding: 22px !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .royal-card-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .royal-card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .royal-tier-badge {
+      background: #D4B996;
+      color: #241A14;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font: 800 9px var(--sans);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .royal-trust-title {
+      font: 600 14px var(--serif);
+      color: #FFFFFF;
+      line-height: 1.3;
+    }
+
+    .royal-trust-sub {
+      font: 700 8px var(--sans);
+      letter-spacing: 0.2em;
+      color: #D4B996;
+      margin-top: 2px;
+      margin-bottom: 16px;
+    }
+
+    .royal-card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 14px;
+    }
+
+    .royal-devotee-name {
+      font: 700 16px var(--dev);
+      color: #FFFFFF;
+    }
+
+    .royal-devotee-id {
+      font-size: 11px;
+      color: #D4B996;
+      margin-top: 2px;
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+    .btn-royal-view {
+      margin-top: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(212, 185, 150, 0.4);
+      color: #FFFFFF !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-royal-view:hover {
+      background: #D4B996;
+      color: #241A14 !important;
+      transform: translateY(-1px);
+    }
+
+    .dashboard-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid rgba(180, 83, 9, 0.12);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .dashboard-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .dash-tab-btn {
+      padding: 9px 18px;
+      border-radius: 9999px;
+      border: 1.5px solid rgba(180, 83, 9, 0.2);
+      background: #FAF5EE;
+      font: 700 12.5px var(--dev);
+      color: #78350F;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .dash-tab-btn:hover {
+      background: #FEF3C7;
+      border-color: #B45309;
+      transform: translateY(-1px);
+    }
+
+    .dash-tab-btn.active-dash-tab {
+      background: #8F1719 !important;
+      color: #FFFFFF !important;
+      border-color: #8F1719 !important;
+      box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25) !important;
+    }
+
+    .dash-tab-btn.active-dash-tab .dash-tab-count {
+      background: rgba(255, 255, 255, 0.28);
+      color: #FFFFFF;
+    }
+
+    .dash-tab-count {
+      background: rgba(180, 83, 9, 0.14);
+      color: #78350F;
+      padding: 1px 7px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .empty-sacred-state {
+      padding: 38px 24px;
+      text-align: center;
+      background: #FAF5EE;
+      border: 1.5px dashed rgba(180, 83, 9, 0.25);
+      border-radius: 18px;
+      margin: 10px 0;
+    }
+
+    .sacred-diya-halo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #FEF3C7;
+      border: 1.5px solid #F59E0B;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+    }
+
+    .sacred-diya-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .empty-sacred-title {
+      font: 700 20px var(--dev);
+      color: #78350F;
+      margin: 0 0 8px;
+    }
+
+    .empty-sacred-desc {
+      font-size: 13.5px;
+      color: #6B7280;
+      max-width: 520px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .empty-quick-causes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .quick-cause-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(180, 83, 9, 0.2);
+      border-radius: 12px;
+      padding: 9px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #78350F;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .quick-cause-card:hover {
+      background: #FEF3C7;
+      border-color: #B45309;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.15);
+    }
+
     /* Mobile Dashboard Enhancements */
     @media (max-width: 860px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 18px !important;
+      }
+
+      .dashboard-tabs {
+        display: none !important;
+      }
+
+      .dashboard-section {
+        padding-top: 100px !important;
+        padding-bottom: 120px !important;
+      }
+
+      .dashboard-card {
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 16px rgba(130, 70, 20, 0.05) !important;
+      }
+
+      .dashboard-header-card {
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+      }
+
+      .devotee-stats-bar {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        padding: 12px 14px !important;
+      }
+
+      .stat-divider {
+        display: none !important;
+      }
+
+      .dashboard-main-content {
+        padding: 18px 14px !important;
+      }
+
+      .dashboard-user-info {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 12px !important;
+      }
+
+      .dashboard-title {
+        font-size: clamp(20px, 5.5vw, 24px) !important;
+        margin: 4px 0 !important;
+      }
+
+      .dashboard-role-badge {
+        margin: 0 auto 6px !important;
+        display: inline-block !important;
+      }
+
+      .dashboard-meta-row {
+        justify-content: center !important;
+        font-size: 12px !important;
+        gap: 10px !important;
+      }
+
+      .dashboard-meta {
+        font-size: 13px !important;
+        word-break: break-all !important;
+      }
+
       .devotee-mobile-segment-wrap {
         display: flex !important;
         gap: 8px;
@@ -268,15 +837,6 @@
         color: #ffffff;
       }
 
-      .dashboard-section {
-        padding-top: 100px !important;
-        padding-bottom: 120px !important;
-      }
-
-      .dashboard-main-content {
-        padding: 18px 14px !important;
-      }
-
       .devotee-notif-panel {
         position: fixed !important;
         top: 130px !important;
@@ -295,6 +855,10 @@
         margin-top: 14px !important;
       }
 
+      .dashboard-actions .dashboard-logout-form {
+        display: contents !important;
+      }
+
       .dashboard-actions .devotee-notif-wrap {
         width: 100% !important;
         display: block !important;
@@ -303,13 +867,13 @@
       .dashboard-actions .devotee-notif-btn,
       .dashboard-actions .btn-card-dl,
       .dashboard-actions .btn-edit-profile,
-      .dashboard-actions .dashboard-logout-form,
       .dashboard-actions .btn-logout {
         width: 100% !important;
         min-height: 44px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        gap: 6px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         margin: 0 !important;
@@ -350,35 +914,58 @@
       .profile-details-list {
         display: flex !important;
         flex-direction: column !important;
-        gap: 8px !important;
+        gap: 10px !important;
       }
 
       .profile-item {
         display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
+        flex-direction: row !important;
+        align-items: center !important;
         justify-content: flex-start !important;
-        border-bottom: 1px dashed rgba(180, 83, 9, 0.18) !important;
-        padding-bottom: 8px !important;
-        gap: 2px !important;
+        background: #FAF5EE !important;
+        border: 1px solid rgba(180, 83, 9, 0.12) !important;
+        border-radius: 12px !important;
+        padding: 11px 14px !important;
+        border-bottom: none !important;
+        gap: 12px !important;
+      }
+
+      .profile-item-icon {
+        display: flex !important;
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 8px !important;
+        background: rgba(180, 83, 9, 0.12) !important;
+        color: #92400E !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        font-size: 16px !important;
+      }
+
+      .profile-item-content {
+        flex: 1 !important;
+        min-width: 0 !important;
       }
 
       .profile-item strong {
-        font-size: 11.5px !important;
-        color: #92400E !important;
+        font-size: 11px !important;
+        color: #78350F !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.04em !important;
         display: block !important;
+        margin-bottom: 2px !important;
+        line-height: 1.2 !important;
       }
 
       .profile-item span {
-        font-size: 14px !important;
+        font-size: 13.5px !important;
         color: #2B1A12 !important;
         font-weight: 600 !important;
         text-align: left !important;
         word-break: break-word !important;
-        line-height: 1.45 !important;
+        line-height: 1.4 !important;
         display: block !important;
         width: 100% !important;
       }
@@ -419,13 +1006,26 @@
       }
 
       #profileEditModal {
-        padding: 10px !important;
+        align-items: flex-end !important;
+        padding: 0 !important;
       }
 
       #profileEditModal > div {
-        padding: 20px 14px !important;
-        border-radius: 16px !important;
-        max-height: 94vh !important;
+        padding: 16px 18px 28px !important;
+        border-radius: 22px 22px 0 0 !important;
+        max-height: 88vh !important;
+        width: 100% !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25) !important;
+        margin: 0 !important;
+      }
+
+      .modal-drag-handle {
+        display: block !important;
+        width: 44px;
+        height: 5px;
+        background: #D1D5DB;
+        border-radius: 9999px;
+        margin: 0 auto 12px;
       }
 
       #profileEditModal input,
@@ -443,6 +1043,20 @@
         grid-column: span 1 !important;
       }
 
+      .profile-modal-actions {
+        position: sticky;
+        bottom: -28px;
+        background: #FFFDF9;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        border-top: 1px solid rgba(180, 83, 9, 0.16);
+        margin-top: 18px;
+        z-index: 10;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
       .devotee-toast-container {
         left: 14px !important;
         right: 14px !important;
@@ -456,80 +1070,159 @@
 @section('content')
 
   <section class="section dashboard-section" style="padding-top: 140px; background: var(--paper); min-height: 85vh;">
-    <div class="container" style="max-width: 1100px;">
+    <div class="container" style="max-width: 1220px;">
 
-      <!-- Header Card -->
+      <!-- Premium Sacred Devotee Masthead -->
       <div class="dashboard-header-card">
-        <div class="dashboard-user-info">
-          @if($user->profile?->photo_path)
-            <img src="{{ asset('storage/' . $user->profile->photo_path) }}" alt="{{ $user->name }}"
-              class="dashboard-avatar">
-          @else
-            <div class="dashboard-avatar-placeholder">
-              {{ strtoupper(substr($user->name, 0, 1)) }}
+        <div class="header-card-top">
+          <div class="dashboard-user-info">
+            @if($user->profile?->photo_path)
+              <img src="{{ asset('storage/' . $user->profile->photo_path) }}" alt="{{ $user->name }}"
+                class="dashboard-avatar-img">
+            @else
+              <div class="dashboard-avatar-medallion">
+                <span>{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+              </div>
+            @endif
+            <div class="dashboard-user-titles">
+              <div class="dashboard-badge-row">
+                <span class="dashboard-role-badge">
+                  ✨ {{ strtoupper($user->role) }} ACCOUNT
+                </span>
+                <span class="dashboard-devotee-pill">
+                  श्री कामदगिरि अनन्य भक्त
+                </span>
+              </div>
+              <h1 class="dashboard-title">प्रणाम, {{ $user->name }}</h1>
+              <div class="dashboard-meta-row">
+                <span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  {{ $user->email }}
+                </span>
+                <span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  {{ $user->phone ?? 'संपर्क नंबर उपलब्ध नहीं' }}
+                </span>
+                <span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="16" rx="2"/>
+                    <line x1="7" y1="8" x2="17" y2="8"/>
+                    <line x1="7" y1="12" x2="13" y2="12"/>
+                  </svg>
+                  ID: {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}
+                </span>
+              </div>
             </div>
-          @endif
-          <div>
-            <span class="dashboard-role-badge">
-              {{ strtoupper($user->role) }} ACCOUNT
-            </span>
-            <h1 class="dashboard-title">प्रणाम, {{ $user->name }}</h1>
-            <p class="dashboard-meta">{{ $user->email }} · {{ $user->phone ?? 'संपर्क नंबर उपलब्ध नहीं' }}</p>
+          </div>
+
+          <div class="dashboard-actions">
+            <!-- Devotee Notification Center Bell & Dropdown -->
+            <div class="devotee-notif-wrap" id="devoteeNotifWrap">
+              <button type="button" class="devotee-notif-btn" id="devoteeNotifBtn" onclick="toggleDevoteeNotifDropdown()"
+                aria-label="Devotee Notifications">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span>सूचनाएं</span>
+                <span class="devotee-notif-badge" id="devoteeNotifBadge" style="display: none;">0</span>
+              </button>
+
+              <div class="devotee-notif-panel" id="devoteeNotifPanel">
+                <div class="devotee-notif-header">
+                  <div style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev);">
+                    🔔 Notifications
+                  </div>
+                  <button type="button" onclick="markDevoteeNotifSeen()"
+                    style="background: none; border: none; color: #B45309; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">
+                    Mark as Read
+                  </button>
+                </div>
+                <div class="devotee-notif-list" id="devoteeNotifList">
+                  <div style="padding: 24px; text-align: center; color: #888; font-size: 12px;">
+                    Checking updates...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a href="{{ url('/user/card') }}" class="btn primary btn-card-dl">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <line x1="7" y1="8" x2="17" y2="8" />
+                <line x1="7" y1="12" x2="13" y2="12" />
+              </svg>
+              <span>पहचान पत्र (ID Card)</span>
+            </a>
+            <button type="button" onclick="openProfileModal()" class="btn btn-edit-profile"
+              style="background: rgba(180, 83, 9, 0.08); color: #B45309; border: 1px solid rgba(180, 83, 9, 0.25);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              <span>संशोधन (Edit Profile)</span>
+            </button>
+            <form action="{{ url('/logout') }}" method="POST" class="dashboard-logout-form"
+              style="margin: 0; display: inline;">
+              @csrf
+              <button type="submit" class="btn dark btn-logout">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span>Logout</span>
+              </button>
+            </form>
           </div>
         </div>
 
-        <div class="dashboard-actions">
-          <!-- Devotee Notification Center Bell & Dropdown -->
-          <div class="devotee-notif-wrap" id="devoteeNotifWrap">
-            <button type="button" class="devotee-notif-btn" id="devoteeNotifBtn" onclick="toggleDevoteeNotifDropdown()"
-              aria-label="Devotee Notifications">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              <span>Notifications</span>
-              <span class="devotee-notif-badge" id="devoteeNotifBadge" style="display: none;">0</span>
-            </button>
-
-            <div class="devotee-notif-panel" id="devoteeNotifPanel">
-              <div class="devotee-notif-header">
-                <div style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev);">
-                  🔔 Notifications
-                </div>
-                <button type="button" onclick="markDevoteeNotifSeen()"
-                  style="background: none; border: none; color: #B45309; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">
-                  Mark as Read
-                </button>
-              </div>
-              <div class="devotee-notif-list" id="devoteeNotifList">
-                <div style="padding: 24px; text-align: center; color: #888; font-size: 12px;">
-                  Checking updates...
-                </div>
-              </div>
+        <!-- Devotee Quick Metric Highlights Bar -->
+        <div class="devotee-stats-bar">
+          <div class="stat-cell">
+            <span class="stat-icon">🙏</span>
+            <div>
+              <div class="stat-num">₹{{ number_format($donations->where('status', 'verified')->sum('amount'), 0) }}</div>
+              <div class="stat-label">समर्पित दान (Total Seva)</div>
             </div>
           </div>
-
-          <a href="{{ url('/user/card') }}" class="btn primary btn-card-dl">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="16" rx="2" />
-              <line x1="7" y1="8" x2="17" y2="8" />
-              <line x1="7" y1="12" x2="13" y2="12" />
-            </svg>
-            <span>ID Card</span>
-          </a>
-          <button type="button" onclick="openProfileModal()" class="btn btn-edit-profile"
-            style="background: rgba(180, 83, 9, 0.08); color: #B45309; border: 1px solid rgba(180, 83, 9, 0.25);">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-            <span>Edit Profile</span>
-          </button>
-          <form action="{{ url('/logout') }}" method="POST" class="dashboard-logout-form"
-            style="margin: 0; display: inline;">
-            @csrf
-            <button type="submit" class="btn dark btn-logout">Logout</button>
-          </form>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-icon">🪔</span>
+            <div>
+              <div class="stat-num">{{ $poojaBookings->count() }}</div>
+              <div class="stat-label">पूजा संकल्प (Poojas)</div>
+            </div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-icon">🏨</span>
+            <div>
+              <div class="stat-num">{{ $atithiEnquiries->count() }}</div>
+              <div class="stat-label">अतिथि विश्राम (Atithi)</div>
+            </div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-icon">🪪</span>
+            <div>
+              <div class="stat-num" style="font-size: 14px; color: #8F1719;">
+                @if(($user->membership?->status ?? '') === 'active')
+                  स्वर्ण सक्रिय सदस्य
+                @elseif($user->donations->count() > 0)
+                  समर्थक भक्त
+                @else
+                  पंजीकृत सदस्य
+                @endif
+              </div>
+              <div class="stat-label">सदस्यता स्थिति (Member Tier)</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -556,10 +1249,7 @@
 
       <!-- Devotee Mobile Segmented Quick View Pills -->
       <div class="devotee-mobile-segment-wrap" id="devoteeMobileSegmentWrap">
-        <button type="button" class="devotee-segment-btn active" data-target="all" onclick="switchDevoteeMobileSection('all', this)">
-          <span>📋 सभी</span>
-        </button>
-        <button type="button" class="devotee-segment-btn" data-target="profile" onclick="switchDevoteeMobileSection('profile', this)">
+        <button type="button" class="devotee-segment-btn active" data-target="profile" onclick="switchDevoteeMobileSection('profile', this)">
           <span>👤 प्रोफाइल</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-donations" onclick="switchDevoteeMobileSection('tab-donations', this)">
@@ -590,56 +1280,121 @@
         <div class="dashboard-sidebar" id="devoteeSidebarSection">
 
           <div class="dashboard-card">
-            <div
-              style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(180, 83, 9, 0.18); padding-bottom: 12px; margin-bottom: 18px;">
-              <h3 class="dashboard-card-title" style="margin: 0; border: none; padding: 0;">
-                व्यक्तिगत जानकारी (Profile Details)
-              </h3>
-              <button type="button" onclick="openProfileModal()"
-                style="background: rgba(180, 83, 9, 0.1); border: 1px solid rgba(180, 83, 9, 0.25); color: #B45309; border-radius: 9999px; padding: 5px 14px; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap;">
-                Edit Profile
+            <div class="sacred-card-header">
+              <div class="sacred-title-group">
+                <div class="sacred-title-badge">👤</div>
+                <div>
+                  <h3 class="sacred-card-title">व्यक्तिगत विवरण</h3>
+                  <span class="sacred-card-subtitle">Devotee Profile Details</span>
+                </div>
+              </div>
+              <button type="button" onclick="openProfileModal()" class="btn-micro-edit">
+                ✏️ Edit
               </button>
             </div>
             <div class="profile-details-list">
-              <div class="profile-item"><strong>नाम (Name):</strong> <span>{{ $user->name }}</span></div>
-              <div class="profile-item"><strong>फोन (Phone):</strong>
-                <span>{{ $user->profile?->phone ?? $user->phone ?? 'N/A' }}</span></div>
-              <div class="profile-item"><strong>लिंग (Gender):</strong>
-                <span>{{ ucfirst($user->profile?->gender ?? 'N/A') }}</span></div>
-              <div class="profile-item"><strong>जन्म तिथि (DOB):</strong>
-                <span>{{ $user->profile?->date_of_birth ? \Carbon\Carbon::parse($user->profile->date_of_birth)->format('d M Y') : 'N/A' }}</span>
+              <div class="profile-item">
+                <div class="profile-item-icon">👤</div>
+                <div class="profile-item-content">
+                  <strong>नाम (Name):</strong>
+                  <span>{{ $user->name }}</span>
+                </div>
               </div>
-              <div class="profile-item"><strong>व्यवसाय (Profession):</strong>
-                <span>{{ $user->profile?->occupation ?? 'N/A' }}</span></div>
-              <div class="profile-item"><strong>जिला (District):</strong>
-                <span>{{ $user->profile?->district ?? 'N/A' }}</span></div>
-              <div class="profile-item"><strong>पता (Address):</strong>
-                <span>{{ $user->profile?->address ?? 'N/A' }}</span></div>
+              <div class="profile-item">
+                <div class="profile-item-icon">📱</div>
+                <div class="profile-item-content">
+                  <strong>फोन (Phone):</strong>
+                  <span>{{ $user->profile?->phone ?? $user->phone ?? 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="profile-item">
+                <div class="profile-item-icon">🚻</div>
+                <div class="profile-item-content">
+                  <strong>लिंग (Gender):</strong>
+                  <span>{{ ucfirst($user->profile?->gender ?? 'N/A') }}</span>
+                </div>
+              </div>
+              <div class="profile-item">
+                <div class="profile-item-icon">🎂</div>
+                <div class="profile-item-content">
+                  <strong>जन्म तिथि (DOB):</strong>
+                  <span>{{ $user->profile?->date_of_birth ? \Carbon\Carbon::parse($user->profile->date_of_birth)->format('d M Y') : 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="profile-item">
+                <div class="profile-item-icon">💼</div>
+                <div class="profile-item-content">
+                  <strong>व्यवसाय (Profession):</strong>
+                  <span>{{ $user->profile?->occupation ?? 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="profile-item">
+                <div class="profile-item-icon">📍</div>
+                <div class="profile-item-content">
+                  <strong>जिला / शहर (District/City):</strong>
+                  <span>{{ $user->profile?->district ?? $user->profile?->city ?? 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="profile-item">
+                <div class="profile-item-icon">🏠</div>
+                <div class="profile-item-content">
+                  <strong>पता (Address):</strong>
+                  <span>{{ $user->profile?->address ?? 'N/A' }}</span>
+                </div>
+              </div>
             </div>
+
+            <button type="button" onclick="openProfileModal()" class="btn primary"
+              style="width: 100%; margin-top: 16px; justify-content: center; font-size: 13px; font-weight: 700; border-radius: 10px; padding: 11px;">
+              ✏️ प्रोफाइल संशोधित करें (Edit Profile)
+            </button>
           </div>
 
-          <div class="dashboard-card">
-            <h3 class="dashboard-card-title">सदस्यता कार्ड स्थिति</h3>
-            <p class="membership-id-text">
-              ID: {{ $user->membership?->membership_id ?? 'SKP-SUPPORTER' }}
-            </p>
-
-            <div class="membership-type-banner">
-              <div class="m-card-label">Card Type</div>
-              <div class="m-card-val">
-                @if(($user->membership?->status ?? '') === 'active')
-                  Active Member Digital Card
-                @elseif($user->donations->count() > 0)
-                  Supporter Digital Card
-                @else
-                  Member Registration Card
-                @endif
+          <!-- Official Royal Devotee Pass Preview Card -->
+          <div class="dashboard-card devotee-royal-card">
+            <div class="royal-card-inner">
+              <div class="royal-card-top-row">
+                <div class="royal-chip-icon">
+                  <svg width="28" height="22" viewBox="0 0 36 28" fill="none">
+                    <rect width="36" height="28" rx="4" fill="#F59E0B" fill-opacity="0.25" stroke="#F59E0B" stroke-width="1.5"/>
+                    <line x1="12" y1="0" x2="12" y2="28" stroke="#F59E0B" stroke-width="1.2"/>
+                    <line x1="24" y1="0" x2="24" y2="28" stroke="#F59E0B" stroke-width="1.2"/>
+                    <line x1="0" y1="14" x2="36" y2="14" stroke="#F59E0B" stroke-width="1.2"/>
+                  </svg>
+                </div>
+                <span class="royal-tier-badge">
+                  @if(($user->membership?->status ?? '') === 'active')
+                    GOLD ACTIVE
+                  @elseif($user->donations->count() > 0)
+                    SUPPORTER PASS
+                  @else
+                    MEMBER PASS
+                  @endif
+                </span>
+              </div>
+              <div class="royal-trust-title">{{ $orgSettings->org_name ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट' }}</div>
+              <div class="royal-trust-sub">CHITRAKOOT DHAM · OFFICIAL DIGITAL ID</div>
+              <div class="royal-card-meta">
+                <div>
+                  <div class="royal-devotee-name">{{ $user->name }}</div>
+                  <div class="royal-devotee-id">ID: {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}</div>
+                </div>
+                <div class="royal-qr-stub">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4B996" stroke-width="1.5">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                  </svg>
+                </div>
               </div>
             </div>
-
-            <a href="{{ url('/user/card') }}" class="btn primary"
-              style="width: 100%; justify-content: center; font-size: 12px; padding: 12px; border-radius: 9999px; font-weight: 700; white-space: nowrap;">
-              View ID Card &rarr;
+            <a href="{{ url('/user/card') }}" class="btn-royal-view">
+              <span>पहचान पत्र देखें (View Digital Card)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
             </a>
           </div>
 
@@ -650,8 +1405,8 @@
 
           <!-- Sync Notice -->
           <div
-            style="background: #FFF8EE; border: 1px solid rgba(180, 83, 9, 0.22); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #78350F; line-height: 1.6;">
-            <span style="font-size: 20px;">🛡️</span>
+            style="background: linear-gradient(135deg, #FFF8EE 0%, #FEF3C7 100%); border: 1px solid rgba(180, 83, 9, 0.22); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #78350F; line-height: 1.6;">
+            <span style="font-size: 22px; line-height: 1;">🛡️</span>
             <div>
               <strong>ईमेल संबद्धता सक्रिय (Guest History Synchronized):</strong> आपके ईमेल
               <code>{{ $user->email }}</code> से पूर्व में अतिथि के रूप में किए गए सभी सेवा दान, पूजा संकल्प एवं सेवादार
@@ -660,28 +1415,26 @@
           </div>
 
           <!-- Section Switcher Tabs -->
-          <div class="dashboard-tabs"
-            style="display: flex; gap: 10px; border-bottom: 2px solid rgba(180, 83, 9, 0.14); margin-bottom: 24px; overflow-x: auto; padding-bottom: 2px;">
-            <button type="button" class="dash-tab-btn active-dash-tab" onclick="switchDashTab('tab-donations', this)"
-              style="padding: 10px 18px; border: none; background: transparent; font: 700 13.5px var(--dev); color: #B45309; cursor: pointer; border-bottom: 3px solid #B45309; margin-bottom: -4px; transition: all .2s; white-space: nowrap;">
-              {{ ($orgSettings->is_80g_enabled ?? false) ? 'दान एवं 80G रसीदें' : 'दान एवं सेवा रसीदें' }}
-              ({{ $donations->count() }})
+          <div class="dashboard-tabs">
+            <button type="button" class="dash-tab-btn active-dash-tab" onclick="switchDashTab('tab-donations', this)">
+              <span>🙏 {{ ($orgSettings->is_80g_enabled ?? false) ? 'दान एवं 80G रसीदें' : 'दान एवं सेवा रसीदें' }}</span>
+              <span class="dash-tab-count">{{ $donations->count() }}</span>
             </button>
-            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-poojas', this)"
-              style="padding: 10px 18px; border: none; background: transparent; font: 700 13.5px var(--dev); color: #786457; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -4px; transition: all .2s; white-space: nowrap;">
-              पूजा व अनुष्ठान संकल्प ({{ $poojaBookings->count() }})
+            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-poojas', this)">
+              <span>🪔 पूजा व अनुष्ठान संकल्प</span>
+              <span class="dash-tab-count">{{ $poojaBookings->count() }}</span>
             </button>
-            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-volunteers', this)"
-              style="padding: 10px 18px; border: none; background: transparent; font: 700 13.5px var(--dev); color: #786457; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -4px; transition: all .2s; white-space: nowrap;">
-              सेवादार नामांकन ({{ $volunteerApplications->count() }})
+            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-volunteers', this)">
+              <span>🤝 सेवादार नामांकन</span>
+              <span class="dash-tab-count">{{ $volunteerApplications->count() }}</span>
             </button>
-            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-atithi', this)"
-              style="padding: 10px 18px; border: none; background: transparent; font: 700 13.5px var(--dev); color: #786457; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -4px; transition: all .2s; white-space: nowrap;">
-              अतिथि विश्राम ({{ $atithiEnquiries->count() }})
+            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-atithi', this)">
+              <span>🏨 अतिथि विश्राम</span>
+              <span class="dash-tab-count">{{ $atithiEnquiries->count() }}</span>
             </button>
-            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-temple-bookings', this)"
-              style="padding: 10px 18px; border: none; background: transparent; font: 700 13.5px var(--dev); color: #786457; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -4px; transition: all .2s; white-space: nowrap;">
-              परिसर आरक्षण ({{ $templeBookings->count() }})
+            <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-temple-bookings', this)">
+              <span>🏛️ परिसर आरक्षण</span>
+              <span class="dash-tab-count">{{ $templeBookings->count() }}</span>
             </button>
           </div>
 
@@ -734,10 +1487,32 @@
                 </div>
               </div>
             @empty
-              <div class="empty-donations-state" style="padding: 40px 20px;">
-                <p style="color: #6B7280; font-size: 14px;">आपने अभी तक कोई ऑनलाइन दान नहीं दिया है।</p>
+              <div class="empty-sacred-state">
+                <div class="sacred-diya-halo">
+                  <div class="sacred-diya-icon">🪔</div>
+                </div>
+                <h4 class="empty-sacred-title">श्री कामदगिरि धाम सेवा संकल्प</h4>
+                <p class="empty-sacred-desc">
+                  आपने इस खाते से अभी तक कोई ऑनलाइन दान दर्ज नहीं किया है। कामदगिरि पर्वत परिक्रमा एवं संत-सेवा में आपका प्रत्येक अंशदान धर्म-संस्कृति संरक्षण में समर्पित होता है।
+                </p>
+                <div class="empty-quick-causes">
+                  <a href="{{ url('/donate') }}" class="quick-cause-card">
+                    <span>🍲</span>
+                    <span>साधु-संत अन्नक्षेत्र सेवा</span>
+                  </a>
+                  <a href="{{ url('/donate') }}" class="quick-cause-card">
+                    <span>🐄</span>
+                    <span>कामधेनु गौ सेवा</span>
+                  </a>
+                  <a href="{{ url('/donate') }}" class="quick-cause-card">
+                    <span>🪔</span>
+                    <span>नित्य दीपदान संकल्प</span>
+                  </a>
+                </div>
                 <a href="{{ url('/donate') }}" class="btn primary"
-                  style="margin-top: 15px; font-size: 12px; padding: 11px 26px; white-space: nowrap;">Donate Now</a>
+                  style="font-size: 13px; padding: 12px 32px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 6px 18px rgba(180, 83, 9, 0.25);">
+                  🙏 अभी सेवा दान अर्पित करें (Donate Now)
+                </a>
               </div>
             @endforelse
           </div>
@@ -829,10 +1604,18 @@
                 </div>
               </div>
             @empty
-              <div class="empty-donations-state" style="padding: 40px 20px;">
-                <p style="color: #6B7280; font-size: 14px;">आपकी कोई सक्रिय पूजा अथवा अनुष्ठान संकल्प पंजीकृत नहीं है।</p>
+              <div class="empty-sacred-state">
+                <div class="sacred-diya-halo">
+                  <div class="sacred-diya-icon">🪔</div>
+                </div>
+                <h4 class="empty-sacred-title">पूजा एवं अनुष्ठान संकल्प</h4>
+                <p class="empty-sacred-desc">
+                  आपकी कोई सक्रिय पूजा अथवा अनुष्ठान संकल्प पंजीकृत नहीं है। कामदगिरि धाम में अपने नाम एवं गोत्र से विशेष पूजन, रुद्राभिषेक अथवा अखंड रामायण पाठ संकल्प लें।
+                </p>
                 <a href="{{ url('/pooja/book') }}" class="btn primary"
-                  style="margin-top: 15px; font-size: 12px; padding: 11px 26px; white-space: nowrap;">Book Pooja</a>
+                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);">
+                  🪔 पूजा संकल्प बुक करें (Book Pooja)
+                </a>
               </div>
             @endforelse
           </div>
@@ -885,11 +1668,18 @@
                 </div>
               </div>
             @empty
-              <div class="empty-donations-state" style="padding: 40px 20px;">
-                <p style="color: #6B7280; font-size: 14px;">आपने अभी तक सेवादार के रूप में पंजीकरण नहीं कराया है।</p>
+              <div class="empty-sacred-state">
+                <div class="sacred-diya-halo">
+                  <div class="sacred-diya-icon">🤝</div>
+                </div>
+                <h4 class="empty-sacred-title">कामदगिरि सेवादार परिवार</h4>
+                <p class="empty-sacred-desc">
+                  आपने अभी तक सेवादार के रूप में पंजीकरण नहीं कराया है। कामदगिरि परिक्रमा मार्ग, अन्नक्षेत्र एवं मंदिर व्यवस्था में निस्वार्थ सेवा हेतु सेवा दल से जुड़ें।
+                </p>
                 <a href="{{ url('/volunteer') }}" class="btn primary"
-                  style="margin-top: 15px; font-size: 12px; padding: 11px 26px; white-space: nowrap;">Join Volunteer
-                  Seva</a>
+                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);">
+                  🤝 सेवादार नामांकन करें (Join Volunteer Seva)
+                </a>
               </div>
             @endforelse
           </div>
@@ -940,12 +1730,18 @@
                 </div>
               </div>
             @empty
-              <div class="empty-donations-state" style="padding: 40px 20px;">
-                <p style="color: #6B7280; font-size: 14px;">आपने अभी तक अतिथि विश्राम गृह में ठहरने की कोई पूछताछ दर्ज नहीं
-                  कराई है।</p>
+              <div class="empty-sacred-state">
+                <div class="sacred-diya-halo">
+                  <div class="sacred-diya-icon">🏨</div>
+                </div>
+                <h4 class="empty-sacred-title">अतिथि विश्राम गृह सेवा</h4>
+                <p class="empty-sacred-desc">
+                  आपने अभी तक कामदगिरि पीठम् अतिथि विश्राम गृह में ठहरने की कोई पूछताछ दर्ज नहीं कराई है। तीर्थ यात्रा के दौरान सात्विक एवं शांत वातावरण में विश्राम की व्यवस्था उपलब्ध है।
+                </p>
                 <a href="{{ route('services.atithiVishram') }}" class="btn primary"
-                  style="margin-top: 15px; font-size: 12px; padding: 11px 26px; white-space: nowrap; background: #2D6A4F; border-color: #2D6A4F;">Enquire
-                  for Guest Stay</a>
+                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #2D6A4F; border-color: #2D6A4F; box-shadow: 0 4px 14px rgba(45, 106, 79, 0.25);">
+                  🏨 विश्राम गृह पूछताछ (Enquire for Stay)
+                </a>
               </div>
             @endforelse
           </div>
@@ -997,12 +1793,18 @@
                 </div>
               </div>
             @empty
-              <div class="empty-donations-state" style="padding: 40px 20px;">
-                <p style="color: #6B7280; font-size: 14px;">आपने मंदिर परिसर अथवा मंडप आरक्षण हेतु अभी तक कोई प्रस्ताव दर्ज
-                  नहीं कराया है।</p>
+              <div class="empty-sacred-state">
+                <div class="sacred-diya-halo">
+                  <div class="sacred-diya-icon">🏛️</div>
+                </div>
+                <h4 class="empty-sacred-title">मंदिर परिसर व मंडप आरक्षण</h4>
+                <p class="empty-sacred-desc">
+                  आपने मंदिर परिसर अथवा मंडप आरक्षण हेतु अभी तक कोई प्रस्ताव दर्ज नहीं कराया है। श्रीमद्भागवत कथा, संत समागम अथवा धार्मिक अनुष्ठान हेतु परिसर आरक्षण उपलब्ध है।
+                </p>
                 <a href="{{ route('services.templeBooking') }}" class="btn primary"
-                  style="margin-top: 15px; font-size: 12px; padding: 11px 26px; white-space: nowrap; background: #8F1719; border-color: #8F1719;">Enquire
-                  for Premises Booking</a>
+                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #8F1719; border-color: #8F1719; box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25);">
+                  🏛️ परिसर आरक्षण प्रस्ताव (Hall Booking)
+                </a>
               </div>
             @endforelse
           </div>
@@ -1013,15 +1815,13 @@
           function switchDashTab(tabId, btn) {
             document.querySelectorAll('.dash-tab-content').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.dash-tab-btn').forEach(b => {
-              b.style.color = '#786457';
-              b.style.borderBottomColor = 'transparent';
+              b.style.color = '';
+              b.style.borderBottomColor = '';
               b.classList.remove('active-dash-tab');
             });
             const targetContent = document.getElementById(tabId);
             if (targetContent) targetContent.style.display = 'block';
             if (btn) {
-              btn.style.color = '#B45309';
-              btn.style.borderBottomColor = '#B45309';
               btn.classList.add('active-dash-tab');
             }
 
@@ -1029,7 +1829,7 @@
             document.querySelectorAll('.devotee-segment-btn').forEach(seg => {
               if (seg.getAttribute('data-target') === tabId) {
                 seg.classList.add('active');
-              } else if (seg.getAttribute('data-target') !== 'all') {
+              } else {
                 seg.classList.remove('active');
               }
             });
@@ -1042,19 +1842,12 @@
             const sidebar = document.getElementById('devoteeSidebarSection');
             const mainContent = document.getElementById('devoteeMainSection');
 
-            if (targetKey === 'all') {
-              if (sidebar) sidebar.style.display = '';
-              if (mainContent) mainContent.style.display = '';
-              const headerCard = document.querySelector('.dashboard-header-card');
-              if (headerCard) headerCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else if (targetKey === 'profile') {
-              if (sidebar) sidebar.style.display = 'block';
+            if (targetKey === 'profile') {
+              if (sidebar) sidebar.style.display = 'flex';
               if (mainContent) mainContent.style.display = 'none';
               if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else if (targetKey.startsWith('tab-')) {
-              if (window.innerWidth <= 860) {
-                if (sidebar) sidebar.style.display = 'none';
-              }
+              if (sidebar) sidebar.style.display = 'none';
               if (mainContent) mainContent.style.display = 'block';
               
               const desktopTabBtn = document.querySelector(`.dash-tab-btn[onclick*="${targetKey}"]`);
@@ -1062,6 +1855,27 @@
               if (mainContent) mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
           }
+
+          function checkDevoteeResponsiveLayout() {
+            const sidebar = document.getElementById('devoteeSidebarSection');
+            const mainContent = document.getElementById('devoteeMainSection');
+            if (window.innerWidth <= 860) {
+              const activeSeg = document.querySelector('.devotee-segment-btn.active');
+              const targetKey = activeSeg ? activeSeg.getAttribute('data-target') : 'profile';
+              if (targetKey === 'profile') {
+                if (sidebar) sidebar.style.display = 'flex';
+                if (mainContent) mainContent.style.display = 'none';
+              } else if (targetKey && targetKey.startsWith('tab-')) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (mainContent) mainContent.style.display = 'block';
+              }
+            } else {
+              if (sidebar) sidebar.style.display = '';
+              if (mainContent) mainContent.style.display = '';
+            }
+          }
+          window.addEventListener('resize', checkDevoteeResponsiveLayout);
+          document.addEventListener('DOMContentLoaded', checkDevoteeResponsiveLayout);
 
           function openProfileModal() {
             const modal = document.getElementById('profileEditModal');
@@ -1084,6 +1898,8 @@
     style="display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(22, 16, 13, 0.72); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px;">
     <div
       style="background: #FFFDF9; border: 1px solid rgba(180, 83, 9, 0.28); border-radius: 18px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); padding: 28px 32px; position: relative;">
+
+      <div class="modal-drag-handle"></div>
 
       <div
         style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(180, 83, 9, 0.16); padding-bottom: 14px; margin-bottom: 20px;">
@@ -1184,15 +2000,15 @@
 
         </div>
 
-        <div
+        <div class="profile-modal-actions"
           style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(180, 83, 9, 0.16);">
           <button type="button" onclick="closeProfileModal()"
             style="padding: 10px 20px; border-radius: 9999px; border: 1px solid #D1D5DB; background: #fff; color: #4B5563; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">
-            Cancel
+            रद्द करें (Cancel)
           </button>
           <button type="submit" class="btn primary"
             style="padding: 10px 24px; font-size: 12.5px; font-weight: 700; border-radius: 9999px; cursor: pointer; white-space: nowrap;">
-            Save Changes
+            सहेजें (Save Changes)
           </button>
         </div>
 
