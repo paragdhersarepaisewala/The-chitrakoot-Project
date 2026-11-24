@@ -470,7 +470,7 @@
     <!-- 2. Master Killswitch Status Bar -->
     <div class="killswitch-banner {{ $stats['is_sending_enabled'] ? 'killswitch-active' : 'killswitch-stopped' }}">
       <div style="display: flex; align-items: center; gap: 14px;">
-        <span style="font-size: 24px;">{{ $stats['is_sending_enabled'] ? '🟢' : '🛑' }}</span>
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ $stats['is_sending_enabled'] ? '#16a34a' : '#dc2626' }}; display: inline-block; flex-shrink: 0;"></span>
         <div>
           <div style="font-size: 14px; font-weight: 800;">
             {{ $stats['is_sending_enabled'] ? 'AUTOMATIC EMAIL SERVICES: ACTIVE & RUNNING' : 'AUTOMATIC EMAIL SERVICES: PAUSED / STOPPED' }}
@@ -497,7 +497,7 @@
       <div class="stat-card">
         <div class="stat-label">
           <span>Registered Templates</span>
-          <span>📑</span>
+          <x-icon name="file-text" size="15" />
         </div>
         <div class="stat-value">{{ $stats['total_templates'] }}</div>
         <div class="stat-sub">{{ $stats['active_templates'] }} Active &middot; {{ $stats['disabled_templates'] }} Disabled
@@ -507,7 +507,7 @@
       <div class="stat-card">
         <div class="stat-label">
           <span>SMTP Server Health</span>
-          <span>⚡</span>
+          <x-icon name="zap" size="15" />
         </div>
         <div class="stat-value"
           style="font-size: 17px; font-weight: 800; color: {{ $stats['is_smtp_configured'] ? '#16a34a' : '#d97706' }};">
@@ -520,7 +520,7 @@
       <div class="stat-card">
         <div class="stat-label">
           <span>Outbox Deliveries</span>
-          <span>📬</span>
+          <x-icon name="inbox" size="15" />
         </div>
         <div class="stat-value">{{ $stats['logs_total'] }}</div>
         <div class="stat-sub">{{ $stats['logs_sent'] }} Live Sent &middot; {{ $stats['logs_simulated'] }} Simulated</div>
@@ -529,7 +529,7 @@
       <div class="stat-card">
         <div class="stat-label">
           <span>Dispatches Stopped / Failed</span>
-          <span>🛡️</span>
+          <x-icon name="shield" size="15" />
         </div>
         <div class="stat-value" style="color: {{ $stats['logs_failed'] > 0 ? '#dc2626' : '#2b231d' }};">
           {{ $stats['logs_stopped'] }} / {{ $stats['logs_failed'] }}
@@ -568,28 +568,28 @@
             All Causes & Triggers ({{ $stats['total_templates'] }})
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'donations']) }}"
-            class="cat-pill {{ $category === 'donations' ? 'active' : '' }}">
-            🪙 Donations & Receipts
+            class="cat-pill {{ $category === 'donations' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="heart-handshake" size="13" /> Donations & Receipts
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'services']) }}"
-            class="cat-pill {{ $category === 'services' ? 'active' : '' }}">
-            🛕 Pooja & Services
+            class="cat-pill {{ $category === 'services' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="flame" size="13" /> Pooja & Services
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'auth']) }}"
-            class="cat-pill {{ $category === 'auth' ? 'active' : '' }}">
-            🔐 Accounts & OTP
+            class="cat-pill {{ $category === 'auth' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="lock" size="13" /> Accounts & OTP
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'volunteers']) }}"
-            class="cat-pill {{ $category === 'volunteers' ? 'active' : '' }}">
-            🤝 Seva Dal & Volunteers
+            class="cat-pill {{ $category === 'volunteers' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="users" size="13" /> Seva Dal & Volunteers
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'inquiries']) }}"
-            class="cat-pill {{ $category === 'inquiries' ? 'active' : '' }}">
-            💬 Contact Inquiries
+            class="cat-pill {{ $category === 'inquiries' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="mail" size="13" /> Contact Inquiries
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'newsletter']) }}"
-            class="cat-pill {{ $category === 'newsletter' ? 'active' : '' }}">
-            📰 Newsletter & Journal
+            class="cat-pill {{ $category === 'newsletter' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="file-text" size="13" /> Newsletter & Journal
           </a>
         </div>
 
@@ -696,7 +696,7 @@
         @empty
           <div
             style="background: #fff; padding: 50px 20px; text-align: center; border-radius: 10px; color: #888; border: 1px dashed var(--line);">
-            <div style="font-size: 32px; margin-bottom: 10px;">📭</div>
+            <div style="display: inline-flex; margin-bottom: 10px; color: #9CA3AF;"><x-icon name="inbox" size="32" /></div>
             <div style="font-size: 15px; font-weight: 700; color: #16100d;">No email templates found matching your criteria.
             </div>
             <p style="font-size: 12.5px; color: #777; margin-top: 4px;">Try selecting another category or click "+ Create
@@ -737,7 +737,7 @@
 
         <div id="diagInitialPlaceholder"
           style="background: #faf8f5; border: 1px dashed #dcd3c5; border-radius: 8px; padding: 28px; text-align: center; color: #777;">
-          <div style="font-size: 28px; margin-bottom: 8px;">🔌</div>
+          <div style="display: inline-flex; margin-bottom: 8px; color: #9CA3AF;"><x-icon name="zap" size="28" /></div>
           <div style="font-size: 13.5px; font-weight: 700; color: #16100d;">No diagnostic check run yet for this session.
           </div>
           <div style="font-size: 12px; color: #888; margin-top: 4px;">
@@ -1165,7 +1165,7 @@
         @if($settings->isSmtpConfigured())
           <div
             style="background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">🟢</span>
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: #16a34a; display: inline-block; flex-shrink: 0;"></span>
             <div>
               <strong>Live SMTP Server Active:</strong> Outgoing emails, verification OTP codes, and donation receipts are delivered directly to devotees' inboxes.
             </div>
@@ -1173,7 +1173,7 @@
         @else
           <div
             style="background: #fffbeb; border: 1.5px dashed #f59e0b; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">🟡</span>
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: #d97706; display: inline-block; flex-shrink: 0;"></span>
             <div>
               <strong>Outgoing SMTP Not Configured:</strong> Outgoing SMTP credentials are not yet saved. Saving valid SMTP credentials below activates live email delivery.
             </div>
@@ -1593,12 +1593,12 @@
             badge.style.background = '#f0fdf4';
             badge.style.color = '#166534';
             badge.style.border = '1px solid #86efac';
-            badge.innerHTML = `✅ ${data.message}`;
+            badge.innerHTML = data.message;
           } else {
             badge.style.background = '#fef2f2';
             badge.style.color = '#991b1b';
             badge.style.border = '1px solid #fca5a5';
-            badge.innerHTML = `⚠️ ${data.message}`;
+            badge.innerHTML = data.message;
           }
 
           const stepsList = document.getElementById('diagStepsList');

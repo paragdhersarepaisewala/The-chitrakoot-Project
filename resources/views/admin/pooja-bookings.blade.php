@@ -147,8 +147,8 @@
                 <button type="button" 
                         onclick='openQuotationModal(@json($booking))' 
                         class="action-btn" 
-                        style="background: #b45309; color: #fff; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 6px;">
-                  ⚡ {{ ($booking->status === 'quoted') ? 'Re-Quote' : 'Send Quotation' }}
+                        style="background: #b45309; color: #fff; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                  <x-icon name="zap" size="12" /> {{ ($booking->status === 'quoted') ? 'Re-Quote' : 'Send Quotation' }}
                 </button>
               @endif
 
@@ -191,7 +191,7 @@
 <div id="quotationModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
   <div style="background: #ffffff; width: 100%; max-width: 520px; border-radius: 14px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1.5px solid rgba(180,83,9,0.3);">
     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 18px;">
-      <h3 style="font-size: 16px; font-weight: 800; color: #B45309; margin: 0;">⚡ Send Official Dakshina Quotation</h3>
+      <h3 style="font-size: 16px; font-weight: 800; color: #B45309; margin: 0; display: flex; align-items: center; gap: 6px;"><x-icon name="zap" size="16" /> Send Official Dakshina Quotation</h3>
       <button type="button" onclick="closeQuotationModal()" style="background: none; border: 0; font-size: 24px; color: var(--brown); cursor: pointer;">&times;</button>
     </div>
 
@@ -213,10 +213,10 @@
           <span style="font-size: 11px; color: #B45309; font-weight: 700;">Max 12 Hours</span>
         </label>
         <select name="quotation_hours" id="quoteHours" class="form-input" style="font-weight: 600;">
-          <option value="6" selected>⚡ 6 Hours (Recommended Standard)</option>
-          <option value="12">⏳ 12 Hours (Maximum Window)</option>
-          <option value="3">🔥 3 Hours (Urgent Slot)</option>
-          <option value="1">🚨 1 Hour (Immediate Reservation)</option>
+          <option value="6" selected>6 Hours (Recommended Standard)</option>
+          <option value="12">12 Hours (Maximum Window)</option>
+          <option value="3">3 Hours (Urgent Slot)</option>
+          <option value="1">1 Hour (Immediate Reservation)</option>
         </select>
         <p style="font-size: 11px; color: #7A4B29; margin: 4px 0 0;">
           * Under temple scheduling guidelines, quotation payment links remain valid for 6 to a maximum of 12 hours.
@@ -230,8 +230,8 @@
 
       <div style="display: flex; justify-content: flex-end; gap: 8px;">
         <button type="button" onclick="closeQuotationModal()" class="action-btn" style="background: var(--sand); color: var(--deep);">Cancel</button>
-        <button type="submit" class="action-btn primary" style="background: #B45309; font-weight: 800;">
-          ✉️ Send Quotation & Payment Link &rarr;
+        <button type="submit" class="action-btn primary" style="background: #B45309; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+          <x-icon name="mail" size="13" /> Send Quotation & Payment Link &rarr;
         </button>
       </div>
     </form>

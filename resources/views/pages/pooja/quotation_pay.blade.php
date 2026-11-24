@@ -63,7 +63,7 @@
             <!-- Expired Notice -->
             <div id="expiredBanner"
               style="background: #FFF1F2; border: 1.5px solid #F43F5E; border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 24px;">
-              <span style="font-size: 34px; display: block; margin-bottom: 8px;">⏳</span>
+              <span style="display: inline-flex; justify-content: center; margin-bottom: 8px; color: #9F1239;"><x-icon name="clock" size="34" /></span>
               <h2 style="font-size: 18px; font-weight: 800; color: #9F1239; margin: 0 0 6px;">यह कोटेशन लिंक समाप्त (Expired) हो चुका है</h2>
               <p style="font-size: 13px; color: #881337; margin: 0 0 16px; line-height: 1.6;">
                 वैदिक आचार्यों की समय-सारणी आरक्षण व्यवस्था के तहत यह दक्षिणा कोटेशन लिंक केवल ६ से १२ घंटे तक ही सक्रिय था।
@@ -72,7 +72,7 @@
               <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <a href="tel:{{ $orgSettings->org_phone ?? '+919415000000' }}"
                   style="display: inline-flex; align-items: center; gap: 6px; background: #B45309; color: #fff; padding: 10px 20px; border-radius: 9999px; font-size: 12.5px; font-weight: 800; text-decoration: none;">
-                  📞 न्यास कार्यालय संपर्क करें
+                  <x-icon name="phone" size="14" /> न्यास कार्यालय संपर्क करें
                 </a>
                 <a href="{{ route('pooja.bookingForm') }}"
                   style="display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1.5px solid #B45309; color: #B45309; padding: 9px 18px; border-radius: 9999px; font-size: 12.5px; font-weight: 800; text-decoration: none;">
@@ -87,7 +87,7 @@
               <div
                 style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 20px; animation: pulse 2s infinite;">⏳</span>
+                  <span style="color: #B45309; display: inline-flex; animation: pulse 2s infinite;"><x-icon name="clock" size="20" /></span>
                   <div>
                     <strong style="font-size: 13.5px; color: #92400E; display: block;">पावन समय-सीमा (Validity Window: 6-12
                       Hours)</strong>
@@ -203,7 +203,8 @@
 
                 <button type="button" id="payDakshinaBtn" onclick="initiateRazorpayPayment()"
                   style="width: 100%; background: linear-gradient(135deg, #D95D0F 0%, #EA580C 100%); color: #ffffff; padding: 18px 28px; border: none; border-radius: 9999px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 24px rgba(217,93,15,0.38); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap;">
-                  <span>🔒 Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;</span>
+                  <x-icon name="lock" size="16" />
+                  <span>Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;</span>
                 </button>
               </form>
 

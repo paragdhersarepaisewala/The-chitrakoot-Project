@@ -86,7 +86,7 @@
         <div>
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">
             <input type="text" name="about_photo_url" id="about_photo_url" value="{{ $settings['about_photo_1_url'] ?? '' }}" placeholder="Enter image URL or select from library" class="form-input">
-            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#about_photo_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#about_photo_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <input type="file" name="about_photo_file" accept="image/*" class="form-input" style="padding: 6px;">
           <span style="font-size: 11px; color: #888;">Supports PNG, JPG, WebP, SVG (Max 10MB). Overrides current photo if uploaded.</span>
@@ -135,7 +135,7 @@
           <label class="form-label">Pillar Feature Image URL</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" name="mission_1_image_url" id="mission_1_image_url" value="{{ $settings['mission_1_image_url'] ?? asset('images/ram-ghat-aarti.webp') }}" class="form-input" placeholder="https://...">
-            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_1_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_1_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
         </div>
         <div class="form-group">
@@ -163,7 +163,7 @@
           <label class="form-label">Pillar Feature Image URL</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" name="mission_2_image_url" id="mission_2_image_url" value="{{ $settings['mission_2_image_url'] ?? asset('images/kamadgiri-mountain.webp') }}" class="form-input" placeholder="https://...">
-            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_2_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_2_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
         </div>
         <div class="form-group">
@@ -191,7 +191,7 @@
           <label class="form-label">Pillar Feature Image URL</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" name="mission_3_image_url" id="mission_3_image_url" value="{{ $settings['mission_3_image_url'] ?? 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80' }}" class="form-input" placeholder="https://...">
-            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_3_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_3_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
         </div>
         <div class="form-group">
@@ -219,7 +219,7 @@
           <label class="form-label">Pillar Feature Image URL</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" name="mission_4_image_url" id="mission_4_image_url" value="{{ $settings['mission_4_image_url'] ?? 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=800&q=80' }}" class="form-input" placeholder="https://...">
-            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_4_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+            <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#mission_4_image_url' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
         </div>
         <div class="form-group">

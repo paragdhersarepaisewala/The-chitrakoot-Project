@@ -362,8 +362,8 @@
         ✕ <strong>बुकिंग निरस्त (Booking Cancelled):</strong> यह पूजा बुकिंग निरस्त कर दी गई है। यह पावती अब मंदिर दर्शन, पूजन अथवा अनुष्ठान हेतु मान्य नहीं है।
       </div>
     @elseif($booking->status === 'pending')
-      <div class="alert-banner no-print" style="background: #FEF08A; border-left: 4px solid #CA8A04; color: #713F12; padding: 14px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 20px;">
-        ⏳ <strong>अनुरोध समीक्षाधीन (Request Pending):</strong> आपका संकल्प अनुरोध प्राप्त हुआ है। व्यवस्थापक द्वारा दक्षिणा एवं व्यवस्था पुष्ट होने पर अंतिम रसीद सक्रिय होगी।
+      <div class="alert-banner no-print" style="background: #FEF08A; border-left: 4px solid #CA8A04; color: #713F12; padding: 14px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+        <x-icon name="clock" size="16" /> <span><strong>अनुरोध समीक्षाधीन (Request Pending):</strong> आपका संकल्प अनुरोध प्राप्त हुआ है। व्यवस्थापक द्वारा दक्षिणा एवं व्यवस्था पुष्ट होने पर अंतिम रसीद सक्रिय होगी।</span>
       </div>
     @elseif($booking->status === 'confirmed')
       <div class="alert-banner no-print" style="background: #DEF7EC; border-left: 4px solid #059669; color: #065F46; padding: 12px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 20px;">
@@ -407,9 +407,9 @@
             @elseif($booking->status === 'cancelled')
               <span class="voucher-status-badge cancelled">✕ Cancelled</span>
             @elseif($booking->status === 'quoted')
-              <span class="voucher-status-badge quoted">⚡ Quoted</span>
+              <span class="voucher-status-badge quoted" style="display: inline-flex; align-items: center; gap: 4px;"><x-icon name="zap" size="12" /> Quoted</span>
             @else
-              <span class="voucher-status-badge pending">⏳ Pending</span>
+              <span class="voucher-status-badge pending" style="display: inline-flex; align-items: center; gap: 4px;"><x-icon name="clock" size="12" /> Pending</span>
             @endif
           </div>
         </div>
@@ -521,8 +521,8 @@
           Receipt Cancelled (Invalid)
         </button>
       @elseif($booking->isQuotationActive())
-        <a href="{{ $booking->getQuotationPaymentUrl() }}" class="btn-voucher-action primary" style="background: #B45309;">
-          🔒 Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
+        <a href="{{ $booking->getQuotationPaymentUrl() }}" class="btn-voucher-action primary" style="background: #B45309; display: inline-flex; align-items: center; gap: 6px;">
+          <x-icon name="lock" size="13" /> Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
         </a>
         <button type="button" onclick="window.print()" class="btn-voucher-action outline">
           Print Quotation

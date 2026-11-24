@@ -36,7 +36,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'comment_'.$comment->id,
                 'type' => 'comment',
-                'icon' => '💬',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
                 'title' => 'नया विचार / टिप्पणी (New Blog Comment)',
                 'description' => ($comment->author_name ?: 'अतिथि').' ने लेख पर टिप्पणी की: "'.Str::limit($comment->content, 60).'"',
                 'url' => route('admin.comments'),
@@ -54,7 +54,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'user_'.$user->id,
                 'type' => 'user',
-                'icon' => '👤',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
                 'title' => 'नया भक्त पंजीकरण (New Devotee Registered)',
                 'description' => $user->name.' ('.$user->email.') ने नया खाता बनाया',
                 'url' => route('admin.users'),
@@ -73,7 +73,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'donation_'.$donation->id,
                 'type' => 'donation',
-                'icon' => '🪔',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
                 'title' => 'नया सेवा समर्पण (New Donation: ₹'.number_format((float) $donation->amount, 0).')',
                 'description' => ($donation->donor_name ?: 'गुप्त दानदाता').' &bull; '.$causeTitle.' &bull; स्थिति: '.strtoupper($donation->status ?? 'pending'),
                 'url' => route('admin.causes'),
@@ -91,7 +91,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'booking_'.$booking->id,
                 'type' => 'booking',
-                'icon' => '⚡',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
                 'title' => 'नया पूजा संकल्प अनुरोध (New Ritual Booking)',
                 'description' => $booking->devotee_name.' ('.$booking->getEffectiveRitualTitle().') &bull; संदर्भ: '.$booking->booking_number,
                 'url' => route('admin.poojaBookings'),
@@ -109,7 +109,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'volunteer_'.$vol->id,
                 'type' => 'volunteer',
-                'icon' => '🤝',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
                 'title' => 'नया सेवादार आवेदन (New Volunteer Enrollment)',
                 'description' => $vol->name.' ('.$vol->city.', '.$vol->phone.') &bull; स्थिति: '.ucfirst($vol->status),
                 'url' => route('admin.volunteers'),
@@ -127,7 +127,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'sub_'.$sub->id,
                 'type' => 'subscriber',
-                'icon' => '📬',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
                 'title' => 'नया समाचार पत्रिका सदस्य (New Newsletter Subscriber)',
                 'description' => $sub->email.' ने पत्रिका सदस्यता ग्रहण की',
                 'url' => route('admin.subscribers'),
@@ -145,7 +145,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'inquiry_'.$inq->id,
                 'type' => 'inquiry',
-                'icon' => '✉️',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
                 'title' => 'नया संपर्क संदेश (New Contact Inquiry)',
                 'description' => $inq->name.': "'.Str::limit($inq->subject ?: $inq->message, 50).'"',
                 'url' => route('admin.contactInquiries'),
@@ -164,7 +164,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'atithi_'.$ave->id,
                 'type' => 'atithi_vishram',
-                'icon' => '🏨',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/></svg>',
                 'title' => 'नई अतिथि विश्राम पूछताछ (New Guest Stay Enquiry)',
                 'description' => $ave->devotee_name.' ('.$ave->number_of_devotees.' यात्री, आगमन: '.$checkInStr.') &bull; #'.$ave->enquiry_number,
                 'url' => route('admin.atithiVishram'),
@@ -183,7 +183,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'temple_booking_'.$tbe->id,
                 'type' => 'temple_booking',
-                'icon' => '🏛️',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8F1719" stroke-width="2"><line x1="3" x2="21" y1="22" y2="22"/><polygon points="12 2 20 7 4 7"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="12" x2="12" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/></svg>',
                 'title' => 'नया परिसर आरक्षण प्रस्ताव (New Temple Event Enquiry)',
                 'description' => $tbe->devotee_name.' ('.$tbe->getEventTypeLabel().', तिथि: '.$propDateStr.') &bull; #'.$tbe->enquiry_number,
                 'url' => route('admin.templeBookings'),
@@ -261,7 +261,7 @@ class NotificationCenterController extends Controller
                 $notifications[] = [
                     'id' => 'booking_quote_'.$b->id,
                     'type' => 'quotation',
-                    'icon' => '⚡',
+                    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
                     'title' => 'पूजा दक्षिणा कोटेशन प्राप्त (Quotation Received)',
                     'description' => 'अनुष्ठान: '.$b->getEffectiveRitualTitle().' &bull; स्वीकृत दक्षिणा: ₹'.number_format((float) $b->quotation_amount, 0).' &bull; शीघ्र दक्षिणा अर्पित करें।',
                     'url' => $b->getQuotationPaymentUrl(),
@@ -275,7 +275,7 @@ class NotificationCenterController extends Controller
                 $notifications[] = [
                     'id' => 'booking_conf_'.$b->id,
                     'type' => 'booking_confirmed',
-                    'icon' => '✓',
+                    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
                     'title' => 'पूजा संकल्प पुष्ट (Booking Confirmed)',
                     'description' => 'संकल्प: '.$b->getEffectiveRitualTitle().' (संदर्भ: '.$b->booking_number.') पुष्टि हो गई है।',
                     'url' => route('pooja.confirmation', ['bookingNumber' => $b->booking_number]),
@@ -305,7 +305,7 @@ class NotificationCenterController extends Controller
                 $notifications[] = [
                     'id' => 'vol_appr_'.$v->id,
                     'type' => 'volunteer_approved',
-                    'icon' => '🤝',
+                    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
                     'title' => 'सेवादार आवेदन स्वीकृत (Volunteer Approved)',
                     'description' => 'श्री कामदगिरि पीठम् सेवा दल में आपका स्वागत है! आपका आवेदन स्वीकृत किया गया है।',
                     'url' => url('/dashboard#tab-volunteers'),
@@ -319,7 +319,7 @@ class NotificationCenterController extends Controller
                 $notifications[] = [
                     'id' => 'vol_rej_'.$v->id,
                     'type' => 'volunteer_rejected',
-                    'icon' => 'ℹ️',
+                    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
                     'title' => 'सेवादार आवेदन समीक्षा पूर्ण',
                     'description' => 'आपके सेवादार आवेदन की समीक्षा पूर्ण हो चुकी है। विवरण देखें।',
                     'url' => url('/dashboard#tab-volunteers'),
@@ -349,7 +349,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'don_rcpt_'.$d->id,
                 'type' => 'donation_receipt',
-                'icon' => '📜',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
                 'title' => 'डिजिटल दान रसीद उपलब्ध',
                 'description' => 'समर्पण राशि: ₹'.number_format((float) $d->amount, 0).' &bull; रसीद: '.$d->receipt_number,
                 'url' => url('/receipt/'.$d->receipt_number),
@@ -378,7 +378,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'atithi_usr_'.$ua->id,
                 'type' => 'atithi_status',
-                'icon' => '🏨',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/></svg>',
                 'title' => 'अतिथि विश्राम स्थिति: '.$statusBadge['label'],
                 'description' => 'संदर्भ: #'.$ua->enquiry_number.' &bull; आगमन: '.optional($ua->check_in_date)->format('d M Y'),
                 'url' => url('/dashboard#tab-atithi'),
@@ -407,7 +407,7 @@ class NotificationCenterController extends Controller
             $notifications[] = [
                 'id' => 'temple_usr_'.$ut->id,
                 'type' => 'temple_status',
-                'icon' => '🏛️',
+                'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8F1719" stroke-width="2"><line x1="3" x2="21" y1="22" y2="22"/><polygon points="12 2 20 7 4 7"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="12" x2="12" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/></svg>',
                 'title' => 'परिसर आयोजन स्थिति: '.$statusBadge['label'],
                 'description' => $ut->getEventTypeLabel().' &bull; संदर्भ: #'.$ut->enquiry_number,
                 'url' => url('/dashboard#tab-temple-bookings'),

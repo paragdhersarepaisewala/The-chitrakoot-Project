@@ -92,13 +92,13 @@
             <td>
               <strong style="color: var(--deep); font-size: 14px;">{{ $enq->devotee_name }}</strong>
               <div style="font-size: 12px; margin-top: 2px;">
-                <a href="tel:{{ $enq->phone }}" style="color: var(--deep); text-decoration: none;">📞 {{ $enq->phone }}</a>
+                <a href="tel:{{ $enq->phone }}" style="color: var(--deep); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><x-icon name="phone" size="12" /> {{ $enq->phone }}</a>
               </div>
               <div style="font-size: 11px; color: #B45309;">
-                <a href="mailto:{{ $enq->email }}" style="color: inherit; text-decoration: none;">✉ {{ $enq->email }}</a>
+                <a href="mailto:{{ $enq->email }}" style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><x-icon name="mail" size="11" /> {{ $enq->email }}</a>
               </div>
               @if($enq->city)
-                <div style="font-size: 10.5px; color: #888;">📍 {{ $enq->city }}</div>
+                <div style="font-size: 10.5px; color: #888; display: inline-flex; align-items: center; gap: 4px;"><x-icon name="map-pin" size="11" /> {{ $enq->city }}</div>
               @endif
             </td>
             <td>

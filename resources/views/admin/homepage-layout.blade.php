@@ -375,7 +375,7 @@
             <input type="text" name="hero_video_url" id="hero_video_url" value="{{ $settings['hero_video_url'] ?? '' }}"
               class="form-input" placeholder="Video URL or select from library">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#hero_video_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Upload
             Video File (MP4/WebM):</label>
@@ -389,7 +389,7 @@
             <input type="text" name="hero_photo_url" id="hero_photo_url" value="{{ $settings['hero_photo_url'] ?? '' }}"
               class="form-input" placeholder="Image URL or pick from gallery">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#hero_photo_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Upload
             Poster File (JPG/PNG/WebP):</label>
@@ -679,7 +679,7 @@
               value="{{ $settings['about_photo_1_url'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfOUqcsYwKNWdOv3-IySqrpdeo9-aBjdqcY15-uvLwf_VoWoEx-U1nvKGS2-jtfSlovihdEg3_b1s0-lbKpDDcIFSus-7fFE753BIRrO8WI8kMYj2_0FFT4qNEAK0772GxDZOYKJnZEZe3t4cHWEvQLZv7iMxOf44ldS-_6w2cjcFU41obdfY4R9BsY_utkY-FWJc4v6XbcYWLHkEU3NnjPGlX-TGbJZHFRE6vpNhYwmMofphi33u4' }}"
               class="form-input" placeholder="Image URL">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#about_photo_1_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Or Upload
             Photo 1 File:</label>
@@ -697,7 +697,7 @@
               value="{{ $settings['about_photo_2_url'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCGizC1EIA1jnKlpQ1SWBzKrHG_OgZkQe6sDax_wnuZtIhFWtfWt-6m1jnBTWhz5Jji0AOrt9xr8W41pZkn-cZaOkuTyo2yeOHwrD92V6audP3fJcrCspCJNsquLRugs1Igok9LRE_4xwn9hZ6UVHI8f_hQJMjVOuIxA9CF87Om-bfNQNfGcQEsRylsOnCo7SMcSgmrXG2xf7A_uXu2kYkWLuPWiLaz4ltFV-UADzwzoIoVFdYetNmu' }}"
               class="form-input" placeholder="Image URL">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#about_photo_2_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Or Upload
             Photo 2 File:</label>
@@ -819,7 +819,7 @@
               value="{{ $settings['env_section_image_url'] ?? 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80' }}"
               class="form-input" placeholder="https://...">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#env_section_image_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <span class="form-label-sub">High quality image showing Kamadgiri nature, Mandakini river or tree
             plantation.</span>
@@ -1051,7 +1051,7 @@
               value="{{ $settings['donation_image_url'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDc5W4bxgqR7HwAkOkbyOQx3S8U_-YOP5i98bycRrLoNDpDgfUIRM80LfXXdlRd4-ogFPAXEfuralih2lOEp5APoROVdM0ki3US5w-TP_pLrjrc0rnNVPuBTq3RNH0piJfNBIkktuSzelW5DaiHO2Y7DwhSM0repTTFyUnTwMJIBibE_oFO3L8d8Ucee_SyHrgUdz67sBy3L5-aPQeqWQ7hclmRTeOMAOZjnQFC_vFfbWqLkAzzwrCE' }}"
               class="form-input" placeholder="Image URL">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#donation_image_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Or Upload
             Replacement Image File:</label>
@@ -1463,7 +1463,7 @@
               value="{{ $settings['custom_section_image_url'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuD_10PzMJvMK88XcmC2AB8m_aU1hgj9DFHBTrIyWQmqHlJR5eacLXqVggzhxSsUul4eeWmpkQZ4xrl-Hkk1M1xFkw65-2vvIV2HX7SH-9M1U6RKBSGsTVQEWqdyip-ercdU9diCPfb733xWaBC8Ipc6ERxlGl9PawntmnSCRLQ-xitKW9UtdPeI5elR1uc2lH9gzAmw2l_vl_OsCCxVLkDx590Cm6bzBZ8QCnigPFXkLhpvyujXMW6q' }}"
               class="form-input" placeholder="Image URL">
             <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#custom_section_image_url' })"
-              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+              class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
           </div>
           <label style="font-size: 11px; color: #7A4B29; font-weight: 700; margin-bottom: 4px; display: block;">Or Upload
             File:</label>

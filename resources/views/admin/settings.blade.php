@@ -371,7 +371,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div style="flex: 1; min-width: 260px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 20px;">📜</span>
+              <span style="display: inline-flex; color: #92400E;"><x-icon name="shield" size="18" /></span>
               <strong style="font-size: 15px; color: #16100D;">1-Click 80G Tax Exemption Status (Master Switch)</strong>
             </div>
             <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.6;">

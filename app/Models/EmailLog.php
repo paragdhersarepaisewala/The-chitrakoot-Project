@@ -43,14 +43,14 @@ class EmailLog extends Model
                 'color' => '#b45309',
                 'border' => '#fde68a',
                 'label' => 'Logged (Unsent)',
-                'icon' => '⚡',
+                'icon' => '!',
             ],
             'stopped' => [
                 'bg' => '#fee2e2',
                 'color' => '#b91c1c',
                 'border' => '#fca5a5',
                 'label' => 'Stopped (Killswitch)',
-                'icon' => '⏸',
+                'icon' => 'II',
             ],
             'failed' => [
                 'bg' => '#ffe4e6',

@@ -402,8 +402,8 @@
       </p>
       <div style="display: flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap;">
         <a href="tel:{{ $orgSettings->phone ?? '+919415000000' }}" class="btn secondary"
-          style="padding: 10px 22px; border-radius: 9999px; font-size: 13px; font-weight: 700;">
-          📞 {{ $orgSettings->phone ?? '+91 94150 00000' }}
+          style="padding: 10px 22px; border-radius: 9999px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+          <x-icon name="phone" size="14" /> {{ $orgSettings->phone ?? '+91 94150 00000' }}
         </a>
         <a href="{{ route('contact') }}" class="btn primary"
           style="padding: 10px 22px; border-radius: 9999px; font-size: 13px; font-weight: 700;">

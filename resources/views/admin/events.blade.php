@@ -7,8 +7,8 @@
 @section('header_actions')
   <form action="{{ route('admin.events.autoArchive') }}" method="POST" style="display: inline-block;">
     @csrf
-    <button type="submit" class="action-btn" style="background: #2B1A12; color: #fff; font-size: 11px; padding: 7px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: none; cursor: pointer;">
-      ⚡ Auto-Expire Passed Events
+    <button type="submit" class="action-btn" style="background: #2B1A12; color: #fff; font-size: 11px; padding: 7px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+      <x-icon name="zap" size="12" /> Auto-Expire Passed Events
     </button>
   </form>
   <a href="{{ url('/#events') }}" target="_blank" class="action-btn" style="background: #ffffff; color: var(--deep); font-size: 11px; padding: 7px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); text-decoration: none;">
@@ -74,7 +74,7 @@
   <!-- Quick Utsav Presets Bar -->
   <div style="background: #FFF7ED; border: 1.5px solid rgba(217,93,15,0.25); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
     <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 16px;">⚡</span>
+      <span style="display: inline-flex; color: #9A3412;"><x-icon name="zap" size="16" /></span>
       <div>
         <span style="font-size: 12.5px; font-weight: 800; color: #9A3412; display: block;">Quick Presets from Utsav Directory:</span>
         <span style="font-size: 11px; color: #7A4B29;">Click any authentic Chitrakoot festival below to instantly auto-fill all event fields</span>
@@ -150,7 +150,7 @@
         <label class="form-label">FEATURED IMAGE URL</label>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="create_featured_image" name="featured_image" value="{{ old('featured_image') }}" placeholder="https://... or /images/..." class="form-input">
-          <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#create_featured_image' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+          <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#create_featured_image' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
         </div>
       </div>
       <div>
@@ -354,7 +354,7 @@
         <label class="form-label">FEATURED IMAGE URL</label>
         <div style="display: flex; gap: 8px; margin-bottom: 6px;">
           <input type="text" id="edit_featured_image" name="featured_image" class="form-input">
-          <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#edit_featured_image' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;">🖼️ Reuse</button>
+          <button type="button" onclick="openUniversalMediaPicker({ targetInput: '#edit_featured_image' })" class="action-btn teal" style="padding: 7px 12px; font-size: 11px; white-space: nowrap;"><x-icon name="image" size="12" /> Reuse</button>
         </div>
         <label class="form-label" style="font-size: 10px; color: #7A4B29;">OR UPLOAD REPLACEMENT IMAGE</label>
         <input type="file" name="featured_image_file" accept="image/*" class="form-input" style="padding: 6px;">

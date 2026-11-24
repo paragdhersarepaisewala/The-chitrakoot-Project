@@ -964,8 +964,9 @@
 
           <div class="notif-dropdown-panel" id="adminNotifPanel">
             <div class="notif-panel-header">
-              <div class="notif-panel-title">
-                <span>🔔 Portal Activity Stream</span>
+              <div class="notif-panel-title" style="display: flex; align-items: center; gap: 6px;">
+                <x-icon name="bell" size="14" />
+                <span>Portal Activity Stream</span>
                 <span class="notif-counter-pill" id="adminNotifHeaderBadge" style="display: none;">0</span>
               </div>
               <button type="button" class="notif-mark-read-btn" onclick="markAdminNotifSeen()">Mark Seen</button>
@@ -983,21 +984,22 @@
 
         @yield('header_actions')
         <div class="mobile-admin-actions-wrap" id="mobileAdminActionsWrap">
-          <button type="button" class="action-btn" onclick="toggleMobileAdminDropdown()" aria-label="Quick Actions" style="font-weight: 800; background: #faf8f5;">
-            <span>⚡ Actions</span>
+          <button type="button" class="action-btn" onclick="toggleMobileAdminDropdown()" aria-label="Quick Actions" style="font-weight: 800; background: #faf8f5; display: inline-flex; align-items: center; gap: 5px;">
+            <x-icon name="zap" size="13" />
+            <span>Actions</span>
           </button>
           <div id="mobileAdminDropdownPanel" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #ffffff; border: 1.5px solid var(--line); border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); min-width: 190px; z-index: 1000; overflow: hidden; flex-direction: column;">
             <a href="{{ url('/') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--ink);">
-              🌐 View Website
+              <x-icon name="globe" size="14" /> View Website
             </a>
             <button type="button" onclick="triggerCacheFlush(); toggleMobileAdminDropdown();" style="width: 100%; text-align: left; background: none; border: none; padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--forest); cursor: pointer;">
-              🔄 Flush Cache
+              <x-icon name="refresh" size="14" /> Flush Cache
             </button>
             <a href="{{ url('/sitemap.xml') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--ink);">
-              🗺️ Sitemap XML
+              <x-icon name="file-text" size="14" /> Sitemap XML
             </a>
             <a href="{{ url('/feed.xml') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--gold);">
-              📡 Live RSS Feed
+              <x-icon name="zap" size="14" /> Live RSS Feed
             </a>
           </div>
         </div>
@@ -1042,7 +1044,7 @@
       @if($errors->any())
         <div style="background: #fee2e2; border-left: 4px solid #dc2626; color: #991b1b; padding: 14px 20px; border-radius: 6px; margin-bottom: 24px; font-size: 13.5px; font-weight: 600;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span>⚠️ कृपया निम्न त्रुटियों को सुधारें (Please correct the following errors):</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px;"><x-icon name="alert-triangle" size="15" /> कृपया निम्न त्रुटियों को सुधारें (Please correct the following errors):</span>
             <button type="button" onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:inherit; font-size:16px; cursor:pointer;">&times;</button>
           </div>
           <ul style="margin: 4px 0 0 20px; font-size: 13px; font-weight: 500;">

@@ -329,10 +329,10 @@
       background: #FAF5EE;
       border: 1px solid rgba(180, 83, 9, 0.14);
       border-radius: 14px;
-      padding: 14px 24px;
+      padding: 14px 20px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
       align-items: center;
     }
 
@@ -340,15 +340,23 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 0 16px;
+    }
+
+    .stat-cell:first-child {
+      padding-left: 4px;
+    }
+
+    .stat-cell:not(:last-child) {
+      border-right: 1px solid rgba(180, 83, 9, 0.15);
     }
 
     .stat-icon {
-      font-size: 22px;
-      line-height: 1;
       width: 40px;
       height: 40px;
       border-radius: 10px;
       background: rgba(180, 83, 9, 0.1);
+      color: #92400E;
       display: grid;
       place-items: center;
       flex-shrink: 0;
@@ -365,12 +373,6 @@
       font-weight: 700;
       color: #78350F;
       margin-top: 2px;
-    }
-
-    .stat-divider {
-      width: 1px;
-      height: 36px;
-      background: rgba(180, 83, 9, 0.15);
     }
 
     .sacred-card-header {
@@ -586,11 +588,10 @@
 
     .dashboard-tabs {
       display: flex;
-      gap: 8px;
-      border-bottom: 2px solid rgba(180, 83, 9, 0.12);
+      gap: 4px;
+      border-bottom: 1.5px solid rgba(180, 83, 9, 0.14);
       margin-bottom: 24px;
       overflow-x: auto;
-      padding-bottom: 8px;
       scrollbar-width: none;
     }
 
@@ -599,116 +600,70 @@
     }
 
     .dash-tab-btn {
-      padding: 9px 18px;
-      border-radius: 9999px;
-      border: 1.5px solid rgba(180, 83, 9, 0.2);
-      background: #FAF5EE;
-      font: 700 12.5px var(--dev);
-      color: #78350F;
+      padding: 10px 16px;
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      background: transparent;
+      font: 700 13px var(--dev);
+      color: #786457;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: color 0.18s ease, border-color 0.18s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       white-space: nowrap;
+      margin-bottom: -1.5px;
     }
 
     .dash-tab-btn:hover {
-      background: #FEF3C7;
-      border-color: #B45309;
-      transform: translateY(-1px);
+      color: #8F1719;
     }
 
     .dash-tab-btn.active-dash-tab {
-      background: #8F1719 !important;
-      color: #FFFFFF !important;
-      border-color: #8F1719 !important;
-      box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25) !important;
+      color: #8F1719 !important;
+      border-bottom-color: #8F1719 !important;
     }
 
     .dash-tab-btn.active-dash-tab .dash-tab-count {
-      background: rgba(255, 255, 255, 0.28);
-      color: #FFFFFF;
+      background: rgba(143, 23, 25, 0.12);
+      color: #8F1719;
     }
 
     .dash-tab-count {
-      background: rgba(180, 83, 9, 0.14);
+      background: rgba(180, 83, 9, 0.1);
       color: #78350F;
       padding: 1px 7px;
       border-radius: 9999px;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .empty-sacred-state {
-      padding: 38px 24px;
+      padding: 42px 24px;
       text-align: center;
       background: #FAF5EE;
-      border: 1.5px dashed rgba(180, 83, 9, 0.25);
-      border-radius: 18px;
-      margin: 10px 0;
+      border: 1px solid rgba(180, 83, 9, 0.15);
+      border-radius: 16px;
+      margin: 8px 0;
     }
 
     .sacred-diya-halo {
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: #FEF3C7;
-      border: 1.5px solid #F59E0B;
+      background: rgba(180, 83, 9, 0.1);
+      color: #92400E;
       display: grid;
       place-items: center;
-      margin: 0 auto 16px;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
-    }
-
-    .sacred-diya-icon {
-      font-size: 28px;
-      line-height: 1;
-    }
-
-    .empty-sacred-title {
-      font: 700 20px var(--dev);
-      color: #78350F;
-      margin: 0 0 8px;
+      margin: 0 auto 14px;
     }
 
     .empty-sacred-desc {
-      font-size: 13.5px;
-      color: #6B7280;
-      max-width: 520px;
+      font-size: 14px;
+      color: #57534E;
+      max-width: 460px;
       margin: 0 auto 20px;
       line-height: 1.6;
-    }
-
-    .empty-quick-causes {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-
-    .quick-cause-card {
-      background: #FFFFFF;
-      border: 1px solid rgba(180, 83, 9, 0.2);
-      border-radius: 12px;
-      padding: 9px 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #78350F;
-      text-decoration: none;
-      font-size: 12.5px;
-      font-weight: 700;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    }
-
-    .quick-cause-card:hover {
-      background: #FEF3C7;
-      border-color: #B45309;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.15);
     }
 
     /* Mobile Dashboard Enhancements */
@@ -740,12 +695,13 @@
 
       .devotee-stats-bar {
         grid-template-columns: 1fr 1fr !important;
-        gap: 10px !important;
+        gap: 12px !important;
         padding: 12px 14px !important;
       }
 
-      .stat-divider {
-        display: none !important;
+      .stat-cell {
+        padding: 0 !important;
+        border-right: none !important;
       }
 
       .dashboard-main-content {
@@ -1085,35 +1041,18 @@
               </div>
             @endif
             <div class="dashboard-user-titles">
-              <div class="dashboard-badge-row">
-                <span class="dashboard-role-badge">
-                  ✨ {{ strtoupper($user->role) }} ACCOUNT
-                </span>
-                <span class="dashboard-devotee-pill">
-                  श्री कामदगिरि अनन्य भक्त
-                </span>
-              </div>
               <h1 class="dashboard-title">प्रणाम, {{ $user->name }}</h1>
               <div class="dashboard-meta-row">
                 <span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
-                  </svg>
+                  <x-icon name="mail" size="13" />
                   {{ $user->email }}
                 </span>
                 <span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
+                  <x-icon name="phone" size="13" />
                   {{ $user->phone ?? 'संपर्क नंबर उपलब्ध नहीं' }}
                 </span>
                 <span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="16" rx="2"/>
-                    <line x1="7" y1="8" x2="17" y2="8"/>
-                    <line x1="7" y1="12" x2="13" y2="12"/>
-                  </svg>
+                  <x-icon name="id-card" size="13" />
                   ID: {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}
                 </span>
               </div>
@@ -1125,18 +1064,15 @@
             <div class="devotee-notif-wrap" id="devoteeNotifWrap">
               <button type="button" class="devotee-notif-btn" id="devoteeNotifBtn" onclick="toggleDevoteeNotifDropdown()"
                 aria-label="Devotee Notifications">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
+                <x-icon name="bell" size="15" />
                 <span>सूचनाएं</span>
                 <span class="devotee-notif-badge" id="devoteeNotifBadge" style="display: none;">0</span>
               </button>
 
               <div class="devotee-notif-panel" id="devoteeNotifPanel">
                 <div class="devotee-notif-header">
-                  <div style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev);">
-                    🔔 Notifications
+                  <div style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev); display: flex; align-items: center; gap: 6px;">
+                    <x-icon name="bell" size="14" /> Notifications
                   </div>
                   <button type="button" onclick="markDevoteeNotifSeen()"
                     style="background: none; border: none; color: #B45309; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">
@@ -1152,30 +1088,19 @@
             </div>
 
             <a href="{{ url('/user/card') }}" class="btn primary btn-card-dl">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="16" rx="2" />
-                <line x1="7" y1="8" x2="17" y2="8" />
-                <line x1="7" y1="12" x2="13" y2="12" />
-              </svg>
+              <x-icon name="id-card" size="14" />
               <span>पहचान पत्र (ID Card)</span>
             </a>
             <button type="button" onclick="openProfileModal()" class="btn btn-edit-profile"
               style="background: rgba(180, 83, 9, 0.08); color: #B45309; border: 1px solid rgba(180, 83, 9, 0.25);">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
+              <x-icon name="edit" size="13" />
               <span>संशोधन (Edit Profile)</span>
             </button>
             <form action="{{ url('/logout') }}" method="POST" class="dashboard-logout-form"
               style="margin: 0; display: inline;">
               @csrf
               <button type="submit" class="btn dark btn-logout">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                  <polyline points="16 17 21 12 16 7"/>
-                  <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
+                <x-icon name="logout" size="13" />
                 <span>Logout</span>
               </button>
             </form>
@@ -1185,31 +1110,28 @@
         <!-- Devotee Quick Metric Highlights Bar -->
         <div class="devotee-stats-bar">
           <div class="stat-cell">
-            <span class="stat-icon">🙏</span>
+            <span class="stat-icon"><x-icon name="heart-handshake" size="18" /></span>
             <div>
               <div class="stat-num">₹{{ number_format($donations->where('status', 'verified')->sum('amount'), 0) }}</div>
               <div class="stat-label">समर्पित दान (Total Seva)</div>
             </div>
           </div>
-          <div class="stat-divider"></div>
           <div class="stat-cell">
-            <span class="stat-icon">🪔</span>
+            <span class="stat-icon"><x-icon name="flame" size="18" /></span>
             <div>
               <div class="stat-num">{{ $poojaBookings->count() }}</div>
               <div class="stat-label">पूजा संकल्प (Poojas)</div>
             </div>
           </div>
-          <div class="stat-divider"></div>
           <div class="stat-cell">
-            <span class="stat-icon">🏨</span>
+            <span class="stat-icon"><x-icon name="building" size="18" /></span>
             <div>
               <div class="stat-num">{{ $atithiEnquiries->count() }}</div>
               <div class="stat-label">अतिथि विश्राम (Atithi)</div>
             </div>
           </div>
-          <div class="stat-divider"></div>
           <div class="stat-cell">
-            <span class="stat-icon">🪪</span>
+            <span class="stat-icon"><x-icon name="id-card" size="18" /></span>
             <div>
               <div class="stat-num" style="font-size: 14px; color: #8F1719;">
                 @if(($user->membership?->status ?? '') === 'active')
@@ -1250,26 +1172,32 @@
       <!-- Devotee Mobile Segmented Quick View Pills -->
       <div class="devotee-mobile-segment-wrap" id="devoteeMobileSegmentWrap">
         <button type="button" class="devotee-segment-btn active" data-target="profile" onclick="switchDevoteeMobileSection('profile', this)">
-          <span>👤 प्रोफाइल</span>
+          <x-icon name="user" size="14" />
+          <span>प्रोफाइल</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-donations" onclick="switchDevoteeMobileSection('tab-donations', this)">
-          <span>🙏 दान</span>
+          <x-icon name="heart-handshake" size="14" />
+          <span>दान</span>
           <span class="devotee-segment-count">{{ $donations->count() }}</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-poojas" onclick="switchDevoteeMobileSection('tab-poojas', this)">
-          <span>🪔 पूजा</span>
+          <x-icon name="flame" size="14" />
+          <span>पूजा</span>
           <span class="devotee-segment-count">{{ $poojaBookings->count() }}</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-atithi" onclick="switchDevoteeMobileSection('tab-atithi', this)">
-          <span>🏨 विश्राम</span>
+          <x-icon name="building" size="14" />
+          <span>विश्राम</span>
           <span class="devotee-segment-count">{{ $atithiEnquiries->count() }}</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-temple-bookings" onclick="switchDevoteeMobileSection('tab-temple-bookings', this)">
-          <span>🏛️ परिसर</span>
+          <x-icon name="landmark" size="14" />
+          <span>परिसर</span>
           <span class="devotee-segment-count">{{ $templeBookings->count() }}</span>
         </button>
         <button type="button" class="devotee-segment-btn" data-target="tab-volunteers" onclick="switchDevoteeMobileSection('tab-volunteers', this)">
-          <span>🤝 सेवादार</span>
+          <x-icon name="users" size="14" />
+          <span>सेवादार</span>
           <span class="devotee-segment-count">{{ $volunteerApplications->count() }}</span>
         </button>
       </div>
@@ -1282,72 +1210,66 @@
           <div class="dashboard-card">
             <div class="sacred-card-header">
               <div class="sacred-title-group">
-                <div class="sacred-title-badge">👤</div>
+                <div class="sacred-title-badge"><x-icon name="user" size="17" /></div>
                 <div>
                   <h3 class="sacred-card-title">व्यक्तिगत विवरण</h3>
-                  <span class="sacred-card-subtitle">Devotee Profile Details</span>
                 </div>
               </div>
-              <button type="button" onclick="openProfileModal()" class="btn-micro-edit">
-                ✏️ Edit
+              <button type="button" onclick="openProfileModal()" class="btn-micro-edit" style="display: inline-flex; align-items: center; gap: 5px;">
+                <x-icon name="edit" size="12" /> Edit
               </button>
             </div>
             <div class="profile-details-list">
               <div class="profile-item">
-                <div class="profile-item-icon">👤</div>
+                <div class="profile-item-icon"><x-icon name="user" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>नाम (Name):</strong>
                   <span>{{ $user->name }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">📱</div>
+                <div class="profile-item-icon"><x-icon name="phone" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>फोन (Phone):</strong>
                   <span>{{ $user->profile?->phone ?? $user->phone ?? 'N/A' }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">🚻</div>
+                <div class="profile-item-icon"><x-icon name="users" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>लिंग (Gender):</strong>
                   <span>{{ ucfirst($user->profile?->gender ?? 'N/A') }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">🎂</div>
+                <div class="profile-item-icon"><x-icon name="calendar" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>जन्म तिथि (DOB):</strong>
                   <span>{{ $user->profile?->date_of_birth ? \Carbon\Carbon::parse($user->profile->date_of_birth)->format('d M Y') : 'N/A' }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">💼</div>
+                <div class="profile-item-icon"><x-icon name="briefcase" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>व्यवसाय (Profession):</strong>
                   <span>{{ $user->profile?->occupation ?? 'N/A' }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">📍</div>
+                <div class="profile-item-icon"><x-icon name="map-pin" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>जिला / शहर (District/City):</strong>
                   <span>{{ $user->profile?->district ?? $user->profile?->city ?? 'N/A' }}</span>
                 </div>
               </div>
               <div class="profile-item">
-                <div class="profile-item-icon">🏠</div>
+                <div class="profile-item-icon"><x-icon name="home" size="15" /></div>
                 <div class="profile-item-content">
                   <strong>पता (Address):</strong>
                   <span>{{ $user->profile?->address ?? 'N/A' }}</span>
                 </div>
               </div>
             </div>
-
-            <button type="button" onclick="openProfileModal()" class="btn primary"
-              style="width: 100%; margin-top: 16px; justify-content: center; font-size: 13px; font-weight: 700; border-radius: 10px; padding: 11px;">
-              ✏️ प्रोफाइल संशोधित करें (Edit Profile)
-            </button>
           </div>
 
           <!-- Official Royal Devotee Pass Preview Card -->
@@ -1403,49 +1325,43 @@
         <!-- Synchronized Devotee History (Donations, Poojas, Volunteering) -->
         <div class="dashboard-card dashboard-main-content" id="devoteeMainSection" style="padding: 24px 28px;">
 
-          <!-- Sync Notice -->
-          <div
-            style="background: linear-gradient(135deg, #FFF8EE 0%, #FEF3C7 100%); border: 1px solid rgba(180, 83, 9, 0.22); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #78350F; line-height: 1.6;">
-            <span style="font-size: 22px; line-height: 1;">🛡️</span>
-            <div>
-              <strong>ईमेल संबद्धता सक्रिय (Guest History Synchronized):</strong> आपके ईमेल
-              <code>{{ $user->email }}</code> से पूर्व में अतिथि के रूप में किए गए सभी सेवा दान, पूजा संकल्प एवं सेवादार
-              आवेदन स्वतः आपके इस डैशबोर्ड से जोड़ दिए गए हैं।
-            </div>
-          </div>
-
           <!-- Section Switcher Tabs -->
           <div class="dashboard-tabs">
             <button type="button" class="dash-tab-btn active-dash-tab" onclick="switchDashTab('tab-donations', this)">
-              <span>🙏 {{ ($orgSettings->is_80g_enabled ?? false) ? 'दान एवं 80G रसीदें' : 'दान एवं सेवा रसीदें' }}</span>
+              <x-icon name="heart-handshake" size="14" />
+              <span>{{ ($orgSettings->is_80g_enabled ?? false) ? 'दान एवं 80G रसीदें' : 'दान एवं सेवा रसीदें' }}</span>
               <span class="dash-tab-count">{{ $donations->count() }}</span>
             </button>
             <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-poojas', this)">
-              <span>🪔 पूजा व अनुष्ठान संकल्प</span>
+              <x-icon name="flame" size="14" />
+              <span>पूजा व अनुष्ठान संकल्प</span>
               <span class="dash-tab-count">{{ $poojaBookings->count() }}</span>
             </button>
             <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-volunteers', this)">
-              <span>🤝 सेवादार नामांकन</span>
+              <x-icon name="users" size="14" />
+              <span>सेवादार नामांकन</span>
               <span class="dash-tab-count">{{ $volunteerApplications->count() }}</span>
             </button>
             <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-atithi', this)">
-              <span>🏨 अतिथि विश्राम</span>
+              <x-icon name="building" size="14" />
+              <span>अतिथि विश्राम</span>
               <span class="dash-tab-count">{{ $atithiEnquiries->count() }}</span>
             </button>
             <button type="button" class="dash-tab-btn" onclick="switchDashTab('tab-temple-bookings', this)">
-              <span>🏛️ परिसर आरक्षण</span>
+              <x-icon name="landmark" size="14" />
+              <span>परिसर आरक्षण</span>
               <span class="dash-tab-count">{{ $templeBookings->count() }}</span>
             </button>
           </div>
 
           <!-- Tab 1: Donations & 80G Receipts -->
           <div id="tab-donations" class="dash-tab-content">
-            <h3 class="dashboard-card-title"
-              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <span>{{ ($orgSettings->is_80g_enabled ?? false) ? 'दान एवं आधिकारिक 80G रसीद इतिहास' : 'दान एवं आधिकारिक रसीद इतिहास' }}</span>
-              <a href="{{ url('/donate') }}" class="btn primary"
-                style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Donate Now</a>
-            </h3>
+            @if($donations->count() > 0)
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <a href="{{ url('/donate') }}" class="btn primary"
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Donate Now</a>
+              </div>
+            @endif
 
             @forelse($donations as $donation)
               <div class="donation-receipt-row">
@@ -1473,12 +1389,7 @@
                     <a href="{{ url('/receipt/' . $donation->receipt_number) }}" target="_blank"
                       class="btn dark btn-receipt-view"
                       style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                      </svg>
+                      <x-icon name="file-text" size="13" />
                       View Receipt
                     </a>
                   @else
@@ -1489,29 +1400,14 @@
             @empty
               <div class="empty-sacred-state">
                 <div class="sacred-diya-halo">
-                  <div class="sacred-diya-icon">🪔</div>
+                  <x-icon name="heart-handshake" size="26" />
                 </div>
-                <h4 class="empty-sacred-title">श्री कामदगिरि धाम सेवा संकल्प</h4>
                 <p class="empty-sacred-desc">
-                  आपने इस खाते से अभी तक कोई ऑनलाइन दान दर्ज नहीं किया है। कामदगिरि पर्वत परिक्रमा एवं संत-सेवा में आपका प्रत्येक अंशदान धर्म-संस्कृति संरक्षण में समर्पित होता है।
+                  आपने इस खाते से अभी तक कोई ऑनलाइन दान दर्ज नहीं किया है।
                 </p>
-                <div class="empty-quick-causes">
-                  <a href="{{ url('/donate') }}" class="quick-cause-card">
-                    <span>🍲</span>
-                    <span>साधु-संत अन्नक्षेत्र सेवा</span>
-                  </a>
-                  <a href="{{ url('/donate') }}" class="quick-cause-card">
-                    <span>🐄</span>
-                    <span>कामधेनु गौ सेवा</span>
-                  </a>
-                  <a href="{{ url('/donate') }}" class="quick-cause-card">
-                    <span>🪔</span>
-                    <span>नित्य दीपदान संकल्प</span>
-                  </a>
-                </div>
                 <a href="{{ url('/donate') }}" class="btn primary"
-                  style="font-size: 13px; padding: 12px 32px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 6px 18px rgba(180, 83, 9, 0.25);">
-                  🙏 अभी सेवा दान अर्पित करें (Donate Now)
+                  style="font-size: 13px; padding: 11px 28px; border-radius: 9999px; white-space: nowrap; font-weight: 700;">
+                  Donate Now
                 </a>
               </div>
             @endforelse
@@ -1519,12 +1415,12 @@
 
           <!-- Tab 2: Pooja & Sankalp Bookings -->
           <div id="tab-poojas" class="dash-tab-content" style="display: none;">
-            <h3 class="dashboard-card-title"
-              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <span>पूजा एवं अनुष्ठान संकल्प (Pooja & Rituals)</span>
-              <a href="{{ url('/pooja/book') }}" class="btn primary"
-                style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Book Pooja</a>
-            </h3>
+            @if($poojaBookings->count() > 0)
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <a href="{{ url('/pooja/book') }}" class="btn primary"
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Book Pooja</a>
+              </div>
+            @endif
 
             @forelse($poojaBookings as $booking)
               <div class="donation-receipt-row"
@@ -1537,12 +1433,12 @@
                     @if($booking->isQuotationActive())
                       <span class="donation-status-pill"
                         style="background: #FEF3C7; color: #B45309; border: 1px solid #F59E0B; font-weight: 800;">
-                        ⚡ दक्षिणा कोटेशन प्राप्त (QUOTED)
+                        दक्षिणा कोटेशन प्राप्त (QUOTED)
                       </span>
                     @elseif($booking->status === 'confirmed')
                       <span class="donation-status-pill"
                         style="background: rgba(16, 124, 65, 0.12); color: #059669; font-weight: 800;">
-                        ✓ अनुष्ठान पुष्ट (CONFIRMED)
+                        अनुष्ठान पुष्ट (CONFIRMED)
                       </span>
                     @elseif($booking->isQuotationExpired())
                       <span class="donation-status-pill" style="background: #FEE2E2; color: #DC2626;">
@@ -1560,7 +1456,7 @@
                       style="background: #FFF7ED; border: 1.5px dashed #D97706; border-radius: 8px; padding: 10px 14px; margin-top: 8px; font-size: 13px; color: #9A3412;">
                       <strong>स्वीकृत दक्षिणा:</strong> <span
                         style="font-size: 16px; font-weight: 800; color: #8F1719;">₹{{ number_format((float) $booking->quotation_amount, 2) }}</span>
-                      &bull; <span style="font-size: 11.5px; color: #B45309;">⏳ वैधता:
+                      &bull; <span style="font-size: 11.5px; color: #B45309; display: inline-flex; align-items: center; gap: 4px;"><x-icon name="clock" size="12" /> वैधता:
                         {{ $booking->quotation_expires_at ? $booking->quotation_expires_at->diffForHumans() : 'सीमित समय' }}</span>
                       @if($booking->quotation_notes)
                         <div style="margin-top: 4px; font-size: 12px; color: #78350F;">{{ $booking->quotation_notes }}</div>
@@ -1592,8 +1488,8 @@
                   style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
                   @if($booking->isQuotationActive())
                     <a href="{{ $booking->getQuotationPaymentUrl() }}" class="btn primary"
-                      style="font-size: 11px; padding: 9px 18px; border-radius: 8px; background: #B45309; color: #fff; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px rgba(180,83,9,0.25); white-space: nowrap;">
-                      🔒 Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
+                      style="font-size: 11px; padding: 9px 18px; border-radius: 8px; background: #B45309; color: #fff; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px rgba(180,83,9,0.25); white-space: nowrap; display: inline-flex; align-items: center; gap: 5px;">
+                      <x-icon name="lock" size="12" /> Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
                     </a>
                   @endif
 
@@ -1606,15 +1502,14 @@
             @empty
               <div class="empty-sacred-state">
                 <div class="sacred-diya-halo">
-                  <div class="sacred-diya-icon">🪔</div>
+                  <x-icon name="flame" size="26" />
                 </div>
-                <h4 class="empty-sacred-title">पूजा एवं अनुष्ठान संकल्प</h4>
                 <p class="empty-sacred-desc">
-                  आपकी कोई सक्रिय पूजा अथवा अनुष्ठान संकल्प पंजीकृत नहीं है। कामदगिरि धाम में अपने नाम एवं गोत्र से विशेष पूजन, रुद्राभिषेक अथवा अखंड रामायण पाठ संकल्प लें।
+                  आपकी कोई सक्रिय पूजा अथवा अनुष्ठान संकल्प पंजीकृत नहीं है।
                 </p>
                 <a href="{{ url('/pooja/book') }}" class="btn primary"
-                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);">
-                  🪔 पूजा संकल्प बुक करें (Book Pooja)
+                  style="font-size: 13px; padding: 11px 28px; border-radius: 9999px; white-space: nowrap; font-weight: 700;">
+                  Book Pooja
                 </a>
               </div>
             @endforelse
@@ -1622,13 +1517,12 @@
 
           <!-- Tab 3: Volunteer Enrolments -->
           <div id="tab-volunteers" class="dash-tab-content" style="display: none;">
-            <h3 class="dashboard-card-title"
-              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <span>सेवादार नामांकन एवं सेवा दल स्थिति</span>
-              <a href="{{ url('/volunteer') }}" class="btn primary"
-                style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Join Volunteer
-                Seva</a>
-            </h3>
+            @if($volunteerApplications->count() > 0)
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <a href="{{ url('/volunteer') }}" class="btn primary"
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Join Volunteer Seva</a>
+              </div>
+            @endif
 
             @forelse($volunteerApplications as $applicant)
               <div class="donation-receipt-row">
@@ -1639,7 +1533,7 @@
                     <span class="donation-status-pill"
                       style="background: {{ $applicant->status === 'approved' ? 'rgba(16, 124, 65, 0.12)' : ($applicant->status === 'rejected' ? 'rgba(220, 38, 38, 0.12)' : 'rgba(217, 119, 6, 0.12)') }}; color: {{ $applicant->status === 'approved' ? '#059669' : ($applicant->status === 'rejected' ? '#DC2626' : '#D97706') }};">
                       @if($applicant->status === 'approved')
-                        ✓ सेवादार दल स्वीकृत (APPROVED)
+                        सेवादार दल स्वीकृत (APPROVED)
                       @elseif($applicant->status === 'rejected')
                         स्थगित / समीक्षा पूर्ण
                       @else
@@ -1670,15 +1564,14 @@
             @empty
               <div class="empty-sacred-state">
                 <div class="sacred-diya-halo">
-                  <div class="sacred-diya-icon">🤝</div>
+                  <x-icon name="users" size="26" />
                 </div>
-                <h4 class="empty-sacred-title">कामदगिरि सेवादार परिवार</h4>
                 <p class="empty-sacred-desc">
-                  आपने अभी तक सेवादार के रूप में पंजीकरण नहीं कराया है। कामदगिरि परिक्रमा मार्ग, अन्नक्षेत्र एवं मंदिर व्यवस्था में निस्वार्थ सेवा हेतु सेवा दल से जुड़ें।
+                  आपने अभी तक सेवादार के रूप में पंजीकरण नहीं कराया है।
                 </p>
                 <a href="{{ url('/volunteer') }}" class="btn primary"
-                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);">
-                  🤝 सेवादार नामांकन करें (Join Volunteer Seva)
+                  style="font-size: 13px; padding: 11px 28px; border-radius: 9999px; white-space: nowrap; font-weight: 700;">
+                  Join Volunteer Seva
                 </a>
               </div>
             @endforelse
@@ -1686,20 +1579,19 @@
 
           <!-- Tab 4: Atithi Vishram (Stay Enquiries) -->
           <div id="tab-atithi" class="dash-tab-content" style="display: none;">
-            <h3 class="dashboard-card-title"
-              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <span>अतिथि विश्राम गृह पूछताछ इतिहास (Guest Stay Enquiries)</span>
-              <a href="{{ route('services.atithiVishram') }}" class="btn primary"
-                style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #2D6A4F; border-color: #2D6A4F;">+
-                New Stay Enquiry</a>
-            </h3>
+            @if($atithiEnquiries->count() > 0)
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <a href="{{ route('services.atithiVishram') }}" class="btn primary"
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #2D6A4F; border-color: #2D6A4F;">+ New Stay Enquiry</a>
+              </div>
+            @endif
 
             @forelse($atithiEnquiries as $enq)
               <div class="donation-receipt-row">
                 <div class="donation-row-left">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12;">
-                      🏨 {{ $enq->getPurposeLabel() }}
+                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
+                      <x-icon name="building" size="15" /> {{ $enq->getPurposeLabel() }}
                     </span>
                     @php $badge = $enq->getStatusBadge(); @endphp
                     <span class="badge"
@@ -1732,15 +1624,14 @@
             @empty
               <div class="empty-sacred-state">
                 <div class="sacred-diya-halo">
-                  <div class="sacred-diya-icon">🏨</div>
+                  <x-icon name="building" size="26" />
                 </div>
-                <h4 class="empty-sacred-title">अतिथि विश्राम गृह सेवा</h4>
                 <p class="empty-sacred-desc">
-                  आपने अभी तक कामदगिरि पीठम् अतिथि विश्राम गृह में ठहरने की कोई पूछताछ दर्ज नहीं कराई है। तीर्थ यात्रा के दौरान सात्विक एवं शांत वातावरण में विश्राम की व्यवस्था उपलब्ध है।
+                  आपने अभी तक अतिथि विश्राम गृह में ठहरने की कोई पूछताछ दर्ज नहीं कराई है।
                 </p>
                 <a href="{{ route('services.atithiVishram') }}" class="btn primary"
-                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #2D6A4F; border-color: #2D6A4F; box-shadow: 0 4px 14px rgba(45, 106, 79, 0.25);">
-                  🏨 विश्राम गृह पूछताछ (Enquire for Stay)
+                  style="font-size: 13px; padding: 11px 28px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #2D6A4F; border-color: #2D6A4F;">
+                  Enquire for Stay
                 </a>
               </div>
             @endforelse
@@ -1748,20 +1639,19 @@
 
           <!-- Tab 5: Temple Hall & Premises Bookings -->
           <div id="tab-temple-bookings" class="dash-tab-content" style="display: none;">
-            <h3 class="dashboard-card-title"
-              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <span>मंदिर परिसर व आयोजन आरक्षण पूछताछ (Hall Booking Proposals)</span>
-              <a href="{{ route('services.templeBooking') }}" class="btn primary"
-                style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #8F1719; border-color: #8F1719;">+
-                New Hall Proposal</a>
-            </h3>
+            @if($templeBookings->count() > 0)
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <a href="{{ route('services.templeBooking') }}" class="btn primary"
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #8F1719; border-color: #8F1719;">+ New Hall Proposal</a>
+              </div>
+            @endif
 
             @forelse($templeBookings as $tb)
               <div class="donation-receipt-row">
                 <div class="donation-row-left">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12;">
-                      🏛️ {{ $tb->getEventTypeLabel() }}
+                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
+                      <x-icon name="landmark" size="15" /> {{ $tb->getEventTypeLabel() }}
                       @if($tb->event_title) - "{{ $tb->event_title }}" @endif
                     </span>
                     @php $tbadge = $tb->getStatusBadge(); @endphp
@@ -1795,15 +1685,14 @@
             @empty
               <div class="empty-sacred-state">
                 <div class="sacred-diya-halo">
-                  <div class="sacred-diya-icon">🏛️</div>
+                  <x-icon name="landmark" size="26" />
                 </div>
-                <h4 class="empty-sacred-title">मंदिर परिसर व मंडप आरक्षण</h4>
                 <p class="empty-sacred-desc">
-                  आपने मंदिर परिसर अथवा मंडप आरक्षण हेतु अभी तक कोई प्रस्ताव दर्ज नहीं कराया है। श्रीमद्भागवत कथा, संत समागम अथवा धार्मिक अनुष्ठान हेतु परिसर आरक्षण उपलब्ध है।
+                  आपने मंदिर परिसर अथवा मंडप आरक्षण हेतु अभी तक कोई प्रस्ताव दर्ज नहीं कराया है।
                 </p>
                 <a href="{{ route('services.templeBooking') }}" class="btn primary"
-                  style="font-size: 13px; padding: 12px 30px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #8F1719; border-color: #8F1719; box-shadow: 0 4px 14px rgba(143, 23, 25, 0.25);">
-                  🏛️ परिसर आरक्षण प्रस्ताव (Hall Booking)
+                  style="font-size: 13px; padding: 11px 28px; border-radius: 9999px; white-space: nowrap; font-weight: 700; background: #8F1719; border-color: #8F1719;">
+                  Enquire for Premises Booking
                 </a>
               </div>
             @endforelse
@@ -2043,7 +1932,17 @@
       } catch (e) { }
     }
 
-    function showDevoteeToast(icon, title, desc, url = null) {
+    function getDevoteeNotifSvg(type) {
+      const svgs = {
+        quotation: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        atithi_status: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/></svg>',
+        temple_status: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8F1719" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><polygon points="12 2 20 7 4 7"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="12" x2="12" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/></svg>',
+        volunteer: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+      };
+      return svgs[type] || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+    }
+
+    function showDevoteeToast(type, title, desc, url = null) {
       playDevoteeNotificationChime();
       const container = document.getElementById('devoteeToastContainer');
       if (!container) return;
@@ -2051,7 +1950,7 @@
       const toast = document.createElement('div');
       toast.className = 'devotee-live-toast';
       toast.innerHTML = `
-          <div style="font-size: 24px; line-height: 1;">${icon}</div>
+          <div style="flex-shrink: 0; display: grid; place-items: center;">${getDevoteeNotifSvg(type)}</div>
           <div style="flex: 1; min-width: 0;">
             <div style="font: 700 13.5px var(--dev); color: #78350F; line-height: 1.3;">${title}</div>
             <div style="font-size: 12px; color: #4B5563; margin-top: 3px; line-height: 1.4;">${desc}</div>
@@ -2138,7 +2037,7 @@
               callout.innerHTML = `
                 <div class="quotation-alert-card">
                   <div class="quotation-alert-left">
-                    <div style="font-size: 28px; line-height: 1; flex-shrink: 0;">⚡</div>
+                    <div style="flex-shrink: 0; width: 42px; height: 42px; border-radius: 10px; background: rgba(180, 83, 9, 0.14); display: grid; place-items: center;">${getDevoteeNotifSvg('quotation')}</div>
                     <div style="flex: 1; min-width: 0;">
                       <div style="font: 700 16px var(--dev); color: #92400E; line-height: 1.3;">पूजा दक्षिणा कोटेशन उपलब्ध (Quotation Received & Ready for Payment)</div>
                       <div style="font-size: 13.5px; color: #78350F; margin-top: 4px; line-height: 1.4; word-break: break-word;">
@@ -2167,7 +2066,7 @@
                 const isUnread = item.is_unread;
                 html += `
                   <a href="${item.url}" class="devotee-notif-item ${isUnread ? 'unread' : ''}">
-                    <div style="font-size: 20px; line-height: 1;">${item.icon}</div>
+                    <div style="flex-shrink: 0; margin-top: 2px;">${getDevoteeNotifSvg(item.type)}</div>
                     <div style="flex: 1; min-width: 0;">
                       <div style="font: 700 13px var(--dev); color: #78350F;">${item.title}</div>
                       <div style="font-size: 11.5px; color: #4B5563; line-height: 1.4; margin-top: 2px;">${item.description}</div>
@@ -2178,7 +2077,7 @@
 
                 // If newly arrived in background poll, show toast feedback
                 if (!isInitial && isUnread && !devoteeKnownNotificationIds.has(item.id)) {
-                  showDevoteeToast(item.icon, item.title, item.description, item.url);
+                  showDevoteeToast(item.type, item.title, item.description, item.url);
                 }
                 devoteeKnownNotificationIds.add(item.id);
               });

@@ -198,7 +198,7 @@
                     {{ $s->title_hi }}
                   </strong>
                   @if($s->is_featured)
-                    <span style="font-size: 10px; background: #fef3c7; color: #92400e; font-weight: 800; padding: 1px 6px; border-radius: 4px; border: 1px solid #fde68a;">⭐ FEATURED</span>
+                    <span style="font-size: 10px; background: #fef3c7; color: #92400e; font-weight: 800; padding: 1px 6px; border-radius: 4px; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 3px;"><x-icon name="star" size="10" /> FEATURED</span>
                   @endif
                 </div>
                 <span style="font-size: 12px; color: var(--brown); display: block; margin-top: 1px;">
@@ -361,7 +361,7 @@
         <div class="form-group" style="margin: 0; display: flex; align-items: center; padding-top: 22px;">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--deep);">
             <input type="checkbox" name="is_featured" id="seva_is_featured" value="1" style="width: 17px; height: 17px; accent-color: #D95D0F;">
-            <span>⭐ Feature on Public Homepage</span>
+            <span style="display: inline-flex; align-items: center; gap: 5px;"><x-icon name="star" size="13" /> Feature on Public Homepage</span>
           </label>
         </div>
       </div>

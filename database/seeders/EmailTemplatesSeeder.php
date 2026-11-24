@@ -283,7 +283,7 @@ class EmailTemplatesSeeder extends Seeder
                             <div style="font-size: 32px; font-weight: 900; letter-spacing: 8px; color: #8f1719; font-family: monospace;">{otp}</div>
                         </div>
                         <div style="font-size: 12.5px; color: #b45309; margin-top: 14px;">
-                            ⏳ यह सुरक्षा कोड केवल <strong>15 मिनट</strong> तक सक्रिय रहेगा। कृपया इसे किसी के साथ साझा न करें।
+                            यह सुरक्षा कोड केवल <strong>15 मिनट</strong> तक सक्रिय रहेगा। कृपया इसे किसी के साथ साझा न करें।
                         </div>
                     </div>',
                     'भक्त पोर्टल खोलें',
@@ -577,7 +577,7 @@ class EmailTemplatesSeeder extends Seeder
                         <strong>अनुष्ठान:</strong> {service_name}<br>
                         <strong>प्रस्तावित तिथि:</strong> {booking_date} ({time_slot})<br>
                         <strong>व्यवस्था विवरण:</strong> {quotation_notes}<br>
-                        <span style="display: block; margin-top: 8px; font-size: 12.5px; color: #b98550;">⏳ यह पावन भुगतान लिंक केवल <strong>{expires_at}</strong> तक सक्रिय रहेगा। कृपया समय समाप्त होने से पूर्व दक्षिणा अर्पित कर अपना पूजा स्लॉट सुनिश्चित करें।</span>
+                        <span style="display: block; margin-top: 8px; font-size: 12.5px; color: #b98550;">यह पावन भुगतान लिंक केवल <strong>{expires_at}</strong> तक सक्रिय रहेगा। कृपया समय समाप्त होने से पूर्व दक्षिणा अर्पित कर अपना पूजा स्लॉट सुनिश्चित करें।</span>
                     </div>',
                     'ऑनलाइन दक्षिणा अर्पित करें (Pay Dakshina Online)',
                     '{payment_url}'

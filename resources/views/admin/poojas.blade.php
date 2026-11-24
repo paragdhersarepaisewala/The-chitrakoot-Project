@@ -254,7 +254,7 @@
 
             <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
               <input type="checkbox" name="aarti_normal_slots[{{ $idx }}][is_live]" value="1" {{ !empty($slot['is_live']) || !empty($slot['is_live_pulse']) ? 'checked' : '' }} style="accent-color: #D95D0F;">
-              <span>🔴 Live Pulse Highlight</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
             </label>
           </div>
         @endforeach
@@ -292,7 +292,7 @@
 
             <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
               <input type="checkbox" name="aarti_amavasya_slots[{{ $idx }}][is_live]" value="1" {{ !empty($slot['is_live']) || !empty($slot['is_live_pulse']) ? 'checked' : '' }} style="accent-color: #D95D0F;">
-              <span>🔴 Live Pulse Highlight</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
             </label>
           </div>
         @endforeach
@@ -449,7 +449,7 @@
   <details class="card" style="margin-top: 36px; padding: 18px 24px; border: 1.5px dashed var(--line); border-radius: 14px; background: #FAF7F2;">
     <summary style="font-size: 14px; font-weight: 800; color: var(--deep); cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 16px;">📦</span>
+        <span style="display: inline-flex; color: #7A4B29;"><x-icon name="package" size="16" /></span>
         <span>Prebuilt Packages Directory (Currently Deactivated — Click to View/Edit {{ $poojas->count() }} Packages)</span>
       </div>
       <span class="badge" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">Turned Off</span>
@@ -829,7 +829,7 @@
 
             <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
               <input type="checkbox" name="aarti_normal_slots[{{ $idx }}][is_live]" value="1" {{ !empty($slot['is_live']) || !empty($slot['is_live_pulse']) ? 'checked' : '' }} style="accent-color: #D95D0F;">
-              <span>🔴 Live Pulse Highlight</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
             </label>
           </div>
         @endforeach
@@ -867,7 +867,7 @@
 
             <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
               <input type="checkbox" name="aarti_amavasya_slots[{{ $idx }}][is_live]" value="1" {{ !empty($slot['is_live']) || !empty($slot['is_live_pulse']) ? 'checked' : '' }} style="accent-color: #D95D0F;">
-              <span>🔴 Live Pulse Highlight</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
             </label>
           </div>
         @endforeach
@@ -1046,7 +1046,7 @@
       <!-- Preset Bar from Sacred Offerings Directory -->
       <div style="background: #FFF7ED; border: 1.5px solid rgba(217,93,15,0.25); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 16px;">⚡</span>
+          <span style="display: inline-flex; color: #9A3412;"><x-icon name="zap" size="16" /></span>
           <div>
             <span style="font-size: 12.5px; font-weight: 800; color: #9A3412; display: block;">Quick Presets from Sacred Offerings Directory:</span>
             <span style="font-size: 11px; color: #7A4B29;">Select any authentic offering to auto-fill all ritual parameters</span>
@@ -1202,7 +1202,7 @@
       <!-- Preset Bar from Mandir Timetable Directory -->
       <div style="background: #F0FDF4; border: 1.5px solid rgba(22,101,52,0.25); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 16px;">⏱️</span>
+          <span style="display: inline-flex; color: #166534;"><x-icon name="clock" size="16" /></span>
           <div>
             <span style="font-size: 12.5px; font-weight: 800; color: #166534; display: block;">Quick Presets from Mandir Timetable:</span>
             <span style="font-size: 11px; color: #2D6A4F;">Select authentic temple schedule to auto-fill times</span>
@@ -1655,7 +1655,7 @@
       <input type="text" name="aarti_normal_slots[${newIdx}][desc]" value="" class="form-input" style="font-size: 12.5px; margin-bottom: 10px; padding: 6px 8px;" placeholder="कामदगिरि मुख्य गर्भगृह">
       <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
         <input type="checkbox" name="aarti_normal_slots[${newIdx}][is_live]" value="1" style="accent-color: #D95D0F;">
-        <span>🔴 Live Pulse Highlight</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
       </label>
     `;
     container.appendChild(card);
@@ -1682,7 +1682,7 @@
       <input type="text" name="aarti_amavasya_slots[${newIdx}][desc]" value="" class="form-input" style="font-size: 12.5px; margin-bottom: 10px; padding: 6px 8px;" placeholder="प्रातः विशेष कामदगिरि परिक्रमा">
       <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7A4B29; cursor: pointer; border-top: 1px dashed rgba(180,83,9,0.25); padding-top: 8px; margin: 0;">
         <input type="checkbox" name="aarti_amavasya_slots[${newIdx}][is_live]" value="1" style="accent-color: #D95D0F;">
-        <span>🔴 Live Pulse Highlight</span>
+        <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>Live Pulse Highlight</span>
       </label>
     `;
     container.appendChild(card);

@@ -321,7 +321,7 @@
     <div class="table-head-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
       <div>
         <span class="table-title" style="font-size: 15px; font-weight: 800; color: var(--deep); display: flex; align-items: center; gap: 8px;">
-          <span>🪔</span> All Temple Services, Bookings & Stay Enquiries Hub
+          <x-icon name="flame" size="16" /> All Temple Services, Bookings & Stay Enquiries Hub
         </span>
         <div style="font-size: 11px; color: rgba(43, 35, 29, 0.6); margin-top: 2px;">
           Live dashboard monitoring incoming orders, ritual bookings, accommodation requests, and hall proposals

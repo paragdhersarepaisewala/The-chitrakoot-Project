@@ -38,22 +38,22 @@
         <!-- Key Highlights Grid for Kamadgiri -->
         <div class="reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 36px;">
           <div style="background: #FFFDFC; border: 1px solid rgba(180,83,9,0.18); border-radius: 16px; padding: 18px 20px; text-align: center;">
-            <span style="font-size: 24px; display: block; margin-bottom: 4px;">⛰️</span>
+            <span style="display: inline-flex; justify-content: center; margin-bottom: 6px; color: #B45309;"><x-icon name="mountain" size="24" /></span>
             <strong style="font-size: 14px; color: #2B1A12; display: block;">पवित्र पर्वत (Parvat)</strong>
             <span style="font-size: 12.5px; color: #7A4B29;">Kamadgiri Parvat</span>
           </div>
           <div style="background: #FFFDFC; border: 1px solid rgba(180,83,9,0.18); border-radius: 16px; padding: 18px 20px; text-align: center;">
-            <span style="font-size: 24px; display: block; margin-bottom: 4px;">🛕</span>
+            <span style="display: inline-flex; justify-content: center; margin-bottom: 6px; color: #B45309;"><x-icon name="landmark" size="24" /></span>
             <strong style="font-size: 14px; color: #2B1A12; display: block;">प्रधान मंदिर (Temple)</strong>
             <span style="font-size: 12.5px; color: #7A4B29;">Kamadgiri Temple (कामतानाथ)</span>
           </div>
           <div style="background: #FFFDFC; border: 1px solid rgba(180,83,9,0.18); border-radius: 16px; padding: 18px 20px; text-align: center;">
-            <span style="font-size: 24px; display: block; margin-bottom: 4px;">🚶</span>
+            <span style="display: inline-flex; justify-content: center; margin-bottom: 6px; color: #B45309;"><x-icon name="map-pin" size="24" /></span>
             <strong style="font-size: 14px; color: #2B1A12; display: block;">परिक्रमा दूरी (Parikrama)</strong>
             <span style="font-size: 12.5px; color: #7A4B29;">5 Kilometers (५ किमी)</span>
           </div>
           <div style="background: #FFFDFC; border: 1px solid rgba(180,83,9,0.18); border-radius: 16px; padding: 18px 20px; text-align: center;">
-            <span style="font-size: 24px; display: block; margin-bottom: 4px;">🏨</span>
+            <span style="display: inline-flex; justify-content: center; margin-bottom: 6px; color: #B45309;"><x-icon name="building" size="24" /></span>
             <strong style="font-size: 14px; color: #2B1A12; display: block;">तीर्थ प्रवास (Stay)</strong>
             <a href="{{ url('/services/atithi-vishram') }}" style="font-size: 12.5px; color: #D95D0F; font-weight: 700; text-decoration: none;">Kamadgiri Stay &rarr;</a>
           </div>
