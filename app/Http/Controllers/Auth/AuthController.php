@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\TempleNotificationMailable;
 use App\Models\Donation;
-use App\Models\EmailTemplate;
 use App\Models\Membership;
 use App\Models\OrganizationSetting;
 use App\Models\PoojaBooking;
@@ -16,7 +14,6 @@ use App\Services\EmailNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -77,26 +74,7 @@ class AuthController extends Controller
             'email_otp_expires_at' => now()->addMinutes(15),
         ]);
 
-        try {
-            $orgSettings = OrganizationSetting::getSettings();
-            $siteName = $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust';
-            $subject = "पासवर्ड पुनर्प्राप्ति सुरक्षा कोड: {$otp} — {$siteName}";
-            $body = EmailNotificationService::renderTempleCard(
-                'पासवर्ड पुनर्प्राप्ति · PASSWORD RESET CODE',
-                'आपका पासवर्ड रीसेट सुरक्षा कोड',
-                "सादर प्रणाम, {$user->name} जी!",
-                'श्री कामदगिरि पीठम् सेवा ट्रस्ट पोर्टल पर पासवर्ड रीसेट करने हेतु आपका 6-अंकीय सुरक्षा कोड (OTP) जारी किया गया है।',
-                '<div style="background: #faf7f0; border: 2px dashed #b98550; border-radius: 10px; text-align: center; padding: 24px 16px; margin: 24px 0;">
-                    <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #8f1719; font-family: monospace;">'.$otp.'</span>
-                    <div style="color: #7a6e65; font-size: 12px; margin-top: 10px;">यह कोड अगले 15 मिनट के लिए मान्य है।</div>
-                </div>'
-            );
-
-            Mail::to($user->email, $user->name)
-                ->send(new TempleNotificationMailable($subject, $body));
-        } catch (\Throwable $e) {
-            logger("Password reset OTP email failed for user #{$user->id}");
-        }
+        EmailNotificationService::sendPasswordResetOtp($user, $otp);
 
         $orgSettings = OrganizationSetting::getSettings();
         $flashMsg = "पासवर्ड रीसेट सुरक्षा कोड {$user->email} पर भेज दिया गया है।";
@@ -138,6 +116,8 @@ class AuthController extends Controller
             'email_otp' => null,
             'email_otp_expires_at' => null,
         ]);
+
+        EmailNotificationService::sendPasswordChangedAlert($user);
 
         return redirect('/login')->with('success', 'आपका पासवर्ड सफलतापूर्वक बदल दिया गया है! कृपया नए पासवर्ड से लॉगिन करें।');
     }
@@ -197,24 +177,7 @@ class AuthController extends Controller
             'consecutive_qualifying_months' => 0,
         ]);
 
-        // Attempt sending email OTP using configurable CMS EmailTemplate
-        try {
-            $template = EmailTemplate::where('slug', 'login_otp')->where('is_active', true)->first();
-            if ($template) {
-                $subject = str_replace(['{name}', '{otp}'], [$user->name, $otp], $template->subject);
-                $html = str_replace(['{name}', '{otp}', '{email}'], [$user->name, $otp, $user->email], $template->content_html);
-                Mail::html($html, function ($message) use ($user, $subject) {
-                    $message->to($user->email)->subject($subject);
-                });
-            } else {
-                Mail::raw("Pranam {$user->name},\n\nYour 6-digit OTP for Shri Kamadgiri Peetham Sewa Trust registration is: {$otp}\n\nThis OTP is valid for 15 minutes.", function ($message) use ($user) {
-                    $message->to($user->email)->subject('Verification OTP — Shri Kamadgiri Peetham Sewa Trust');
-                });
-            }
-        } catch (\Throwable $e) {
-            // Keep sensitive plaintext secrets out of production logs
-            logger("Registration OTP email dispatch failed for user #{$user->id}");
-        }
+        EmailNotificationService::sendRegistrationOtp($user, $otp);
 
         Auth::login($user);
 
@@ -284,22 +247,7 @@ class AuthController extends Controller
             'email_otp_expires_at' => now()->addMinutes(15),
         ]);
 
-        try {
-            $template = EmailTemplate::where('slug', 'login_otp')->where('is_active', true)->first();
-            if ($template) {
-                $subject = str_replace(['{name}', '{otp}'], [$user->name, $otp], $template->subject);
-                $html = str_replace(['{name}', '{otp}', '{email}'], [$user->name, $otp, $user->email], $template->content_html);
-                Mail::html($html, function ($message) use ($user, $subject) {
-                    $message->to($user->email)->subject($subject);
-                });
-            } else {
-                Mail::raw("Pranam {$user->name},\n\nYour new 6-digit OTP for Shri Kamadgiri Peetham Sewa Trust registration is: {$otp}\n\nThis OTP is valid for 15 minutes.", function ($message) use ($user) {
-                    $message->to($user->email)->subject('Verification OTP — Shri Kamadgiri Peetham Sewa Trust');
-                });
-            }
-        } catch (\Throwable $e) {
-            logger("Resend registration OTP email dispatch failed for user #{$user->id}");
-        }
+        EmailNotificationService::sendRegistrationOtp($user, $otp);
 
         $orgSettings = OrganizationSetting::getSettings();
         $isSmtpConfigured = $orgSettings->isSmtpConfigured();
@@ -389,6 +337,7 @@ class AuthController extends Controller
         );
 
         $this->linkGuestHistory($user);
+        EmailNotificationService::sendWelcomeRegistration($user);
 
         return redirect('/dashboard')->with('success', 'Welcome to Shri Kamadgiri Peetham Sewa Trust family! Your profile registration is complete.');
     }

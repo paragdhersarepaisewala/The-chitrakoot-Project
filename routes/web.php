@@ -222,12 +222,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/media-gallery/{id}', [AdminController::class, 'deleteMedia'])->name('admin.deleteMedia');
         Route::get('/api/media-list', [AdminController::class, 'apiMediaList'])->name('admin.apiMediaList');
 
-        // Email SMTP & Template Manager (Screenshot 3)
+        // Email SMTP & Template Manager
         Route::get('/email-templates', [AdminController::class, 'emailTemplates'])->name('admin.emailTemplates');
+        Route::post('/email-templates', [AdminController::class, 'storeEmailTemplate'])->name('admin.storeEmailTemplate');
         Route::get('/email-templates/{id}/preview', [AdminController::class, 'previewEmailTemplate'])->name('admin.previewEmailTemplate');
         Route::put('/email-templates/{id}', [AdminController::class, 'updateEmailTemplate'])->name('admin.updateEmailTemplate');
+        Route::delete('/email-templates/{id}', [AdminController::class, 'destroyEmailTemplate'])->name('admin.destroyEmailTemplate');
+        Route::post('/email-templates/toggle-service', [AdminController::class, 'toggleEmailSending'])->name('admin.toggleEmailSending');
+        Route::post('/email-templates/{id}/toggle', [AdminController::class, 'toggleTemplateStatus'])->name('admin.toggleTemplateStatus');
         Route::post('/email-templates/smtp-config', [AdminController::class, 'updateSmtpConfig'])->name('admin.updateSmtpConfig');
         Route::post('/email-templates/test-smtp', [AdminController::class, 'testSmtpConnection'])->name('admin.testSmtpConnection');
+        Route::get('/email-templates/logs', [AdminController::class, 'emailLogs'])->name('admin.emailLogs');
+        Route::delete('/email-templates/logs/clear', [AdminController::class, 'clearEmailLogs'])->name('admin.clearEmailLogs');
 
         // Events & Utsavs CMS
         Route::get('/events', [AdminController::class, 'events'])->name('admin.events');
@@ -266,6 +272,7 @@ Route::middleware('auth')->group(function () {
         // Contact Inquiries & Devotee Messages CMS
         Route::get('/contact-inquiries', [AdminController::class, 'contactInquiries'])->name('admin.contactInquiries');
         Route::post('/contact-inquiries/{id}/status', [AdminController::class, 'toggleContactInquiryStatus'])->name('admin.contactInquiries.status');
+        Route::post('/contact-inquiries/{id}/reply', [AdminController::class, 'replyContactInquiry'])->name('admin.contactInquiries.reply');
         Route::delete('/contact-inquiries/{id}', [AdminController::class, 'deleteContactInquiry'])->name('admin.contactInquiries.delete');
 
         // Atithi Vishram (Pilgrim Guest House) Enquiries CMS

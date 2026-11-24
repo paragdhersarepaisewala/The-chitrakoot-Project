@@ -130,7 +130,7 @@ class HomeController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        ContactInquiry::create([
+        $inquiry = ContactInquiry::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
@@ -139,6 +139,8 @@ class HomeController extends Controller
             'status' => 'new',
             'is_read' => false,
         ]);
+
+        EmailNotificationService::sendContactInquiryReceived($inquiry);
 
         return back()->with('success', 'जय कामतानाथ! आपके पावन संदेश के लिए धन्यवाद। ट्रस्ट कार्यालय द्वारा आपसे शीघ्र ही संपर्क किया जाएगा। (Thank you for contacting us. We will get back to you shortly.)');
     }
@@ -159,6 +161,8 @@ class HomeController extends Controller
                 'subscribed_at' => now(),
             ]
         );
+
+        EmailNotificationService::sendNewsletterWelcome(strtolower($request->email));
 
         if ($request->wantsJson()) {
             return response()->json([

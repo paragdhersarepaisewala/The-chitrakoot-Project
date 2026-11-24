@@ -10,6 +10,7 @@ use App\Models\Cause;
 use App\Models\ContactInquiry;
 use App\Models\Destination;
 use App\Models\Donation;
+use App\Models\EmailLog;
 use App\Models\EmailTemplate;
 use App\Models\Event;
 use App\Models\Gallery;
@@ -1067,6 +1068,8 @@ class AdminController extends Controller
     {
         $comment = PostComment::findOrFail($id);
         $comment->update(['is_approved' => true]);
+
+        EmailNotificationService::sendCommentApproved($comment);
         ActivityLog::log('Comments CMS', 'approve', "Approved comment #{$id} by {$comment->name}");
 
         return back()->with('success', 'टिप्पणी स्वीकृत कर दी गई है। (Comment approved successfully)');
@@ -1985,13 +1988,69 @@ class AdminController extends Controller
         ]);
     }
 
-    // --- EMAIL SMTP & TEMPLATES MANAGER (SCREENSHOT 3) ---
-    public function emailTemplates()
+    // --- EMAIL SMTP & TEMPLATES MANAGER ---
+    public function emailTemplates(Request $request)
     {
-        $templates = EmailTemplate::orderBy('id', 'asc')->get();
-        $settings = OrganizationSetting::getSettings();
+        $category = $request->query('category', 'all');
+        $search = $request->query('search');
 
-        return view('admin.email-templates', compact('templates', 'settings'));
+        $query = EmailTemplate::query();
+        if ($category && $category !== 'all') {
+            $query->where('category', $category);
+        }
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%");
+            });
+        }
+
+        $templates = $query->orderBy('category', 'asc')->orderBy('id', 'asc')->get();
+        $settings = OrganizationSetting::getSettings();
+        $recentLogs = EmailLog::latest()->take(25)->get();
+
+        $stats = [
+            'total_templates' => EmailTemplate::count(),
+            'active_templates' => EmailTemplate::where('is_active', true)->count(),
+            'disabled_templates' => EmailTemplate::where('is_active', false)->count(),
+            'is_sending_enabled' => $settings->isEmailSendingEnabled(),
+            'is_smtp_configured' => $settings->isSmtpConfigured(),
+            'logs_total' => EmailLog::count(),
+            'logs_sent' => EmailLog::where('status', 'sent')->count(),
+            'logs_failed' => EmailLog::where('status', 'failed')->count(),
+            'logs_simulated' => EmailLog::where('status', 'simulated')->count(),
+            'logs_stopped' => EmailLog::where('status', 'stopped')->count(),
+        ];
+
+        return view('admin.email-templates', compact('templates', 'settings', 'recentLogs', 'stats', 'category', 'search'));
+    }
+
+    public function storeEmailTemplate(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:100|regex:/^[a-z0-9_-]+$/|unique:email_templates,slug',
+            'category' => 'required|string|in:donations,auth,services,inquiries,volunteers,newsletter,general',
+            'subject' => 'required|string|max:255',
+            'content_html' => 'required|string',
+            'description' => 'nullable|string|max:500',
+            'placeholders_hint' => 'nullable|string|max:255',
+            'is_active' => 'nullable',
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_system'] = false;
+
+        $template = EmailTemplate::create($validated);
+
+        ActivityLog::log('Email CMS', 'create_template', "Created new email template: {$template->name} ({$template->slug})");
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => "New email template '{$template->name}' created successfully."]);
+        }
+
+        return back()->with('success', "Email template '{$template->name}' created successfully.");
     }
 
     public function previewEmailTemplate($id)
@@ -2002,20 +2061,23 @@ class AdminController extends Controller
             '{name}' => 'Aditya Sharma',
             '{email}' => 'aditya.sharma@example.com',
             '{otp}' => '749216',
-            '{amount}' => '2,100',
-            '{cause}' => 'गौ सेवा एवं गौ संरक्षण प्रकल्प',
-            '{receipt_id}' => 'CKT-2026-REC-0842',
+            '{amount}' => '2,100.00',
+            '{cause}' => 'कामदगिरि गौ सेवा एवं संरक्षण प्रकल्प',
+            '{receipt_id}' => 'SKP-'.date('Ymd').'-REC-0842',
+            '{receipt_number}' => 'SKP-'.date('Ymd').'-REC-0842',
             '{date}' => now()->format('d M Y'),
             '{site_name}' => 'Shri Kamadgiri Peetham Sewa Trust',
             '{site_url}' => url('/'),
             '{month}' => now()->format('F Y'),
+            '{year}' => date('Y'),
+            '{payment_id}' => 'pay_Kamadgiri991248',
+            '{payment_url}' => url('/dashboard'),
+            '{receipt_url}' => url('/receipt/SKP-'.date('Ymd').'-REC-0842'),
             '{post_title}' => 'चित्रकूट माहात्म्य: कामदगिरि परिक्रमा का आध्यात्मिक एवं वैज्ञानिक महत्व',
             '{post_excerpt}' => 'कामदगिरि पर्वत की परिक्रमा केवल एक धार्मिक अनुष्ठान नहीं, अपितु मन, शरीर और आत्मा के शुद्धिकरण का दिव्य अनुभव है।',
-            '{article_url}' => url('/blog/chitrakoot-mahatmya-aur-kamadgiri-parikrama'),
+            '{article_url}' => url('/blog'),
             '{booking_id}' => 'CKT-TOUR-9912',
-            '{ref_code}' => 'REF-GUEST-3841',
-            '{package}' => '3-Day Kamadgiri & Mandakini Heritage Darshan Package',
-            '{booking_number}' => 'SKP-PB-20261017-84920',
+            '{booking_number}' => 'SKP-PB-'.date('Ymd').'-84920',
             '{service_name}' => 'कामदगिरि नित्य अभिषेक एवं विशेष रुद्राभिषेक',
             '{booking_date}' => now()->addDays(2)->format('d M Y'),
             '{time_slot}' => 'प्रातः 07:00 AM (मंगला दर्शन)',
@@ -2030,7 +2092,23 @@ class AdminController extends Controller
             '{phone}' => '+91 94150 00000',
             '{applicant_id}' => 'VOL-0012',
             '{payment_status}' => 'VERIFIED (PAID)',
-            '{receipt_url}' => url('/receipt/CKT-2026-REC-0842'),
+            '{enquiry_number}' => 'AVE-'.date('Ymd').'-0492',
+            '{check_in_date}' => now()->addDays(5)->format('d M Y'),
+            '{check_out_date}' => now()->addDays(7)->format('d M Y'),
+            '{devotees}' => '4',
+            '{rooms}' => '2',
+            '{room_preference}' => 'Air-Cooled Family Suite (परिवार कक्ष)',
+            '{purpose}' => 'कामदगिरि परिक्रमा एवं दर्शन (Pilgrimage)',
+            '{special_requests}' => 'वरिष्ठ नागरिक हेतु भूतल कक्ष (Ground floor room preferred)',
+            '{status}' => 'आधिकारिक रूप से स्वीकृत (APPROVED)',
+            '{event_type}' => 'श्री रामचरितमानस नवाह्न पारायण एवं हवन',
+            '{proposed_date}' => now()->addDays(14)->format('d M Y'),
+            '{gathering}' => '150',
+            '{duration}' => '3 दिवस',
+            '{requirements}' => 'यज्ञशाला एवं अन्नक्षेत्र सहयोग व्यवस्था',
+            '{subject}' => 'चित्रकूट धाम दर्शन एवं आश्रम विश्राम के संबंध में',
+            '{message}' => 'हम 4 पारिवारिक सदस्य कामदगिरि परिक्रमा दर्शन हेतु आ रहे हैं। कृपया विश्राम एवं अभिषेक की व्यवस्था का मार्गदर्शन करें।',
+            '{reply_message}' => 'जय कामतानाथ! आपके आगमन की तिथि पर विश्राम गृह में व्यवस्था उपलब्ध है। मंदिर कार्यालय द्वारा आपके लिए आचार्य जी का समय निर्धारित कर दिया गया है।',
         ];
 
         $renderedSubject = str_replace(array_keys($sampleData), array_values($sampleData), $template->subject);
@@ -2048,23 +2126,101 @@ class AdminController extends Controller
     {
         $template = EmailTemplate::findOrFail($id);
         $request->validate([
+            'name' => 'nullable|string|max:255',
             'subject' => 'required|string|max:255',
+            'category' => 'nullable|string|in:donations,auth,services,inquiries,volunteers,newsletter,general',
+            'description' => 'nullable|string|max:500',
             'content_html' => 'required|string',
         ]);
 
-        $template->update([
+        $data = [
             'subject' => $request->subject,
             'content_html' => $request->content_html,
             'is_active' => $request->boolean('is_active'),
-        ]);
+        ];
+
+        if ($request->filled('name')) {
+            $data['name'] = $request->name;
+        }
+        if ($request->filled('category')) {
+            $data['category'] = $request->category;
+        }
+        if ($request->has('description')) {
+            $data['description'] = $request->description;
+        }
+
+        $template->update($data);
 
         ActivityLog::log('Email CMS', 'update', "Updated Email Template: {$template->name}");
 
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Email template updated successfully.']);
+            return response()->json(['success' => true, 'message' => "Email template '{$template->name}' updated successfully."]);
         }
 
         return back()->with('success', "Email template '{$template->name}' updated successfully.");
+    }
+
+    public function destroyEmailTemplate($id)
+    {
+        $template = EmailTemplate::findOrFail($id);
+
+        if ($template->is_system) {
+            return response()->json([
+                'success' => false,
+                'message' => 'System notification templates cannot be permanently removed. You can disable/stop them instead.',
+            ], 422);
+        }
+
+        $name = $template->name;
+        $template->delete();
+
+        ActivityLog::log('Email CMS', 'delete_template', "Deleted custom email template: {$name}");
+
+        return response()->json([
+            'success' => true,
+            'message' => "Template '{$name}' deleted successfully.",
+        ]);
+    }
+
+    public function toggleEmailSending(Request $request)
+    {
+        $settings = OrganizationSetting::getSettings();
+        $newState = ! $settings->isEmailSendingEnabled();
+
+        $settings->update([
+            'is_email_sending_enabled' => $newState,
+        ]);
+
+        $statusText = $newState ? 'Active (Live Dispatches Enabled)' : 'Stopped (All automatic emails paused)';
+        ActivityLog::log('Email CMS', 'toggle_service', "Toggled Email Sending Service to: {$statusText}");
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_enabled' => $newState,
+                'message' => $newState
+                    ? 'Email sending service is now ACTIVE. Automated notifications will dispatch normally.'
+                    : 'Email sending service is now STOPPED. All automated emails and dispatches are paused.',
+            ]);
+        }
+
+        return back()->with('success', "Email sending service updated: {$statusText}");
+    }
+
+    public function toggleTemplateStatus($id)
+    {
+        $template = EmailTemplate::findOrFail($id);
+        $template->is_active = ! $template->is_active;
+        $template->save();
+
+        $statusText = $template->is_active ? 'Enabled' : 'Disabled';
+        ActivityLog::log('Email CMS', 'toggle_template', "Toggled template {$template->name} to: {$statusText}");
+
+        return response()->json([
+            'success' => true,
+            'is_active' => $template->is_active,
+            'message' => "Template '{$template->name}' is now {$statusText}.",
+        ]);
     }
 
     public function updateSmtpConfig(Request $request)
@@ -2083,17 +2239,21 @@ class AdminController extends Controller
             $data['smtp_password'] = $request->smtp_password;
         }
 
-        // When user saves valid SMTP settings, attach SMTP and automatically remove testing temp OTP
         $isConfigured = ! empty($request->smtp_host) && ! empty($request->smtp_username);
         $data['is_smtp_configured'] = $isConfigured;
 
         $settings->update($data);
+        EmailNotificationService::configureRuntimeMailer($settings);
 
-        ActivityLog::log('Email CMS', 'smtp_update', 'Updated outgoing SMTP server credentials. Live SMTP status: '.($isConfigured ? 'Active (Testing OTP removed)' : 'Testing Mode'));
+        ActivityLog::log('Email CMS', 'smtp_update', 'Updated outgoing SMTP server credentials. Live SMTP status: '.($isConfigured ? 'Active' : 'Testing Mode'));
 
         $msg = $isConfigured
-            ? 'SMTP server configuration saved and attached successfully. Testing temporary OTP bypass is now automatically disabled — all emails and OTPs will dispatch live.'
-            : 'SMTP server settings saved in testing mode. Temporary OTP bypass remains active until valid SMTP credentials are attached.';
+            ? 'SMTP server configuration saved successfully. Real outgoing SMTP delivery is active.'
+            : 'SMTP server settings saved in testing mode.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
 
         return back()->with('success', $msg);
     }
@@ -2101,42 +2261,88 @@ class AdminController extends Controller
     public function testSmtpConnection(Request $request)
     {
         $request->validate([
-            'test_email' => 'required|email',
+            'test_email' => 'nullable|email',
+            'smtp_host' => 'nullable|string',
+            'smtp_port' => 'nullable|integer',
+            'smtp_username' => 'nullable|string',
+            'smtp_password' => 'nullable|string',
+            'smtp_encryption' => 'nullable|string',
+            'template_slug' => 'nullable|string',
         ]);
 
-        $recipient = $request->test_email;
         $settings = OrganizationSetting::getSettings();
 
-        if (empty($settings->smtp_host) || empty($settings->smtp_username)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'SMTP Host and Username are not configured yet. Please enter valid SMTP credentials.',
-            ]);
+        $host = $request->filled('smtp_host') ? $request->smtp_host : $settings->smtp_host;
+        $port = $request->filled('smtp_port') ? (int) $request->smtp_port : (int) ($settings->smtp_port ?: 587);
+        $username = $request->filled('smtp_username') ? $request->smtp_username : $settings->smtp_username;
+        $password = $request->filled('smtp_password') ? $request->smtp_password : $settings->smtp_password;
+        $encryption = $request->has('smtp_encryption') ? $request->smtp_encryption : $settings->smtp_encryption;
+        $testEmail = $request->test_email;
+        $templateSlug = $request->template_slug ?: 'donation_receipt';
+
+        $diagnostics = EmailNotificationService::testSmtpConnectionDetailed(
+            $host,
+            $port,
+            $username,
+            $password,
+            $encryption,
+            $testEmail,
+            $templateSlug
+        );
+
+        if ($diagnostics['success']) {
+            ActivityLog::log('Email CMS', 'test_smtp', "SMTP diagnostic test completed for {$host}:{$port}".($testEmail ? " with test email to {$testEmail}" : ''));
         }
 
-        try {
-            // Attempt dispatch or simulation
-            ActivityLog::log('Email CMS', 'test_email', "Sent test verification email to {$recipient}");
+        return response()->json($diagnostics);
+    }
 
-            return response()->json([
-                'success' => true,
-                'message' => "Test email successfully dispatched to {$recipient} via {$settings->smtp_host}:{$settings->smtp_port}.",
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'SMTP Dispatch Error: '.$e->getMessage(),
-            ]);
+    public function emailLogs(Request $request)
+    {
+        $status = $request->query('status');
+        $search = $request->query('search');
+
+        $query = EmailLog::latest();
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
         }
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_email', 'like', "%{$search}%")
+                    ->orWhere('recipient_name', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('template_slug', 'like', "%{$search}%");
+            });
+        }
+
+        $logs = $query->paginate(25);
+
+        return response()->json([
+            'success' => true,
+            'logs' => $logs,
+        ]);
+    }
+
+    public function clearEmailLogs()
+    {
+        EmailLog::truncate();
+        ActivityLog::log('Email CMS', 'clear_logs', 'Cleared all email outbox delivery logs.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email delivery logs cleared successfully.',
+        ]);
     }
 
     // --- NAVIGATION MENU CMS ---
     public function navigationMenu()
     {
         $menuTree = NavigationMenuItem::whereNull('parent_id')
-            ->with(['children' => function ($q) {
-                $q->orderBy('sort_order', 'asc');
-            }])
+            ->with([
+                'children' => function ($q) {
+                    $q->orderBy('sort_order', 'asc');
+                },
+            ])
             ->orderBy('sort_order', 'asc')
             ->get();
 
@@ -2576,6 +2782,8 @@ class AdminController extends Controller
 
         if ($booking->status === 'confirmed' && $previousStatus !== 'confirmed') {
             EmailNotificationService::sendPoojaBookingConfirmed($booking);
+        } elseif ($booking->status === 'completed' && $previousStatus !== 'completed') {
+            EmailNotificationService::sendPoojaBookingCompleted($booking);
         }
 
         ActivityLog::log('Pooja CMS', 'update_booking_status', "Updated booking #{$booking->booking_number} to {$validated['booking_status']}");
@@ -3149,6 +3357,26 @@ class AdminController extends Controller
         ActivityLog::log('Contact CMS', 'status_update', "Updated Inquiry #{$inquiry->id} status to {$newStatus}");
 
         return back()->with('success', "Inquiry #{$inquiry->id} marked as {$newStatus}.");
+    }
+
+    public function replyContactInquiry(Request $request, $id)
+    {
+        $inquiry = ContactInquiry::findOrFail($id);
+        $validated = $request->validate([
+            'reply_message' => 'required|string|min:5',
+        ]);
+
+        EmailNotificationService::sendContactInquiryReply($inquiry, $validated['reply_message']);
+
+        $inquiry->update([
+            'status' => 'replied',
+            'is_read' => true,
+            'notes' => ($inquiry->notes ? $inquiry->notes."\n\n" : '').'['.now()->format('d M Y, h:i A').'] Replied: '.$validated['reply_message'],
+        ]);
+
+        ActivityLog::log('Contact CMS', 'reply', "Sent email reply to inquiry #{$id} ({$inquiry->email})");
+
+        return back()->with('success', 'आपके उत्तर का ईमेल भक्त ('.$inquiry->email.') को सफलतापूर्वक भेज दिया गया है।');
     }
 
     public function deleteContactInquiry(Request $request, $id)

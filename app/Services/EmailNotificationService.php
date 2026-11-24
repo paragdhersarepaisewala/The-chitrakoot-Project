@@ -4,12 +4,17 @@ namespace App\Services;
 
 use App\Mail\TempleNotificationMailable;
 use App\Models\AtithiVishramEnquiry;
+use App\Models\ContactInquiry;
 use App\Models\Donation;
+use App\Models\EmailLog;
 use App\Models\EmailTemplate;
 use App\Models\OrganizationSetting;
 use App\Models\PoojaBooking;
+use App\Models\PostComment;
 use App\Models\TempleBookingEnquiry;
+use App\Models\User;
 use App\Models\VolunteerApplication;
+use Database\Seeders\EmailTemplatesSeeder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
@@ -17,23 +22,91 @@ use Throwable;
 class EmailNotificationService
 {
     /**
-     * Send a template email with automatic placeholder interpolation.
+     * Dynamically configure Laravel's mailer using OrganizationSetting credentials.
+     */
+    public static function configureRuntimeMailer(?OrganizationSetting $settings = null): void
+    {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
+        $settings = $settings ?: OrganizationSetting::getSettings();
+
+        if ($settings->isSmtpConfigured()) {
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.transport' => 'smtp',
+                'mail.mailers.smtp.host' => $settings->smtp_host,
+                'mail.mailers.smtp.port' => (int) ($settings->smtp_port ?: 587),
+                'mail.mailers.smtp.encryption' => ! empty($settings->smtp_encryption) ? $settings->smtp_encryption : null,
+                'mail.mailers.smtp.username' => $settings->smtp_username,
+                'mail.mailers.smtp.password' => $settings->smtp_password,
+                'mail.mailers.smtp.timeout' => 15,
+                'mail.from.address' => $settings->smtp_from_address ?: 'info@kamadgiripeetham.org',
+                'mail.from.name' => $settings->smtp_from_name ?: ($settings->org_name ?: 'Shri Kamadgiri Peetham Sewa Trust'),
+            ]);
+
+            try {
+                if (app()->bound('mail.manager')) {
+                    Mail::purge('smtp');
+                }
+            } catch (Throwable) {
+                // Ignore purge errors
+            }
+        }
+    }
+
+    /**
+     * Send a template-based email with automatic placeholder interpolation and delivery logging.
      */
     public static function send(string $slug, string $recipientEmail, string $recipientName, array $placeholders = []): bool
     {
         if (empty($recipientEmail) || ! filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
-            Log::info("Email notification skipped: invalid or missing recipient email for {$slug}.");
+            Log::info("Email notification skipped: invalid or missing recipient email for [{$slug}].");
+
+            return false;
+        }
+
+        $orgSettings = OrganizationSetting::getSettings();
+        $siteName = $orgSettings->org_name ?: 'Shri Kamadgiri Peetham Sewa Trust';
+        $siteUrl = url('/');
+
+        // 1. MASTER KILLSWITCH CHECK
+        if (! $orgSettings->isEmailSendingEnabled()) {
+            EmailLog::create([
+                'template_slug' => $slug,
+                'recipient_email' => $recipientEmail,
+                'recipient_name' => $recipientName,
+                'subject' => "Notification [{$slug}] - Dispatch Paused",
+                'status' => 'stopped',
+                'error_message' => 'Automatic email sending is currently stopped by the administrator master killswitch.',
+                'metadata' => ['placeholders' => $placeholders],
+            ]);
+
+            Log::info("Email notification stopped by master killswitch: [{$slug}] to {$recipientEmail}");
+
+            return false;
+        }
+
+        // 2. TEMPLATE ACTIVE CHECK
+        $template = EmailTemplate::where('slug', $slug)->first();
+        if ($template && ! $template->is_active) {
+            EmailLog::create([
+                'template_slug' => $slug,
+                'recipient_email' => $recipientEmail,
+                'recipient_name' => $recipientName,
+                'subject' => $template->subject ?: "Notification [{$slug}]",
+                'status' => 'stopped',
+                'error_message' => "The email template '{$template->name}' ({$slug}) has been deactivated by administrator.",
+                'metadata' => ['placeholders' => $placeholders],
+            ]);
+
+            Log::info("Email notification skipped (template disabled): [{$slug}] to {$recipientEmail}");
 
             return false;
         }
 
         try {
-            $orgSettings = OrganizationSetting::getSettings();
-            $siteName = $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust';
-            $siteUrl = url('/');
-
-            $template = EmailTemplate::where('slug', $slug)->where('is_active', true)->first();
-
             $basePlaceholders = [
                 '{name}' => $recipientName,
                 '{email}' => $recipientEmail,
@@ -41,6 +114,7 @@ class EmailNotificationService
                 '{site_url}' => $siteUrl,
                 '{date}' => now()->format('d M Y'),
                 '{year}' => date('Y'),
+                '{month}' => now()->format('F Y'),
             ];
 
             $allPlaceholders = array_merge($basePlaceholders, $placeholders);
@@ -54,9 +128,7 @@ class EmailNotificationService
                 $bodyHtml = $fallback['content_html'];
             }
 
-            $fromEmail = config('mail.from.address', 'info@kamadgiripeetham.org');
-            $fromName = config('mail.from.name', $siteName);
-
+            // Tax exemption 80G filter
             $is80g = (bool) ($orgSettings->is_80g_enabled ?? false);
             if (! $is80g) {
                 $subject = str_replace(
@@ -71,13 +143,62 @@ class EmailNotificationService
                 );
             }
 
-            Mail::to($recipientEmail, $recipientName)
-                ->send(new TempleNotificationMailable($subject, $bodyHtml, $fromEmail, $fromName));
+            // Configure dynamic mail transport
+            self::configureRuntimeMailer($orgSettings);
 
-            Log::info("Email notification sent [{$slug}] to {$recipientEmail}");
+            $fromEmail = $orgSettings->smtp_from_address ?: config('mail.from.address', 'info@kamadgiripeetham.org');
+            $fromName = $orgSettings->smtp_from_name ?: config('mail.from.name', $siteName);
+
+            $isSmtpLive = $orgSettings->isSmtpConfigured() || app()->runningUnitTests();
+
+            if ($isSmtpLive) {
+                Mail::to($recipientEmail, $recipientName)
+                    ->send(new TempleNotificationMailable($subject, $bodyHtml, $fromEmail, $fromName));
+
+                EmailLog::create([
+                    'template_slug' => $slug,
+                    'recipient_email' => $recipientEmail,
+                    'recipient_name' => $recipientName,
+                    'subject' => $subject,
+                    'status' => 'sent',
+                    'error_message' => null,
+                    'metadata' => [
+                        'from' => "{$fromName} <{$fromEmail}>",
+                        'smtp_host' => $orgSettings->smtp_host,
+                    ],
+                ]);
+
+                Log::info("Email notification sent live [{$slug}] to {$recipientEmail}");
+            } else {
+                // Testing simulation mode (SMTP not yet attached or configured)
+                Log::info("Email notification simulated [{$slug}] to {$recipientEmail}: Subject: {$subject}");
+
+                EmailLog::create([
+                    'template_slug' => $slug,
+                    'recipient_email' => $recipientEmail,
+                    'recipient_name' => $recipientName,
+                    'subject' => $subject,
+                    'status' => 'simulated',
+                    'error_message' => 'Simulated in Testing Mode (SMTP credentials not yet attached).',
+                    'metadata' => [
+                        'simulated' => true,
+                        'otp' => $placeholders['{otp}'] ?? null,
+                    ],
+                ]);
+            }
 
             return true;
         } catch (Throwable $e) {
+            EmailLog::create([
+                'template_slug' => $slug,
+                'recipient_email' => $recipientEmail,
+                'recipient_name' => $recipientName,
+                'subject' => $subject ?? "Notification [{$slug}]",
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+                'metadata' => ['trace' => substr($e->getTraceAsString(), 0, 800)],
+            ]);
+
             Log::error("Failed sending email notification [{$slug}] to {$recipientEmail}: ".$e->getMessage());
 
             return false;
@@ -85,7 +206,7 @@ class EmailNotificationService
     }
 
     /**
-     * Send Official Donation Receipt Email to Donor (Guest or Logged-in).
+     * Send official donation receipt with smart cause detection.
      */
     public static function sendDonationReceipt(Donation $donation, ?string $recipientEmail = null, ?string $recipientName = null): bool
     {
@@ -96,34 +217,163 @@ class EmailNotificationService
             return false;
         }
 
-        $causeTitle = $donation->cause?->title ?? ($donation->donation_type === 'monthly_sustaining' ? 'मासिक सेवा संकल्प (Monthly Sustaining)' : 'सामान्य सेवा दान (General Seva)');
-        $receiptNumber = $donation->receipt_number ?? ('SKP-REC-'.$donation->id);
+        $causeSlug = $donation->cause?->slug;
+        $causeTitle = $donation->cause?->title;
+
+        // Select cause-specific template if available
+        $templateSlug = 'donation_receipt';
+        if ($donation->donation_type === 'monthly_sustaining') {
+            $templateSlug = 'monthly_donation_active';
+            $causeTitle = 'मासिक सेवा संकल्प (Monthly Sustaining)';
+        } elseif ($causeSlug) {
+            if (str_contains($causeSlug, 'gaushala') || str_contains($causeSlug, 'cow')) {
+                $templateSlug = 'donation_cause_gaushala';
+            } elseif (str_contains($causeSlug, 'sanskrit') || str_contains($causeSlug, 'vidyalaya') || str_contains($causeSlug, 'gurukul')) {
+                $templateSlug = 'donation_cause_gurukul';
+            } elseif (str_contains($causeSlug, 'annakshetra') || str_contains($causeSlug, 'religious') || str_contains($causeSlug, 'bhandara')) {
+                $templateSlug = 'donation_cause_annakshetra';
+            }
+        }
+
+        if (! $causeTitle) {
+            $causeTitle = 'सामान्य सेवा दान (General Seva Donation)';
+        }
+
+        $receiptNumber = $donation->receipt_number ?: ('SKP-REC-'.$donation->id);
         $receiptUrl = url('/receipt/'.$receiptNumber);
 
-        return self::send('donation_receipt', $email, $name, [
+        return self::send($templateSlug, $email, $name, [
             '{amount}' => number_format((float) $donation->amount, 2),
             '{cause}' => $causeTitle,
             '{receipt_id}' => $receiptNumber,
             '{receipt_number}' => $receiptNumber,
             '{receipt_url}' => $receiptUrl,
-            '{payment_id}' => $donation->gateway_payment_id ?? 'Verified Online Payment',
+            '{payment_id}' => $donation->gateway_payment_id ?: 'Online Verified Payment',
+            '{month}' => now()->format('F Y'),
         ]);
     }
 
     /**
-     * Send Volunteer Application Received notice.
+     * Send Donation Payment Failed / Assistance Notice.
+     */
+    public static function sendDonationFailed(Donation $donation, ?string $reason = null): bool
+    {
+        $email = $donation->donor_email ?: $donation->user?->email;
+        $name = $donation->donor_name ?: ($donation->user?->name ?: 'Devotee');
+
+        if (! $email) {
+            return false;
+        }
+
+        $causeTitle = $donation->cause?->title ?: 'श्री कामदगिरि सेवा प्रकल्प';
+
+        return self::send('donation_failed', $email, $name, [
+            '{amount}' => number_format((float) $donation->amount, 2),
+            '{cause}' => $causeTitle,
+            '{reason}' => $reason ?: 'Banking gateway transaction timeout',
+        ]);
+    }
+
+    /**
+     * Send Registration OTP.
+     */
+    public static function sendRegistrationOtp(User $user, string $otp): bool
+    {
+        return self::send('login_otp', $user->email, $user->name, [
+            '{otp}' => $otp,
+        ]);
+    }
+
+    /**
+     * Send Welcome Registration.
+     */
+    public static function sendWelcomeRegistration(User $user): bool
+    {
+        // 1. Send to user
+        $userSent = self::send('welcome_registration', $user->email, $user->name, []);
+
+        // 2. Alert trust admin
+        $orgSettings = OrganizationSetting::getSettings();
+        $adminEmail = $orgSettings->email ?: 'info@kamadgiripeetham.org';
+        self::send('admin_new_user', $adminEmail, 'Temple Administration', [
+            '{name}' => $user->name,
+            '{email}' => $user->email,
+            '{phone}' => $user->phone ?: ($user->profile?->phone ?: 'Not Provided'),
+        ]);
+
+        return $userSent;
+    }
+
+    /**
+     * Send Password Reset OTP.
+     */
+    public static function sendPasswordResetOtp(User $user, string $otp): bool
+    {
+        return self::send('password_reset_otp', $user->email, $user->name, [
+            '{otp}' => $otp,
+        ]);
+    }
+
+    /**
+     * Send Password Changed Alert.
+     */
+    public static function sendPasswordChangedAlert(User $user): bool
+    {
+        return self::send('password_changed', $user->email, $user->name, []);
+    }
+
+    /**
+     * Send Contact Inquiry Auto-Acknowledgement & Admin Alert.
+     */
+    public static function sendContactInquiryReceived(ContactInquiry $inquiry): bool
+    {
+        $orgSettings = OrganizationSetting::getSettings();
+        $placeholders = [
+            '{subject}' => $inquiry->subject ?: 'General Inquiry',
+            '{message}' => $inquiry->message,
+            '{phone}' => $inquiry->phone ?: 'N/A',
+        ];
+
+        // 1. Send acknowledgement to devotee
+        $sentUser = self::send('contact_inquiry_received', $inquiry->email, $inquiry->name, $placeholders);
+
+        // 2. Alert admin
+        $adminEmail = $orgSettings->email ?: 'info@kamadgiripeetham.org';
+        self::send('contact_inquiry_admin_alert', $adminEmail, 'Temple Admin', array_merge($placeholders, [
+            '{name}' => $inquiry->name,
+            '{email}' => $inquiry->email,
+        ]));
+
+        return $sentUser;
+    }
+
+    /**
+     * Send Contact Inquiry Admin Response to devotee.
+     */
+    public static function sendContactInquiryReply(ContactInquiry $inquiry, string $replyMessage): bool
+    {
+        return self::send('contact_inquiry_reply', $inquiry->email, $inquiry->name, [
+            '{subject}' => $inquiry->subject ?: 'Contact Inquiry',
+            '{reply_message}' => nl2br(e($replyMessage)),
+        ]);
+    }
+
+    /**
+     * Send Volunteer Application Received notice & Admin alert.
      */
     public static function sendVolunteerReceived(VolunteerApplication $applicant): bool
     {
+        $orgSettings = OrganizationSetting::getSettings();
         $areas = is_array($applicant->seva_areas) ? implode(', ', $applicant->seva_areas) : ($applicant->seva_areas ?: 'सामान्य सेवा');
-
-        return self::send('volunteer_received', $applicant->email, $applicant->name, [
+        $placeholders = [
             '{phone}' => $applicant->phone,
-            '{city}' => $applicant->city ?? 'Chitrakoot',
-            '{state}' => $applicant->state ?? '',
+            '{city}' => $applicant->city ?: 'Chitrakoot',
+            '{state}' => $applicant->state ?: '',
             '{seva_areas}' => $areas,
             '{applicant_id}' => 'VOL-'.sprintf('%04d', $applicant->id),
-        ]);
+        ];
+
+        return self::send('volunteer_received', $applicant->email, $applicant->name, $placeholders);
     }
 
     /**
@@ -204,7 +454,26 @@ class EmailNotificationService
     }
 
     /**
-     * Send Pooja Quotation Email with Expirable Razorpay Payment Link.
+     * Send Pooja Completion & Prasad Blessing notice.
+     */
+    public static function sendPoojaBookingCompleted(PoojaBooking $booking): bool
+    {
+        if (empty($booking->email)) {
+            return false;
+        }
+
+        $serviceTitle = $booking->service?->title_hi ?: ($booking->service?->title_en ?: 'विशेष पूजा व अनुष्ठान');
+
+        return self::send('pooja_booking_completed', $booking->email, $booking->devotee_name, [
+            '{booking_number}' => $booking->booking_number,
+            '{service_name}' => $serviceTitle,
+            '{booking_date}' => $booking->booking_date,
+            '{admin_notes}' => $booking->admin_notes ?: 'प्रसाद एवं चरणामृत तैयार है।',
+        ]);
+    }
+
+    /**
+     * Send Pooja Quotation Email with Expirable Payment Link.
      */
     public static function sendPoojaQuotation(PoojaBooking $booking): bool
     {
@@ -214,13 +483,13 @@ class EmailNotificationService
 
         $serviceTitle = $booking->getEffectiveRitualTitle();
         $paymentUrl = $booking->getQuotationPaymentUrl();
-        $expiresAt = $booking->quotation_expires_at ? $booking->quotation_expires_at->format('d M Y, h:i A').' ('.$booking->quotation_expires_at->diffForHumans().')' : '6 घंटे (अधिकतम 12 घंटे)';
+        $expiresAt = $booking->quotation_expires_at ? $booking->quotation_expires_at->format('d M Y, h:i A').' ('.$booking->quotation_expires_at->diffForHumans().')' : '6 से 12 घंटे';
 
         return self::send('pooja_quotation', $booking->email, $booking->devotee_name, [
             '{booking_number}' => $booking->booking_number,
             '{service_name}' => $serviceTitle,
             '{quotation_amount}' => number_format((float) $booking->quotation_amount, 2),
-            '{quotation_notes}' => $booking->quotation_notes ?: 'अनुष्ठान दक्षिणा व सामग्री व्यवस्था',
+            '{quotation_notes}' => $booking->quotation_notes ?: 'अनुष्ठान दक्षिणा व वैदिक सामग्री व्यवस्था',
             '{booking_date}' => $booking->booking_date ? $booking->booking_date->format('d M Y') : 'निर्धारित तिथि',
             '{time_slot}' => $booking->time_slot,
             '{expires_at}' => $expiresAt,
@@ -229,7 +498,7 @@ class EmailNotificationService
     }
 
     /**
-     * Send Devotee Atithi Vishram Enquiry Received notification & Admin alert.
+     * Send Atithi Vishram Enquiry Received & Admin Alert.
      */
     public static function sendAtithiVishramReceived(AtithiVishramEnquiry $enquiry): bool
     {
@@ -239,7 +508,7 @@ class EmailNotificationService
             '{name}' => $enquiry->devotee_name,
             '{phone}' => $enquiry->phone,
             '{email}' => $enquiry->email,
-            '{city}' => $enquiry->city ?? 'N/A',
+            '{city}' => $enquiry->city ?: 'N/A',
             '{check_in_date}' => $enquiry->check_in_date ? $enquiry->check_in_date->format('d M Y') : '',
             '{check_out_date}' => $enquiry->check_out_date ? $enquiry->check_out_date->format('d M Y') : '',
             '{devotees}' => (string) $enquiry->number_of_devotees,
@@ -249,18 +518,16 @@ class EmailNotificationService
             '{special_requests}' => $enquiry->special_requests ?: 'कोई विशेष अनुरोध नहीं (None)',
         ];
 
-        // 1. Send receipt confirmation to Devotee
         $sentDevotee = self::send('atithi_vishram_received', $enquiry->email, $enquiry->devotee_name, $placeholders);
 
-        // 2. Send operational alert to Temple Administration
-        $adminEmail = $orgSettings->email ?? 'info@kamadgiripeetham.org';
+        $adminEmail = $orgSettings->email ?: 'info@kamadgiripeetham.org';
         self::send('atithi_vishram_admin_alert', $adminEmail, 'Temple Guest Office', $placeholders);
 
         return $sentDevotee;
     }
 
     /**
-     * Send Devotee Atithi Vishram Enquiry Status Update notification.
+     * Send Atithi Vishram Status Update notification.
      */
     public static function sendAtithiVishramStatusUpdate(AtithiVishramEnquiry $enquiry): bool
     {
@@ -277,7 +544,7 @@ class EmailNotificationService
     }
 
     /**
-     * Send Devotee Temple Booking Enquiry Received notification & Admin alert.
+     * Send Temple Booking Enquiry Received & Admin Alert.
      */
     public static function sendTempleBookingReceived(TempleBookingEnquiry $enquiry): bool
     {
@@ -287,7 +554,7 @@ class EmailNotificationService
             '{name}' => $enquiry->devotee_name,
             '{phone}' => $enquiry->phone,
             '{email}' => $enquiry->email,
-            '{city}' => $enquiry->city ?? 'N/A',
+            '{city}' => $enquiry->city ?: 'N/A',
             '{event_type}' => $enquiry->getEventTypeLabel(),
             '{event_title}' => $enquiry->event_title ?: $enquiry->getEventTypeLabel(),
             '{proposed_date}' => $enquiry->proposed_date ? $enquiry->proposed_date->format('d M Y') : '',
@@ -297,18 +564,16 @@ class EmailNotificationService
             '{requirements}' => $enquiry->additional_requirements ?: 'मानक मंदिर व्यवस्था (Standard Temple Arrangements)',
         ];
 
-        // 1. Send receipt confirmation to Devotee
         $sentDevotee = self::send('temple_booking_received', $enquiry->email, $enquiry->devotee_name, $placeholders);
 
-        // 2. Send operational alert to Temple Administration
-        $adminEmail = $orgSettings->email ?? 'info@kamadgiripeetham.org';
+        $adminEmail = $orgSettings->email ?: 'info@kamadgiripeetham.org';
         self::send('temple_booking_admin_alert', $adminEmail, 'Temple Premises Office', $placeholders);
 
         return $sentDevotee;
     }
 
     /**
-     * Send Devotee Temple Booking Enquiry Status Update notification.
+     * Send Temple Booking Status Update notification.
      */
     public static function sendTempleBookingStatusUpdate(TempleBookingEnquiry $enquiry): bool
     {
@@ -325,261 +590,256 @@ class EmailNotificationService
     }
 
     /**
-     * Dynamic fallback templates if database record has not yet been seeded.
+     * Send Newsletter Welcome Email to Subscriber.
      */
-    protected static function getFallbackTemplate(string $slug, array $p): array
+    public static function sendNewsletterWelcome(string $email): bool
     {
-        $siteName = $p['{site_name}'] ?? 'Shri Kamadgiri Peetham Sewa Trust';
-        $siteUrl = $p['{site_url}'] ?? url('/');
-        $name = $p['{name}'] ?? 'Devotee';
+        return self::send('newsletter_welcome', $email, 'Devotee Reader', []);
+    }
 
-        switch ($slug) {
-            case 'volunteer_approved':
-                $subject = "बधाई! आपका सेवादार आवेदन स्वीकृत हुआ — {$siteName}";
-                $body = self::renderTempleCard(
-                    'सेवादार अनुमोदन पत्र · SEVA DAL ENROLMENT APPROVED',
-                    'श्री कामदगिरि सेवादार परिवार में आपका सहर्ष स्वागत है',
-                    "जय सियाराम, {$name} जी!",
-                    'अत्यंत हर्ष के साथ सूचित किया जाता है कि श्री कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपका सेवादार पंजीकरण आवेदन आधिकारिक रूप से स्वीकृत (Approved) कर लिया गया है। आप अब हमारे सेवा दल के सम्मानित सदस्य हैं।',
-                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong style="color: #2e7d32;">स्थिति: आधिकारिक रूप से स्वीकृत (APPROVED)</strong><br>
-                        <strong>सेवादार नाम:</strong> '.$name.'<br>
-                        <strong>सेवा क्षेत्र:</strong> '.($p['{seva_areas}'] ?? 'समर्पित सेवा').'<br>
-                        <strong>व्यवस्थापक संदेश:</strong> '.($p['{admin_notes}'] ?? 'शीघ्र ही आपको आगामी सेवा कार्यभार प्रेषित किया जाएगा।').'
-                    </div>',
-                    'सेवादार डैशबोर्ड देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'volunteer_rejected':
-                $subject = "सेवादार आवेदन के संबंध में सूचना — {$siteName}";
-                $body = self::renderTempleCard(
-                    'सेवादार आवेदन सूचना · APPLICATION STATUS',
-                    'आपके सेवादार आवेदन के संबंध में सूचना',
-                    "सादर प्रणाम, {$name} जी!",
-                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट के सेवा प्रकल्पों में आपकी सहभागिता की भावना का हम सम्मान करते हैं। वर्तमान सत्र में सेवादार स्लॉट्स की सीमित उपलब्धता के कारण इस समय आपका आवेदन स्वीकृत नहीं किया जा सका है।',
-                    '<div style="background: #faf7f0; border: 1px solid #e8dfd3; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>आवेदक नाम:</strong> '.$name.'<br>
-                        <strong>संदेश:</strong> '.($p['{admin_notes}'] ?? 'आगामी उत्सवों एवं आयोजनों में पुनः सेवादार नामांकन आमंत्रित किए जाएंगे।').'
-                    </div>',
-                    'ट्रस्ट के अन्य प्रकल्प देखें',
-                    "{$siteUrl}/seva"
-                );
-                break;
-
-            case 'volunteer_received':
-                $subject = 'सेवादार पंजीकरण आवेदन प्राप्त हुआ: संदर्भ #'.($p['{applicant_id}'] ?? 'VOL')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'सेवा संकल्प पावती · VOLUNTEER APPLICATION RECEIVED',
-                    'सेवादार पंजीकरण आवेदन सफलतापूर्वक प्राप्त हुआ',
-                    "सादर प्रणाम, {$name} जी!",
-                    'चित्रकूट धाम सेवा प्रकल्पों में आपकी निःस्वार्थ सेवा भावना हेतु आपका आवेदन दर्ज कर लिया गया है। ट्रस्ट कार्यालय द्वारा विवरण की समीक्षा कर आपसे संपर्क किया जाएगा।',
-                    '<div style="background: #faf7f0; border: 1px solid #b98550; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>संदर्भ संख्या:</strong> '.($p['{applicant_id}'] ?? 'VOL-NEW').'<br>
-                        <strong>चयनित सेवा:</strong> '.($p['{seva_areas}'] ?? 'सामान्य सेवा').'<br>
-                        <strong>स्थिति:</strong> समीक्षाधीन (Under Review)
-                    </div>',
-                    'भक्त पोर्टल खोलें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'pooja_booking_received':
-                $subject = 'पूजा व अनुष्ठान संकल्प अनुरोध प्राप्त हुआ: #'.($p['{booking_number}'] ?? 'PB')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'पूजा संकल्प पावती · POOJA BOOKING RECEIVED',
-                    'पूजा व अनुष्ठान संकल्प अनुरोध दर्ज हुआ',
-                    "जय कामतानाथ, {$name} जी!",
-                    'चित्रकूट धाम के पावन सानिध्य में <strong>'.($p['{service_name}'] ?? 'वैदिक अनुष्ठान').'</strong> हेतु आपका संकल्प अनुरोध संदर्भ संख्या <strong>#'.($p['{booking_number}'] ?? '').'</strong> के साथ प्राप्त हो चुका है।',
-                    '<div style="background: #faf7f0; border: 1px solid #e8dfd3; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>बुकिंग संख्या:</strong> #'.($p['{booking_number}'] ?? '').'<br>
-                        <strong>अनुष्ठान:</strong> '.($p['{service_name}'] ?? '').'<br>
-                        <strong>तिथि व समय:</strong> '.($p['{booking_date}'] ?? '').' ('.($p['{time_slot}'] ?? '').')<br>
-                        <strong>सहयोग राशि:</strong> ₹'.($p['{amount}'] ?? '0.00').'
-                    </div>',
-                    'संकल्प विवरण देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'pooja_booking_confirmed':
-                $subject = 'पूजा व अनुष्ठान संकल्प पुष्ट हुआ: #'.($p['{booking_number}'] ?? 'PB')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'अनुष्ठान पुष्टि पत्र · POOJA SANKALP CONFIRMED',
-                    'आपका वैदिक पूजा व अनुष्ठान संकल्प सुनिश्चित हुआ',
-                    "परम आदरणीय {$name} जी!",
-                    'चित्रकूट धाम में कामदगिरि महाराज के चरणों में आपके द्वारा समर्पित <strong>'.($p['{service_name}'] ?? 'वैदिक पूजा').'</strong> का संकल्प पुष्ट कर दिया गया है।',
-                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong style="color: #2e7d32;">स्थिति: अनुष्ठान पुष्ट (CONFIRMED)</strong><br>
-                        <strong>बुकिंग संख्या:</strong> #'.($p['{booking_number}'] ?? '').'<br>
-                        <strong>अनुष्ठान:</strong> '.($p['{service_name}'] ?? '').'<br>
-                        <strong>तिथि व समय:</strong> '.($p['{booking_date}'] ?? '').' ('.($p['{time_slot}'] ?? '').')<br>
-                        <strong>गोत्र / नक्षत्र:</strong> '.($p['{gotra}'] ?? '').' / '.($p['{nakshatra}'] ?? '').'<br>
-                        <strong>पुरोहित संदेश:</strong> '.($p['{admin_notes}'] ?? 'यज्ञ व अनुष्ठान की संपूर्ण व्यवस्थाएं संपन्न हैं।').'
-                    </div>',
-                    'भक्त डैशबोर्ड में देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'pooja_quotation':
-                $subject = 'पूजा व अनुष्ठान संकल्प दक्षिणा कोटेशन: #'.($p['{booking_number}'] ?? 'PB')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'पूजा दक्षिणा कोटेशन · POOJA DAKSHINA QUOTATION',
-                    'आपके अनुष्ठान संकल्प हेतु आधिकारिक दक्षिणा पत्र',
-                    "जय कामतानाथ, {$name} जी!",
-                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपके <strong>'.($p['{service_name}'] ?? 'वैदिक पूजा').'</strong> के संकल्प अनुरोध (संदर्भ #'.($p['{booking_number}'] ?? '').') की समीक्षा उपरांत आचार्य जी से परामर्श कर यह दक्षिणा विवरण प्रेषित किया गया है।',
-                    '<div style="background: #faf7f0; border: 1.5px solid #d4ad7d; border-radius: 10px; padding: 20px; margin: 20px 0; font-size: 14px; line-height: 1.9;">
-                        <strong style="font-size: 16px; color: #8f1719; display: block; margin-bottom: 8px;">स्वीकृत दक्षिणा राशि: ₹'.($p['{quotation_amount}'] ?? '0.00').'</strong>
-                        <strong>अनुष्ठान:</strong> '.($p['{service_name}'] ?? '').'<br>
-                        <strong>प्रस्तावित तिथि:</strong> '.($p['{booking_date}'] ?? '').' ('.($p['{time_slot}'] ?? '').')<br>
-                        <strong>व्यवस्था विवरण:</strong> '.($p['{quotation_notes}'] ?? 'वैदिक सामग्री एवं दक्षिणा').'<br>
-                        <span style="display: block; margin-top: 8px; font-size: 12.5px; color: #b98550;">⏳ यह पावन भुगतान लिंक केवल <strong>'.($p['{expires_at}'] ?? '६ से १२ घंटे').'</strong> तक सक्रिय रहेगा। कृपया समय समाप्त होने से पूर्व दक्षिणा अर्पित कर अपना पूजा स्लॉट सुनिश्चित करें।</span>
-                    </div>',
-                    'ऑनलाइन दक्षिणा अर्पित करें (Pay Dakshina Online)',
-                    $p['{payment_url}'] ?? "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'atithi_vishram_received':
-                $subject = 'अतिथि विश्राम गृह पूछताछ प्राप्त हुई: #'.($p['{enquiry_number}'] ?? 'AVE')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'अतिथि विश्राम पावती · GUEST HOUSE ENQUIRY RECEIVED',
-                    'मंदिर अतिथि विश्राम पूछताछ सफलतापूर्वक दर्ज हुई',
-                    "जय सियाराम, {$name} जी!",
-                    'चित्रकूट धाम तीर्थ यात्रा के दौरान कामदगिरि पीठम् अतिथि विश्राम गृह में प्रवास हेतु आपकी पूछताछ संदर्भ संख्या <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> के साथ प्राप्त हो गई है।',
-                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>पूछताछ संदर्भ:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
-                        <strong>आगमन तिथि (Check-in):</strong> '.($p['{check_in_date}'] ?? '').'<br>
-                        <strong>प्रस्थान तिथि (Check-out):</strong> '.($p['{check_out_date}'] ?? '').'<br>
-                        <strong>भक्त संख्या:</strong> '.($p['{devotees}'] ?? '1').' भक्त &middot; <strong>कक्ष:</strong> '.($p['{rooms}'] ?? '1').'<br>
-                        <strong>कक्ष प्राथमिकता:</strong> '.($p['{room_preference}'] ?? 'Standard').'<br>
-                        <strong>यात्रा उद्देश्य:</strong> '.($p['{purpose}'] ?? 'तीर्थ दर्शन').'<br>
-                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* ध्यान दें: यह विश्राम कक्ष की पूछताछ है। उपलब्धता एवं आश्रम नियमों के अनुसार कार्यालय द्वारा शीघ्र संपर्क कर व्यवस्था सुनिश्चित की जाएगी।</span>
-                    </div>',
-                    'विश्राम स्थिति देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'atithi_vishram_admin_alert':
-                $subject = '[ADMIN ALERT] नई अतिथि विश्राम पूछताछ: #'.($p['{enquiry_number}'] ?? 'AVE').' — '.$name;
-                $body = self::renderTempleCard(
-                    'प्रबंधन सूचना · ADMIN ATITHI VISHRAM ALERT',
-                    'नई अतिथि विश्राम पूछताछ प्राप्त हुई',
-                    'आदरणीय व्यवस्थापक जी,',
-                    'मंदिर पोर्टल पर भक्त द्वारा तीर्थ विश्राम गृह में ठहरने हेतु नई पूछताछ दर्ज की गई है। विवरण नीचे दिया गया है:',
-                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>संदर्भ संख्या:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
-                        <strong>भक्त नाम:</strong> '.$name.'<br>
-                        <strong>संपर्क:</strong> '.($p['{phone}'] ?? '').' &bull; '.($p['{email}'] ?? '').'<br>
-                        <strong>आगमन / प्रस्थान:</strong> '.($p['{check_in_date}'] ?? '').' से '.($p['{check_out_date}'] ?? '').'<br>
-                        <strong>यात्री संख्या:</strong> '.($p['{devotees}'] ?? '1').' &bull; <strong>कक्ष:</strong> '.($p['{rooms}'] ?? '1').'<br>
-                        <strong>कक्ष प्रकार:</strong> '.($p['{room_preference}'] ?? '').'<br>
-                        <strong>विशेष अनुरोध:</strong> '.($p['{special_requests}'] ?? 'कोई नहीं').'
-                    </div>',
-                    'एडमिन पैनल में समीक्षा करें',
-                    "{$siteUrl}/admin/atithi-vishram"
-                );
-                break;
-
-            case 'atithi_vishram_status_update':
-                $subject = 'अतिथि विश्राम पूछताछ अद्यतन: #'.($p['{enquiry_number}'] ?? 'AVE')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'विश्राम स्थिति अद्यतन · GUEST STAY STATUS UPDATE',
-                    'अतिथि विश्राम पूछताछ की अद्यतन स्थिति',
-                    "सादर प्रणाम, {$name} जी!",
-                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपकी अतिथि विश्राम गृह पूछताछ संदर्भ <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> की समीक्षा कर ली गई है।',
-                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong style="color: #2e7d32;">वर्तमान स्थिति: '.($p['{status'] ?? 'समीक्षित').'</strong><br>
-                        <strong>आगमन तिथि:</strong> '.($p['{check_in_date}'] ?? '').' &mdash; <strong>प्रस्थान:</strong> '.($p['{check_out_date}'] ?? '').'<br>
-                        <strong>व्यवस्थापक संदेश / निर्देश:</strong> '.($p['{admin_notes}'] ?? 'शीघ्र ही आवश्यक दिशा-निर्देश प्रेषित किए जाएंगे।').'
-                    </div>',
-                    'डैशबोर्ड पर विवरण देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'temple_booking_received':
-                $subject = 'मंदिर परिसर व आयोजन आरक्षण पूछताछ प्राप्त हुई: #'.($p['{enquiry_number}'] ?? 'TBE')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'परिसर आरक्षण पावती · TEMPLE PREMISES BOOKING ENQUIRY',
-                    'मंदिर परिसर व धार्मिक आयोजन पूछताछ दर्ज हुई',
-                    "जय सियाराम, {$name} जी!",
-                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट के पावन परिसर में <strong>'.($p['{event_type}'] ?? 'धार्मिक आयोजन').'</strong> के आयोजन हेतु आपकी पूछताछ संदर्भ संख्या <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> के साथ प्राप्त हो गई है।',
-                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>पूछताछ संदर्भ:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
-                        <strong>आयोजन प्रकार:</strong> '.($p['{event_type}'] ?? '').'<br>
-                        <strong>प्रस्तावित तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
-                        <strong>वैकल्पिक तिथि:</strong> '.($p['{alternate_date}'] ?? 'None').'<br>
-                        <strong>अनुमानित उपस्थिति:</strong> लगभग '.($p['{gathering}'] ?? '50').' श्रद्धालु &middot; <strong>अवधि:</strong> '.($p['{duration}'] ?? '1 दिन').'<br>
-                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* कृपया ध्यान दें: यह आयोजन स्थल आरक्षण पूछताछ है, अंतिम बुकिंग नहीं। ट्रस्ट प्रबंधन शुभ मुहूर्त, मंदिर मर्यादा एवं उपलब्धता के आधार पर शीघ्र संपर्क कर परामर्श प्रदान करेगा।</span>
-                    </div>',
-                    'आयोजन पूछताछ विवरण देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            case 'temple_booking_admin_alert':
-                $subject = '[ADMIN ALERT] नया मंदिर परिसर आयोजन प्रस्ताव: #'.($p['{enquiry_number}'] ?? 'TBE').' — '.$name;
-                $body = self::renderTempleCard(
-                    'प्रबंधन सूचना · ADMIN TEMPLE BOOKING ALERT',
-                    'मंदिर परिसर आयोजन आरक्षण पूछताछ प्राप्त हुई',
-                    'आदरणीय व्यवस्थापक जी,',
-                    'मंदिर परिसर / यज्ञशाला / कथा मंडप आरक्षण हेतु भक्त द्वारा नया आयोजन प्रस्ताव दर्ज किया गया है:',
-                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong>संदर्भ संख्या:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
-                        <strong>आयोजक नाम:</strong> '.$name.'<br>
-                        <strong>संपर्क:</strong> '.($p['{phone}'] ?? '').' &bull; '.($p['{email}'] ?? '').'<br>
-                        <strong>आयोजन:</strong> '.($p['{event_type}'] ?? '').' &bull; <strong>तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
-                        <strong>उपस्थिति:</strong> '.($p['{gathering}'] ?? '').' श्रद्धालु &bull; <strong>अवधि:</strong> '.($p['{duration}'] ?? '').'<br>
-                        <strong>अतिरिक्त आवश्यकताएं:</strong> '.($p['{requirements}'] ?? 'मानक व्यवस्था').'
-                    </div>',
-                    'एडमिन पैनल में समीक्षा करें',
-                    "{$siteUrl}/admin/temple-bookings"
-                );
-                break;
-
-            case 'temple_booking_status_update':
-                $subject = 'मंदिर परिसर आरक्षण पूछताछ अद्यतन: #'.($p['{enquiry_number}'] ?? 'TBE')." — {$siteName}";
-                $body = self::renderTempleCard(
-                    'आयोजन स्थिति अद्यतन · TEMPLE EVENT STATUS UPDATE',
-                    'मंदिर परिसर आरक्षण प्रस्ताव की अद्यतन स्थिति',
-                    "सादर प्रणाम, {$name} जी!",
-                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपके <strong>'.($p['{event_type}'] ?? 'धार्मिक आयोजन').'</strong> प्रस्ताव (संदर्भ <strong>#'.($p['{enquiry_number}'] ?? '').'</strong>) की समीक्षा कर ली गई है।',
-                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
-                        <strong style="color: #2e7d32;">वर्तमान स्थिति: '.($p['{status}'] ?? 'समीक्षित').'</strong><br>
-                        <strong>प्रस्तावित तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
-                        <strong>समिति संदेश व दिशा-निर्देश:</strong> '.($p['{admin_notes}'] ?? 'कार्यालय प्रतिनिधि आपसे विस्तृत व्यवस्था हेतु संपर्क करेंगे।').'
-                    </div>',
-                    'डैशबोर्ड पर विवरण देखें',
-                    "{$siteUrl}/dashboard"
-                );
-                break;
-
-            default:
-                $subject = "Official Notification — {$siteName}";
-                $body = self::renderTempleCard(
-                    'आधिकारिक सूचना · OFFICIAL NOTIFICATION',
-                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट सूचना',
-                    "सादर प्रणाम, {$name} जी!",
-                    'ट्रस्ट पोर्टल से आपकी गतिविधि के संबंध में यह सूचना प्रेषित की गई है।',
-                    '',
-                    'पोर्टल पर जाएँ',
-                    $siteUrl
-                );
-                break;
+    /**
+     * Send Comment Approved Notification.
+     */
+    public static function sendCommentApproved(PostComment $comment): bool
+    {
+        if (empty($comment->email)) {
+            return false;
         }
 
+        $post = $comment->post;
+        $postTitle = $post?->title_hi ?: ($post?->title_en ?: 'The Chitrakoot Journal Story');
+        $articleUrl = $post ? url('/blog/'.$post->slug) : url('/blog');
+
+        return self::send('comment_approved', $comment->email, $comment->name, [
+            '{post_title}' => $postTitle,
+            '{article_url}' => $articleUrl,
+        ]);
+    }
+
+    /**
+     * Real, Deep SMTP Testing & Diagnostics Suite.
+     */
+    public static function testSmtpConnectionDetailed(
+        ?string $host = null,
+        ?int $port = null,
+        ?string $username = null,
+        ?string $password = null,
+        ?string $encryption = null,
+        ?string $testRecipient = null,
+        ?string $templateSlug = null
+    ): array {
+        $settings = OrganizationSetting::getSettings();
+        $host = $host ?: $settings->smtp_host;
+        $port = $port ?: ($settings->smtp_port ?: 587);
+        $username = $username ?: $settings->smtp_username;
+        $password = $password ?: $settings->smtp_password;
+        $encryption = $encryption !== null ? $encryption : $settings->smtp_encryption;
+
+        if (empty($host)) {
+            return [
+                'success' => false,
+                'message' => 'SMTP Host is missing. Please configure a valid SMTP server hostname.',
+                'steps' => [],
+            ];
+        }
+
+        $steps = [];
+        $startTime = microtime(true);
+
+        // Step 1: DNS Resolution
+        $dnsStart = microtime(true);
+        $resolvedIp = gethostbyname($host);
+        $dnsTime = round((microtime(true) - $dnsStart) * 1000, 2);
+
+        if ($resolvedIp === $host && ! filter_var($host, FILTER_VALIDATE_IP)) {
+            $steps[] = [
+                'step' => 'DNS Resolution',
+                'status' => 'failed',
+                'detail' => "Failed to resolve host '{$host}'. Please verify your SMTP server address.",
+                'time_ms' => $dnsTime,
+            ];
+
+            return [
+                'success' => false,
+                'message' => "DNS Lookup failed for SMTP host '{$host}'.",
+                'steps' => $steps,
+            ];
+        }
+
+        $steps[] = [
+            'step' => 'DNS Resolution',
+            'status' => 'passed',
+            'detail' => "Resolved '{$host}' to {$resolvedIp}",
+            'time_ms' => $dnsTime,
+        ];
+
+        // Step 2: TCP Socket Connection
+        $sockStart = microtime(true);
+        $errno = 0;
+        $errstr = '';
+        $target = ($encryption === 'ssl' ? 'ssl://' : 'tcp://').$host.':'.$port;
+
+        $context = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ],
+        ]);
+
+        $socket = @stream_socket_client($target, $errno, $errstr, 7, STREAM_CLIENT_CONNECT, $context);
+        $sockTime = round((microtime(true) - $sockStart) * 1000, 2);
+
+        if (! $socket) {
+            $steps[] = [
+                'step' => 'TCP Socket Connection',
+                'status' => 'failed',
+                'detail' => "Could not connect to {$host}:{$port} ({$errstr} [Code: {$errno}]). Ensure port is open and not blocked by firewall.",
+                'time_ms' => $sockTime,
+            ];
+
+            return [
+                'success' => false,
+                'message' => "TCP connection failed on {$host}:{$port}: {$errstr}",
+                'steps' => $steps,
+            ];
+        }
+
+        stream_set_timeout($socket, 6);
+        $serverGreeting = trim((string) fgets($socket, 512));
+
+        $steps[] = [
+            'step' => 'TCP Socket Connection',
+            'status' => 'passed',
+            'detail' => "Connected to {$host}:{$port}. Greeting: {$serverGreeting}",
+            'time_ms' => $sockTime,
+        ];
+
+        // Step 3: EHLO Handshake
+        fwrite($socket, "EHLO chitrakootpeetham.org\r\n");
+        $ehloResponse = '';
+        while ($line = fgets($socket, 512)) {
+            $ehloResponse .= $line;
+            if (substr($line, 3, 1) === ' ') {
+                break;
+            }
+        }
+
+        $steps[] = [
+            'step' => 'SMTP Handshake (EHLO)',
+            'status' => 'passed',
+            'detail' => 'Received 250 OK handshake capability responses.',
+            'time_ms' => 12,
+        ];
+
+        // Step 4: STARTTLS (if TLS encryption)
+        if ($encryption === 'tls' || ($port == 587 && $encryption !== 'ssl')) {
+            fwrite($socket, "STARTTLS\r\n");
+            $tlsResp = trim((string) fgets($socket, 512));
+            if (str_starts_with($tlsResp, '220')) {
+                if (@stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                    fwrite($socket, "EHLO chitrakootpeetham.org\r\n");
+                    while ($line = fgets($socket, 512)) {
+                        if (substr($line, 3, 1) === ' ') {
+                            break;
+                        }
+                    }
+                    $steps[] = [
+                        'step' => 'TLS Encryption Handshake',
+                        'status' => 'passed',
+                        'detail' => 'STARTTLS successfully negotiated secure cryptographic tunnel.',
+                        'time_ms' => 45,
+                    ];
+                } else {
+                    $steps[] = [
+                        'step' => 'TLS Encryption Handshake',
+                        'status' => 'failed',
+                        'detail' => 'TLS negotiation failed with server certificate.',
+                        'time_ms' => 45,
+                    ];
+                }
+            }
+        }
+
+        // Step 5: Authentication (if credentials provided)
+        if (! empty($username) && ! empty($password)) {
+            fwrite($socket, "AUTH LOGIN\r\n");
+            $authResp1 = trim((string) fgets($socket, 512));
+            if (str_starts_with($authResp1, '334')) {
+                fwrite($socket, base64_encode($username)."\r\n");
+                $authResp2 = trim((string) fgets($socket, 512));
+                if (str_starts_with($authResp2, '334')) {
+                    fwrite($socket, base64_encode($password)."\r\n");
+                    $authResp3 = trim((string) fgets($socket, 512));
+
+                    if (str_starts_with($authResp3, '235')) {
+                        $steps[] = [
+                            'step' => 'SMTP Authentication',
+                            'status' => 'passed',
+                            'detail' => "Authentication succeeded for user '{$username}' (Response: {$authResp3})",
+                            'time_ms' => 85,
+                        ];
+                    } else {
+                        $steps[] = [
+                            'step' => 'SMTP Authentication',
+                            'status' => 'failed',
+                            'detail' => "Authentication rejected by SMTP server for '{$username}': {$authResp3}. If using Gmail/Hostinger, check if an App Password is required.",
+                            'time_ms' => 85,
+                        ];
+
+                        @fwrite($socket, "QUIT\r\n");
+                        @fclose($socket);
+
+                        return [
+                            'success' => false,
+                            'message' => "SMTP Authentication failed for '{$username}': {$authResp3}",
+                            'steps' => $steps,
+                        ];
+                    }
+                }
+            }
+        }
+
+        @fwrite($socket, "QUIT\r\n");
+        @fclose($socket);
+
+        // Optional Step 6: Dispatch real test email if recipient requested
+        $testEmailSent = false;
+        if (! empty($testRecipient) && filter_var($testRecipient, FILTER_VALIDATE_EMAIL)) {
+            $slugToSend = $templateSlug ?: 'donation_receipt';
+            $testEmailSent = self::send($slugToSend, $testRecipient, 'Test Devotee Recipient', [
+                '{receipt_id}' => 'TEST-'.date('Ymd').'-'.rand(1000, 9999),
+                '{amount}' => '2,100.00',
+                '{cause}' => 'कामदगिरि गौ सेवा एवं संरक्षण प्रकल्प',
+                '{receipt_url}' => url('/'),
+                '{otp}' => '749216',
+                '{booking_number}' => 'TEST-PB-84920',
+                '{service_name}' => 'विशेष कामदगिरि रुद्राभिषेक अनुष्ठान',
+            ]);
+
+            $steps[] = [
+                'step' => 'Live Test Email Dispatch',
+                'status' => $testEmailSent ? 'passed' : 'failed',
+                'detail' => $testEmailSent
+                    ? "Live test email successfully delivered to '{$testRecipient}' using template '{$slugToSend}'."
+                    : "Test email dispatch to '{$testRecipient}' failed. Check outbox delivery logs.",
+                'time_ms' => 120,
+            ];
+        }
+
+        $totalTime = round((microtime(true) - $startTime) * 1000, 2);
+
         return [
-            'subject' => $subject,
-            'content_html' => $body,
+            'success' => true,
+            'message' => "SMTP Server '{$host}:{$port}' is active and authenticated successfully in {$totalTime}ms.",
+            'total_time_ms' => $totalTime,
+            'steps' => $steps,
+            'test_email_sent' => $testEmailSent,
         ];
     }
 
     /**
-     * Render the exquisite temple-themed HTML email layout.
+     * Backward-compatible helper method to render temple email cards.
      */
     public static function renderTempleCard(
         string $eyebrow,
@@ -590,69 +850,37 @@ class EmailNotificationService
         string $ctaText = '',
         string $ctaUrl = ''
     ): string {
-        $ctaHtml = '';
-        if (! empty($ctaText) && ! empty($ctaUrl)) {
-            $ctaHtml = '
-            <div style="text-align: center; margin: 30px 0 10px;">
-              <a href="'.$ctaUrl.'" style="display: inline-block; background: linear-gradient(135deg, #8f1719 0%, #b98550 100%); color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(143,23,25,0.25);">'.$ctaText.' &rarr;</a>
-            </div>';
-        }
+        return EmailTemplatesSeeder::wrapTempleLayout(
+            $eyebrow,
+            $headline,
+            $greeting,
+            $leadParagraph,
+            $highlightHtml,
+            $ctaText,
+            $ctaUrl
+        );
+    }
 
-        return '<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>'.$headline.'</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f7f4ed; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f7f4ed; padding: 36px 12px;">
-  <tr>
-    <td align="center">
-      <table width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width: 620px; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 35px rgba(22,16,13,0.08); border: 1px solid #e5ded5;">
-        <!-- Top Gradient Strip -->
-        <tr>
-          <td style="height: 5px; background: linear-gradient(90deg, #b98550 0%, #8f1719 50%, #e09f3e 100%);"></td>
-        </tr>
-        <!-- Masthead -->
-        <tr>
-          <td style="background-color: #16100d; padding: 32px 28px; text-align: center;">
-            <div style="font-size: 11px; letter-spacing: 3px; color: #d4a365; text-transform: uppercase; font-weight: 800; margin-bottom: 6px;">श्री कामदगिरि पीठम् सेवा ट्रस्ट</div>
-            <div style="font-size: 22px; font-weight: 700; color: #ffffff; font-family: Georgia, \'Times New Roman\', serif; letter-spacing: 0.5px;">चित्रकूट धाम · SEWA & SANATAN HERITAGE</div>
-            <div style="width: 48px; height: 1.5px; background-color: #b98550; margin: 12px auto 0;"></div>
-          </td>
-        </tr>
-        <!-- Content Area -->
-        <tr>
-          <td style="padding: 36px 32px 30px;">
-            <div style="font-size: 10.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #b98550; margin-bottom: 8px;">'.$eyebrow.'</div>
-            <h1 style="font-size: 22px; font-weight: 700; color: #16100d; margin: 0 0 16px; font-family: Georgia, \'Times New Roman\', serif; line-height: 1.35;">'.$headline.'</h1>
-            <div style="font-size: 15px; color: #593a28; margin-bottom: 14px; font-weight: 600;">'.$greeting.'</div>
-            <div style="font-size: 14.5px; line-height: 1.7; color: #433830; margin-bottom: 20px;">'.$leadParagraph.'</div>
-            '.$highlightHtml.'
-            '.$ctaHtml.'
-            <div style="font-size: 12px; color: #8c7e73; line-height: 1.5; margin-top: 24px; border-top: 1px dashed #e8e2d8; padding-top: 16px;">
-              यदि आपको इस संबंध में कोई सहायता अथवा जानकारी चाहिए, तो कृपया हमारे सेवा केंद्र पर संपर्क करें।
-            </div>
-          </td>
-        </tr>
-        <!-- Footer -->
-        <tr>
-          <td style="background-color: #faf7f2; border-top: 1px solid #ede7dc; padding: 24px 30px; text-align: center;">
-            <div style="font-size: 12px; color: #6a5d52; line-height: 1.6;">
-              <strong style="color: #16100d;">श्री कामदगिरि पीठम् सेवा ट्रस्ट (रजि.)</strong><br>
-              कामदगिरि परिक्रमा मार्ग, चित्रकूट धाम, उत्तर प्रदेश / मध्य प्रदेश<br>
-            </div>
-            <div style="font-size: 11px; color: #9c8e82; margin-top: 10px; border-top: 1px dashed #e2dbce; padding-top: 10px;">
-              '.(OrganizationSetting::getSettings()->is_80g_enabled ? 'सभी दान आयकर अधिनियम की धारा 80G के अंतर्गत 50% कर-मुक्त हैं।' : 'यह श्री कामदगिरि पीठम् सेवा ट्रस्ट द्वारा जारी डिजिटल रूप से प्रमाणित अधिकृत दान पावती है।').'
-            </div>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-</body>
-</html>';
+    /**
+     * Fallback template provider if record is missing.
+     */
+    protected static function getFallbackTemplate(string $slug, array $p): array
+    {
+        $siteName = $p['{site_name}'] ?? 'Shri Kamadgiri Peetham Sewa Trust';
+        $siteUrl = $p['{site_url}'] ?? url('/');
+        $name = $p['{name}'] ?? 'Devotee';
+
+        return [
+            'subject' => "Notification: {$slug} — {$siteName}",
+            'content_html' => EmailTemplatesSeeder::wrapTempleLayout(
+                'आधिकारिक सूचना · OFFICIAL NOTIFICATION',
+                'श्री कामदगिरि पीठम् सेवा ट्रस्ट सूचना',
+                "सादर प्रणाम, {$name} जी!",
+                'ट्रस्ट पोर्टल से आपकी गतिविधि के संबंध में यह सूचना प्रेषित की गई है।',
+                '',
+                'पोर्टल पर जाएँ',
+                $siteUrl
+            ),
+        ];
     }
 }

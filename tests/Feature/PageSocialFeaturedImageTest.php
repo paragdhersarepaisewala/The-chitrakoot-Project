@@ -61,7 +61,7 @@ class PageSocialFeaturedImageTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('All Pages SEO & Meta Manager');
         $response->assertSee('Social Share Featured Image');
-        $response->assertSee('3D RAEA Graphic');
+        $response->assertSee('Curated Brand Card');
         $response->assertSee('Home Page');
         $response->assertSee('About Us Page');
         $response->assertSee('Daily Aarti Schedule');

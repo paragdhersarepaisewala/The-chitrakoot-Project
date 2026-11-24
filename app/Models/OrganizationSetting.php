@@ -45,6 +45,7 @@ class OrganizationSetting extends Model
         'smtp_from_address',
         'smtp_from_name',
         'is_smtp_configured',
+        'is_email_sending_enabled',
         'privacy_policy_content',
     ];
 
@@ -53,6 +54,7 @@ class OrganizationSetting extends Model
         'is_80g_enabled' => 'boolean',
         'is_pooja_packages_enabled' => 'boolean',
         'is_smtp_configured' => 'boolean',
+        'is_email_sending_enabled' => 'boolean',
     ];
 
     protected $hidden = [
@@ -112,5 +114,10 @@ class OrganizationSetting extends Model
     public function isSmtpConfigured(): bool
     {
         return (bool) ($this->is_smtp_configured && ! empty($this->smtp_host) && ! empty($this->smtp_username));
+    }
+
+    public function isEmailSendingEnabled(): bool
+    {
+        return $this->is_email_sending_enabled ?? true;
     }
 }
