@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('siteTagline', $settings->site_tagline);
                     $view->with('ga4Id', $settings->ga4_measurement_id);
                     $view->with('ga4Script', $settings->ga4_custom_script);
-                    $view->with('googleSiteVerification', $settings->google_site_verification);
+                    $view->with('googleSiteVerification', $settings->google_site_verification ?: env('GOOGLE_SITE_VERIFICATION'));
                 }
 
                 if (Schema::hasTable('navigation_menu_items')) {

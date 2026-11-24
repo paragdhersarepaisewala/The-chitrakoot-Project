@@ -45,7 +45,7 @@
 
   <!-- Google Search Console Verification -->
   @if(!empty($googleSiteVerification))
-    <meta name="google-site-verification" content="{{ $googleSiteVerification }}">
+    <meta name="google-site-verification" content="{{ str_replace('google-site-verification=', '', $googleSiteVerification) }}">
   @endif
 
   <!-- Google Analytics 4 (GA4) -->
