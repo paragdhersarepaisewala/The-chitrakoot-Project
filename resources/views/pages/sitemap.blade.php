@@ -154,7 +154,7 @@
   @if(isset($events))
     @foreach($events as $event)
       <url>
-        <loc>{{ url('/events') }}</loc>
+        <loc>{{ url('/events/' . $event->slug) }}</loc>
         <lastmod>{{ $event->updated_at?->toAtomString() ?? now()->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

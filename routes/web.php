@@ -82,8 +82,9 @@ Route::get('/privacy-policy', function () {
 Route::get('/feed.xml', function () {
     $posts = Post::where('status', 'published')->latest()->take(20)->get();
 
-    return response()->view('pages.feed', compact('posts'))->header('Content-Type', 'text/xml');
+    return response()->view('pages.feed', compact('posts'))->header('Content-Type', 'text/xml; charset=utf-8');
 });
+
 Route::get('/sitemap.xml', function () {
     $posts = Post::where('status', 'published')->latest()->get();
     $sevas = SevaProject::where('is_published', true)->get();
@@ -91,14 +92,15 @@ Route::get('/sitemap.xml', function () {
     $poojas = PoojaService::where('is_active', true)->get();
     $events = Event::where('is_published', true)->get();
 
-    return response()->view('pages.sitemap', compact('posts', 'sevas', 'destinations', 'poojas', 'events'))->header('Content-Type', 'text/xml');
+    return response()->view('pages.sitemap', compact('posts', 'sevas', 'destinations', 'poojas', 'events'))
+        ->header('Content-Type', 'text/xml; charset=utf-8');
 });
 
 Route::get('/robots.txt', function () {
     $sitemapUrl = url('/sitemap.xml');
     $content = "User-agent: *\nDisallow: /admin/\nDisallow: /api/\nDisallow: /dashboard\nDisallow: /user/\nAllow: /\n\nSitemap: {$sitemapUrl}\n";
 
-    return response($content, 200)->header('Content-Type', 'text/plain');
+    return response($content, 200)->header('Content-Type', 'text/plain; charset=utf-8');
 });
 
 // Gallery Magazine Route
