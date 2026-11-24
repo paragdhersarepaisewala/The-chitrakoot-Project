@@ -2679,19 +2679,23 @@ class AdminController extends Controller
         $pageSeos = PageSeoSetting::all()->keyBy('page_key');
 
         $availablePages = [
-            'home' => ['title' => 'Home Page', 'route' => 'home', 'url' => '/'],
-            'about' => ['title' => 'About Us Page', 'route' => 'about', 'url' => '/about'],
-            'leadership' => ['title' => 'Leadership & Trustees', 'route' => 'leadership', 'url' => '/leadership'],
-            'seva' => ['title' => 'Seva Projects Directory', 'route' => 'seva.index', 'url' => '/seva'],
-            'chitrakoot' => ['title' => 'Chitrakoot Sacred Guide', 'route' => 'chitrakoot.index', 'url' => '/chitrakoot'],
-            'pooja' => ['title' => 'Online Pooja Booking', 'route' => 'pooja.index', 'url' => '/pooja'],
-            'events' => ['title' => 'Events & Festivals', 'route' => 'events.index', 'url' => '/events'],
-            'blog' => ['title' => 'Blog & Articles', 'route' => 'blog.index', 'url' => '/blog'],
-            'gallery' => ['title' => 'Sacred Photo & Video Gallery', 'route' => 'gallery.index', 'url' => '/gallery'],
-            'contact' => ['title' => 'Contact Us Page', 'route' => 'contact', 'url' => '/contact'],
-            'donate' => ['title' => 'Donation & Causes Portal', 'route' => 'donate', 'url' => '/donate'],
-            'volunteer' => ['title' => 'Volunteer Seva Registration', 'route' => 'volunteer', 'url' => '/volunteer'],
-            'privacy' => ['title' => 'Privacy Policy', 'route' => 'privacy', 'url' => '/privacy-policy'],
+            'home' => ['title' => 'Home Page', 'route' => 'home', 'url' => '/', 'raea_image' => '/images/og/og-home.png'],
+            'about' => ['title' => 'About Us Page', 'route' => 'about', 'url' => '/about', 'raea_image' => '/images/og/og-about.png'],
+            'leadership' => ['title' => 'Leadership & Trustees', 'route' => 'leadership', 'url' => '/leadership', 'raea_image' => '/images/og/og-leadership.png'],
+            'seva' => ['title' => 'Seva Projects Directory', 'route' => 'seva.index', 'url' => '/seva', 'raea_image' => '/images/og/og-seva.png'],
+            'chitrakoot' => ['title' => 'Chitrakoot Sacred Guide', 'route' => 'chitrakoot.index', 'url' => '/chitrakoot', 'raea_image' => '/images/og/og-chitrakoot.png'],
+            'pooja' => ['title' => 'Online Pooja Booking', 'route' => 'pooja.index', 'url' => '/pooja', 'raea_image' => '/images/og/og-pooja.png'],
+            'events' => ['title' => 'Events & Festivals', 'route' => 'events.index', 'url' => '/events', 'raea_image' => '/images/og/og-events.png'],
+            'blog' => ['title' => 'Blog & Articles', 'route' => 'blog.index', 'url' => '/blog', 'raea_image' => '/images/og/og-blog.png'],
+            'gallery' => ['title' => 'Sacred Photo & Video Gallery', 'route' => 'gallery.index', 'url' => '/gallery', 'raea_image' => '/images/og/og-gallery.png'],
+            'contact' => ['title' => 'Contact Us Page', 'route' => 'contact', 'url' => '/contact', 'raea_image' => '/images/og/og-contact.png'],
+            'donate' => ['title' => 'Donation & Causes Portal', 'route' => 'donate', 'url' => '/donate', 'raea_image' => '/images/og/og-donate.png'],
+            'volunteer' => ['title' => 'Volunteer Seva Registration', 'route' => 'volunteer', 'url' => '/volunteer', 'raea_image' => '/images/og/og-volunteer.png'],
+            'privacy' => ['title' => 'Privacy Policy', 'route' => 'privacy', 'url' => '/privacy-policy', 'raea_image' => '/images/og/og-privacy.png'],
+            'services' => ['title' => 'Services & Facilities', 'route' => 'services.index', 'url' => '/services', 'raea_image' => '/images/og/og-services.png'],
+            'aarti' => ['title' => 'Daily Aarti Schedule', 'route' => 'services.aarti', 'url' => '/services/aarti', 'raea_image' => '/images/og/og-aarti.png'],
+            'atithi_vishram' => ['title' => 'Atithi Vishram Griha', 'route' => 'services.atithiVishram', 'url' => '/services/atithi-vishram', 'raea_image' => '/images/og/og-atithi-vishram.png'],
+            'temple_booking' => ['title' => 'Temple & Event Booking', 'route' => 'services.templeBooking', 'url' => '/services/temple-booking', 'raea_image' => '/images/og/og-temple-booking.png'],
         ];
 
         return view('admin.seo-settings', compact('pageSeos', 'availablePages'));
@@ -2702,15 +2706,43 @@ class AdminController extends Controller
         $pages = $request->input('pages', []);
 
         foreach ($pages as $key => $fields) {
+            $existing = PageSeoSetting::where('page_key', $key)->first();
+            $ogImage = $existing?->og_image;
+
+            // Handle direct file upload for this page
+            if ($request->hasFile("pages.{$key}.og_image_file")) {
+                $file = $request->file("pages.{$key}.og_image_file");
+                $ext = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension());
+                if (in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'svg'], true)) {
+                    $filename = 'og-'.$key.'-'.time().'.'.$ext;
+                    $destDir = public_path('uploads/og');
+                    if (! File::isDirectory($destDir)) {
+                        File::makeDirectory($destDir, 0755, true, true);
+                    }
+                    $file->move($destDir, $filename);
+                    $ogImage = '/uploads/og/'.$filename;
+                }
+            } elseif (! empty($fields['remove_og_image'])) {
+                // Explicit removal request
+                $ogImage = null;
+            } elseif (isset($fields['og_image_url'])) {
+                // If text input is provided
+                $val = trim($fields['og_image_url']);
+                $ogImage = $val !== '' ? $val : null;
+            } elseif (isset($fields['og_image'])) {
+                $val = trim($fields['og_image']);
+                $ogImage = $val !== '' ? $val : null;
+            }
+
             PageSeoSetting::updateOrCreate(
                 ['page_key' => $key],
                 [
-                    'page_title' => $fields['page_title'] ?? ucfirst($key),
+                    'page_title' => $fields['page_title'] ?? ucfirst(str_replace('_', ' ', $key)),
                     'meta_title' => $fields['meta_title'] ?? null,
                     'meta_description' => $fields['meta_description'] ?? null,
                     'meta_keywords' => $fields['meta_keywords'] ?? ($fields['keywords'] ?? null),
                     'canonical_url' => $fields['canonical_url'] ?? null,
-                    'og_image' => $fields['og_image'] ?? ($fields['og_image_url'] ?? null),
+                    'og_image' => $ogImage,
                     'no_index' => ! empty($fields['no_index']),
                 ]
             );
@@ -2722,6 +2754,82 @@ class AdminController extends Controller
         ActivityLog::log('SEO CMS', 'update_all_pages_seo', 'Updated meta tags and SEO settings across core pages.');
 
         return back()->with('success', 'All page SEO titles, meta descriptions, and Open Graph configurations updated successfully.');
+    }
+
+    public function updatePageOgImage(Request $request)
+    {
+        $validated = $request->validate([
+            'page_key' => 'required|string',
+            'action' => 'required|in:upload,set_url,reset_raea,remove',
+            'image_url' => 'nullable|string',
+            'image_file' => 'nullable|file|mimes:jpeg,jpg,png,webp,svg|max:5120',
+        ]);
+
+        $key = $validated['page_key'];
+        $entry = PageSeoSetting::firstOrCreate(
+            ['page_key' => $key],
+            ['page_title' => ucfirst(str_replace('_', ' ', $key))]
+        );
+
+        $raeaMapping = [
+            'home' => '/images/og/og-home.png',
+            'about' => '/images/og/og-about.png',
+            'leadership' => '/images/og/og-leadership.png',
+            'seva' => '/images/og/og-seva.png',
+            'chitrakoot' => '/images/og/og-chitrakoot.png',
+            'pooja' => '/images/og/og-pooja.png',
+            'events' => '/images/og/og-events.png',
+            'blog' => '/images/og/og-blog.png',
+            'gallery' => '/images/og/og-gallery.png',
+            'contact' => '/images/og/og-contact.png',
+            'donate' => '/images/og/og-donate.png',
+            'volunteer' => '/images/og/og-volunteer.png',
+            'privacy' => '/images/og/og-privacy.png',
+            'services' => '/images/og/og-services.png',
+            'aarti' => '/images/og/og-aarti.png',
+            'atithi_vishram' => '/images/og/og-atithi-vishram.png',
+            'temple_booking' => '/images/og/og-temple-booking.png',
+        ];
+
+        if ($validated['action'] === 'remove') {
+            $entry->og_image = null;
+            $entry->save();
+        } elseif ($validated['action'] === 'reset_raea') {
+            $entry->og_image = $raeaMapping[$key] ?? '/images/og/og-home.png';
+            $entry->save();
+        } elseif ($validated['action'] === 'upload' && $request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $ext = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension());
+            $filename = 'og-'.$key.'-'.time().'.'.$ext;
+            $destinationDir = public_path('uploads/og');
+            if (! File::isDirectory($destinationDir)) {
+                File::makeDirectory($destinationDir, 0755, true, true);
+            }
+            $file->move($destinationDir, $filename);
+            $entry->og_image = '/uploads/og/'.$filename;
+            $entry->save();
+        } elseif ($validated['action'] === 'set_url') {
+            $entry->og_image = $request->input('image_url');
+            $entry->save();
+        }
+
+        PageSeoSetting::clearCache();
+        Artisan::call('view:clear');
+
+        ActivityLog::log('SEO CMS', 'update_page_og_image', "Configured featured image for page: {$key} ({$validated['action']})");
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'page_key' => $key,
+                'og_image' => $entry->og_image,
+                'og_image_url' => $entry->og_image_url,
+                'has_image' => $entry->hasFeaturedImage(),
+                'message' => 'Social share image updated successfully.',
+            ]);
+        }
+
+        return back()->with('success', "Featured social image for {$key} updated successfully.");
     }
 
     // --- UPCOMING EVENTS & UTSAVS CMS ---

@@ -98,6 +98,7 @@
 
       <!-- Section Title & Vision Headline -->
       <div style="text-align: center; max-width: 860px; margin: 0 auto 50px;">
+        <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #B45309; display: block; margin-bottom: 8px;">॥ हमारा विज़न (Trust Vision) एवं सेवा संकल्प ॥</span>
         <h2
           style="font-family: 'Noto Serif', serif; font-size: clamp(26px, 3.4vw, 40px); font-weight: 700; color: #2B1A12; line-height: 1.3; margin: 0 0 16px;">
           {{ $homeSettings['about_mission_heading'] ?? 'पर्यावरण बचाओ अभियान: स्वच्छ, हरित एवं संरक्षित चित्रकूट' }}

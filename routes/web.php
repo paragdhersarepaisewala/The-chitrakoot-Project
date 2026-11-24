@@ -261,6 +261,7 @@ Route::middleware('auth')->group(function () {
         // All Pages SEO Settings CMS
         Route::get('/seo-settings', [AdminController::class, 'seoSettings'])->name('admin.seoSettings');
         Route::post('/seo-settings', [AdminController::class, 'updateSeoSettings'])->name('admin.updateSeoSettings');
+        Route::post('/seo-settings/update-og-image', [AdminController::class, 'updatePageOgImage'])->name('admin.updatePageOgImage');
 
         // Contact Inquiries & Devotee Messages CMS
         Route::get('/contact-inquiries', [AdminController::class, 'contactInquiries'])->name('admin.contactInquiries');

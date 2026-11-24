@@ -26,6 +26,38 @@ class PageSeoSetting extends Model
         'no_index' => 'boolean',
     ];
 
+    /**
+     * Get the full URL for the Open Graph / social share featured image.
+     */
+    public function getOgImageUrlAttribute(): ?string
+    {
+        if (empty($this->og_image)) {
+            return null;
+        }
+
+        if (str_starts_with($this->og_image, 'http://') || str_starts_with($this->og_image, 'https://')) {
+            return $this->og_image;
+        }
+
+        return asset(ltrim($this->og_image, '/'));
+    }
+
+    /**
+     * Alias for featured image URL.
+     */
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        return $this->og_image_url;
+    }
+
+    /**
+     * Check if a custom featured image is set for this page.
+     */
+    public function hasFeaturedImage(): bool
+    {
+        return ! empty($this->og_image);
+    }
+
     public static function getForPage(string $key): ?self
     {
         return static::where('page_key', $key)->first();

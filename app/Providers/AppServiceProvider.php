@@ -68,6 +68,10 @@ class AppServiceProvider extends ServiceProvider
                         'pooja.index' => 'pooja',
                         'volunteer' => 'volunteer',
                         'privacy' => 'privacy',
+                        'services.index' => 'services',
+                        'services.aarti' => 'aarti',
+                        'services.atithiVishram' => 'atithi_vishram',
+                        'services.templeBooking' => 'temple_booking',
                     ];
                     $pageKey = $routeMap[$routeName] ?? null;
                     $currentSeo = $pageKey ? PageSeoSetting::getForPage($pageKey) : null;

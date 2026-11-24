@@ -32,6 +32,10 @@
     content="@yield('og_description', View::yieldContent('meta_description', (!empty($currentSeo->meta_description) ? $currentSeo->meta_description : ($siteMetaDescription ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट, चित्रकूट धाम'))))">
   <meta property="og:image"
     content="@yield('og_image', (!empty($currentSeo->og_image_url) ? $currentSeo->og_image_url : ($siteDefaultOgImage ?? asset('assets/uploads/temple-lotus-logo.png'))))">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt"
+    content="@yield('og_title', View::yieldContent('title', (!empty($currentSeo->meta_title) ? $currentSeo->meta_title : ($orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust') . ' | Chitrakoot Dham')))">
   <meta property="og:site_name" content="{{ $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust' }}">
 
   <!-- Twitter Cards -->
@@ -63,32 +67,61 @@
     {!! $ga4Script !!}
   @endif
 
-  <!-- Schema.org Organization JSON-LD -->
+  <!-- Schema.org Organization & WebSite JSON-LD -->
   @php
     $orgSchema = [
       '@context' => 'https://schema.org',
-      '@type' => 'Organization',
-      'name' => $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust',
-      'url' => url('/'),
-      'logo' => $siteLogoUrl ?? asset('assets/uploads/temple-lotus-logo.png'),
-      'description' => $siteMetaDescription ?? 'सनातन संस्कृति, शिक्षा, गौसेवा, पर्यावरण और मानव कल्याण के लिए समर्पित सेवा परिवार।',
-      'address' => [
-        '@type' => 'PostalAddress',
-        'streetAddress' => $orgSettings->address ?? 'Kamadgiri Parikrama Marg',
-        'addressLocality' => 'Chitrakoot Dham',
-        'addressCountry' => 'IN',
-      ],
-      'contactPoint' => [
-        '@type' => 'ContactPoint',
-        'telephone' => $orgSettings->phone ?? '+919415000000',
-        'email' => $orgSettings->email ?? 'info@kamadgiripeetham.org',
-        'contactType' => 'customer service',
-      ],
+      '@graph' => [
+        [
+          '@type' => 'Organization',
+          '@id' => url('/#organization'),
+          'name' => $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust',
+          'alternateName' => [
+            'Kamadgiri Trust',
+            'कामदगिरि सेवा ट्रस्ट',
+            'Shri Kamadgiri Peetham',
+            'Kamadgiri Peetham',
+            'Kamadgiri Sewa Trust'
+          ],
+          'url' => url('/'),
+          'logo' => $siteLogoUrl ?? asset('assets/uploads/temple-lotus-logo.png'),
+          'description' => $siteMetaDescription ?? 'सनातन संस्कृति, शिक्षा, गौसेवा, पर्यावरण और मानव कल्याण के लिए समर्पित सेवा परिवार।',
+          'address' => [
+            '@type' => 'PostalAddress',
+            'streetAddress' => $orgSettings->address ?? 'Kamadgiri Parikrama Marg',
+            'addressLocality' => 'Chitrakoot Dham',
+            'addressCountry' => 'IN',
+          ],
+          'contactPoint' => [
+            '@type' => 'ContactPoint',
+            'telephone' => $orgSettings->phone ?? '+919415000000',
+            'email' => $orgSettings->email ?? 'info@kamadgiripeetham.org',
+            'contactType' => 'customer service',
+          ],
+        ],
+        [
+          '@type' => 'WebSite',
+          '@id' => url('/#website'),
+          'url' => url('/'),
+          'name' => 'Kamadgiri Trust - Official Portal',
+          'alternateName' => [
+            'Kamadgiri',
+            'Kamadgiri Temple',
+            'Kamadgiri Parvat',
+            'Kamadgiri Stay',
+            'कामदगिरि चित्रकूट'
+          ],
+          'publisher' => [
+            '@id' => url('/#organization')
+          ],
+        ]
+      ]
     ];
   @endphp
   <script type="application/ld+json">
   {!! json_encode($orgSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
   </script>
+  @yield('structured_data')
 
   <!-- Fonts & Material Symbols (Optimized for Fast Page Load) -->
   <link rel="dns-prefetch" href="//fonts.googleapis.com">

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'अतिथि विश्राम गृह प्रवास पूछताछ | ' . ($orgSettings->org_name ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट'))
-@section('meta_description', 'चित्रकूट धाम कामदगिरि परिक्रमा एवं दर्शन हेतु पधारने वाले श्रद्धालुओं के लिए शांत, सात्विक एवं स्वच्छ अतिथि विश्राम गृह में ठहरने की अग्रिम पूछताछ।')
+@section('title', 'Kamadgiri Stay & Dharamshala | Atithi Vishram Griha Chitrakoot | ' . ($orgSettings->org_name ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट'))
+@section('meta_description', 'Book clean & peaceful Kamadgiri stay at Atithi Vishram Griha in Chitrakoot. Pilgrim rooms near Kamadgiri Parvat & Temple with AC, Non-AC & satvik food.')
 
 @section('content')
 
@@ -20,16 +20,16 @@
         <span>&rsaquo;</span>
         <a href="{{ route('services.index') }}" style="color: inherit; text-decoration: none;">मंदिर सेवाएं</a>
         <span>&rsaquo;</span>
-        <span style="color: #2D6A4F; font-weight: 700;">अतिथि विश्राम गृह पूछताछ</span>
+        <span style="color: #2D6A4F; font-weight: 700;">कामदगिरि अतिथि विश्राम गृह (Kamadgiri Stay)</span>
       </nav>
 
       <h1 style="font: 700 clamp(28px, 4vw, 48px) var(--dev); color: #2B1A12; margin: 12px 0 16px; line-height: 1.25;">
-        अतिथि विश्राम गृह (प्रवास पूछताछ)
+        Kamadgiri Stay & Dharamshala | अतिथि विश्राम गृह (प्रवास पूछताछ)
       </h1>
 
       <p style="font: 400 16.5px/1.8 var(--dev); color: #7A4B29; margin: 0 auto; max-width: 740px;">
-        चित्रकूट कामदगिरि परिक्रमा एवं तपोभूमि दर्शन हेतु पधारने वाले श्रद्धालुओं के लिए शांतिपूर्ण, सात्विक एवं स्वच्छ
-        वातावरण में प्रवास की अग्रिम पूछताछ।
+        पवित्र कामदगिरि पर्वत परिक्रमा एवं कामतानाथ मंदिर दर्शन हेतु पधारने वाले श्रद्धालुओं के लिए शांतिपूर्ण, सात्विक एवं स्वच्छ
+        वातावरण में श्रेष्ठ Kamadgiri Stay एवं धर्मशाला प्रवास व्यवस्था।
       </p>
 
     </div>
@@ -320,7 +320,97 @@
 
       </div>
 
+      <!-- FAQ Section: Kamadgiri Stay & Dharamshala -->
+      <div style="margin-top: 60px; background: #FFFDFC; border: 1.5px solid rgba(180,83,9,0.18); border-radius: 22px; padding: clamp(24px, 4vw, 36px); box-shadow: 0 8px 30px rgba(180,83,9,0.05);">
+        <div style="text-align: center; margin-bottom: 28px;">
+          <span style="font-size: 11px; font-weight: 800; color: #B45309; text-transform: uppercase; letter-spacing: 1.5px;">तीर्थयात्री सामान्य प्रश्न (Pilgrim FAQs)</span>
+          <h2 style="font: 700 24px var(--dev); color: #2B1A12; margin: 6px 0 0;">Kamadgiri Stay & Dharamshala Accommodation FAQ</h2>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <details style="background: #FAF6EE; border: 1px solid rgba(180,83,9,0.15); border-radius: 12px; padding: 14px 18px; cursor: pointer;" open>
+            <summary style="font-weight: 700; font-size: 15px; color: #2B1A12;">What is the best Kamadgiri stay for pilgrims and families visiting Chitrakoot?</summary>
+            <p style="font-size: 14px; line-height: 1.7; color: #7A4B29; margin: 10px 0 0;">
+              Shri Kamadgiri Peetham Sewa Trust provides <strong>Atithi Vishram Griha</strong>, a peaceful, clean, and sattvic pilgrim stay located directly on Kamadgiri Parikrama Marg. It offers both AC and Non-AC family rooms, attached bathrooms, pure drinking water, and safe parking.
+            </p>
+          </details>
+
+          <details style="background: #FAF6EE; border: 1px solid rgba(180,83,9,0.15); border-radius: 12px; padding: 14px 18px; cursor: pointer;">
+            <summary style="font-weight: 700; font-size: 15px; color: #2B1A12;">How close is this stay to Kamadgiri Parvat and Kamtanath Temple?</summary>
+            <p style="font-size: 14px; line-height: 1.7; color: #7A4B29; margin: 10px 0 0;">
+              The Atithi Vishram Griha is situated right on the <strong>Kamadgiri Parikrama Marg</strong>, within comfortable walking distance to the sacred <strong>Kamadgiri Parvat</strong> and the Pratham Mukharbindu of <strong>Kamadgiri Temple (Kamtanath Ji)</strong>.
+            </p>
+          </details>
+
+          <details style="background: #FAF6EE; border: 1px solid rgba(180,83,9,0.15); border-radius: 12px; padding: 14px 18px; cursor: pointer;">
+            <summary style="font-weight: 700; font-size: 15px; color: #2B1A12;">How can devotees book or enquire about Kamadgiri stay?</summary>
+            <p style="font-size: 14px; line-height: 1.7; color: #7A4B29; margin: 10px 0 0;">
+              Devotees can easily submit the advance enquiry form above with their proposed check-in and check-out dates and room preference, or contact the Trust office helpline directly at {{ $orgSettings->phone ?? '+91 94150 00000' }}.
+            </p>
+          </details>
+        </div>
+      </div>
+
     </div>
   </section>
 
+@endsection
+
+@section('structured_data')
+  @php
+    $lodgingSchema = [
+      '@context' => 'https://schema.org',
+      '@graph' => [
+        [
+          '@type' => 'LodgingBusiness',
+          '@id' => url('/services/atithi-vishram#lodging'),
+          'name' => 'Kamadgiri Stay - Atithi Vishram Griha & Dharamshala',
+          'alternateName' => ['कामदगिरि अतिथि विश्राम गृह', 'Kamadgiri Dharamshala', 'Chitrakoot Pilgrim Stay'],
+          'description' => 'Clean, peaceful and sattvic pilgrim stay and dharamshala near sacred Kamadgiri Parvat and Kamtanath Temple in Chitrakoot Dham.',
+          'url' => url('/services/atithi-vishram'),
+          'address' => [
+            '@type' => 'PostalAddress',
+            'streetAddress' => 'Kamadgiri Parikrama Marg',
+            'addressLocality' => 'Chitrakoot Dham',
+            'addressCountry' => 'IN'
+          ],
+          'priceRange' => '₹',
+          'telephone' => $orgSettings->phone ?? '+919415000000',
+        ],
+        [
+          '@type' => 'FAQPage',
+          '@id' => url('/services/atithi-vishram#faq'),
+          'mainEntity' => [
+            [
+              '@type' => 'Question',
+              'name' => 'What is the best Kamadgiri stay for pilgrims and families visiting Chitrakoot?',
+              'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => 'Shri Kamadgiri Peetham Sewa Trust provides Atithi Vishram Griha, a peaceful, clean, and sattvic pilgrim stay located directly on Kamadgiri Parikrama Marg.'
+              ]
+            ],
+            [
+              '@type' => 'Question',
+              'name' => 'How close is this stay to Kamadgiri Parvat and Kamtanath Temple?',
+              'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => 'The Atithi Vishram Griha is situated right on the Kamadgiri Parikrama Marg, within comfortable walking distance to the sacred Kamadgiri Parvat and Kamadgiri Temple.'
+              ]
+            ],
+            [
+              '@type' => 'Question',
+              'name' => 'How can devotees book or enquire about Kamadgiri stay?',
+              'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => 'Devotees can easily submit the advance enquiry form online or contact the Trust office helpline directly for availability.'
+              ]
+            ]
+          ]
+        ]
+      ]
+    ];
+  @endphp
+  <script type="application/ld+json">
+  {!! json_encode($lodgingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+  </script>
 @endsection
