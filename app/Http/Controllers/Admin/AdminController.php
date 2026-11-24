@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ArticleCategory;
+use App\Models\AtithiVishramEnquiry;
 use App\Models\Cause;
 use App\Models\ContactInquiry;
 use App\Models\Destination;
@@ -26,6 +27,7 @@ use App\Models\PoojaTimeSlot;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\SevaProject;
+use App\Models\TempleBookingEnquiry;
 use App\Models\User;
 use App\Models\VolunteerApplication;
 use App\Services\EmailNotificationService;
@@ -52,8 +54,19 @@ class AdminController extends Controller
         $draftPostsCount = Post::where('status', 'draft')->count();
         $totalViews = Post::sum('views_count');
 
+        // Services & Bookings Metrics
+        $poojaBookingsCount = PoojaBooking::count();
+        $poojaPendingCount = PoojaBooking::where('status', 'pending')->count();
+        $atithiCount = AtithiVishramEnquiry::count();
+        $atithiNewCount = AtithiVishramEnquiry::where('status', 'new')->count();
+        $templeBookingsCount = TempleBookingEnquiry::count();
+        $templeBookingsNewCount = TempleBookingEnquiry::where('status', 'new')->count();
+
         $topPosts = Post::orderByDesc('views_count')->take(6)->get();
-        $recentDonations = Donation::with(['user', 'cause'])->latest()->take(10)->get();
+        $recentDonations = Donation::with(['user', 'cause'])->latest()->take(8)->get();
+        $recentPoojaBookings = PoojaBooking::with('service')->latest()->take(8)->get();
+        $recentAtithiEnquiries = AtithiVishramEnquiry::latest()->take(8)->get();
+        $recentTempleBookings = TempleBookingEnquiry::latest()->take(8)->get();
         $activityLogs = ActivityLog::latest()->take(15)->get();
 
         return view('admin.dashboard', compact(
@@ -67,8 +80,17 @@ class AdminController extends Controller
             'publishedPostsCount',
             'draftPostsCount',
             'totalViews',
+            'poojaBookingsCount',
+            'poojaPendingCount',
+            'atithiCount',
+            'atithiNewCount',
+            'templeBookingsCount',
+            'templeBookingsNewCount',
             'topPosts',
             'recentDonations',
+            'recentPoojaBookings',
+            'recentAtithiEnquiries',
+            'recentTempleBookings',
             'activityLogs'
         ));
     }
@@ -3155,5 +3177,178 @@ class AdminController extends Controller
         ActivityLog::log('Leadership CMS', 'delete', "Deleted leadership profile: {$name}");
 
         return redirect()->route('admin.leadership')->with('success', "Leadership profile for {$name} deleted successfully.");
+    }
+
+    /**
+     * Atithi Vishram (Pilgrim Guest House) Enquiries Management.
+     */
+    public function atithiVishram(Request $request)
+    {
+        $query = AtithiVishramEnquiry::query();
+
+        if ($request->filled('q')) {
+            $q = $request->query('q');
+            $query->where(function ($sub) use ($q): void {
+                $sub->where('devotee_name', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('enquiry_number', 'like', "%{$q}%")
+                    ->orWhere('city', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        $totalCount = AtithiVishramEnquiry::count();
+        $newCount = AtithiVishramEnquiry::where('status', 'new')->count();
+        $confirmedCount = AtithiVishramEnquiry::where('status', 'confirmed')->count();
+        $cancelledCount = AtithiVishramEnquiry::where('status', 'cancelled')->count();
+
+        $enquiries = $query->latest('created_at')->paginate(20)->withQueryString();
+
+        return view('admin.atithi-vishram', compact(
+            'enquiries',
+            'totalCount',
+            'newCount',
+            'confirmedCount',
+            'cancelledCount'
+        ));
+    }
+
+    /**
+     * Update Atithi Vishram Enquiry Status & Admin Notes.
+     */
+    public function updateAtithiVishramStatus(Request $request, $id)
+    {
+        $enquiry = AtithiVishramEnquiry::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:new,in_review,confirmed,cancelled,completed',
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $statusChanged = $enquiry->status !== $validated['status'];
+        $enquiry->update([
+            'status' => $validated['status'],
+            'admin_notes' => $validated['admin_notes'] ?? $enquiry->admin_notes,
+            'is_read' => true,
+        ]);
+
+        ActivityLog::log(
+            'Atithi Vishram CMS',
+            'status_update',
+            "Updated enquiry #{$enquiry->enquiry_number} status to {$validated['status']}"
+        );
+
+        if ($statusChanged && ! empty($enquiry->email)) {
+            EmailNotificationService::sendAtithiVishramStatusUpdate($enquiry);
+        }
+
+        return redirect()->back()->with('success', "Enquiry #{$enquiry->enquiry_number} status updated to {$validated['status']}.");
+    }
+
+    /**
+     * Delete an Atithi Vishram Enquiry.
+     */
+    public function deleteAtithiVishramEnquiry(Request $request, $id)
+    {
+        $enquiry = AtithiVishramEnquiry::findOrFail($id);
+        $number = $enquiry->enquiry_number;
+        $enquiry->delete();
+
+        ActivityLog::log('Atithi Vishram CMS', 'delete', "Deleted guest house enquiry #{$number}");
+
+        return redirect()->back()->with('success', "Enquiry #{$number} deleted successfully.");
+    }
+
+    /**
+     * Temple Premises & Event Booking Enquiries Management.
+     */
+    public function templeBookings(Request $request)
+    {
+        $query = TempleBookingEnquiry::query();
+
+        if ($request->filled('q')) {
+            $q = $request->query('q');
+            $query->where(function ($sub) use ($q): void {
+                $sub->where('devotee_name', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('enquiry_number', 'like', "%{$q}%")
+                    ->orWhere('event_type', 'like', "%{$q}%")
+                    ->orWhere('city', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('event_type')) {
+            $query->where('event_type', $request->query('event_type'));
+        }
+
+        $totalCount = TempleBookingEnquiry::count();
+        $newCount = TempleBookingEnquiry::where('status', 'new')->count();
+        $approvedCount = TempleBookingEnquiry::where('status', 'approved')->count();
+        $rejectedCount = TempleBookingEnquiry::where('status', 'rejected')->count();
+
+        $enquiries = $query->latest('created_at')->paginate(20)->withQueryString();
+
+        return view('admin.temple-bookings', compact(
+            'enquiries',
+            'totalCount',
+            'newCount',
+            'approvedCount',
+            'rejectedCount'
+        ));
+    }
+
+    /**
+     * Update Temple Booking Enquiry Status & Admin Notes.
+     */
+    public function updateTempleBookingStatus(Request $request, $id)
+    {
+        $enquiry = TempleBookingEnquiry::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:new,contacted,approved,rejected,completed',
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $statusChanged = $enquiry->status !== $validated['status'];
+        $enquiry->update([
+            'status' => $validated['status'],
+            'admin_notes' => $validated['admin_notes'] ?? $enquiry->admin_notes,
+            'is_read' => true,
+        ]);
+
+        ActivityLog::log(
+            'Temple Booking CMS',
+            'status_update',
+            "Updated booking enquiry #{$enquiry->enquiry_number} status to {$validated['status']}"
+        );
+
+        if ($statusChanged && ! empty($enquiry->email)) {
+            EmailNotificationService::sendTempleBookingStatusUpdate($enquiry);
+        }
+
+        return redirect()->back()->with('success', "Booking enquiry #{$enquiry->enquiry_number} status updated to {$validated['status']}.");
+    }
+
+    /**
+     * Delete a Temple Booking Enquiry.
+     */
+    public function deleteTempleBookingEnquiry(Request $request, $id)
+    {
+        $enquiry = TempleBookingEnquiry::findOrFail($id);
+        $number = $enquiry->enquiry_number;
+        $enquiry->delete();
+
+        ActivityLog::log('Temple Booking CMS', 'delete', "Deleted temple booking enquiry #{$number}");
+
+        return redirect()->back()->with('success', "Booking enquiry #{$number} deleted successfully.");
     }
 }

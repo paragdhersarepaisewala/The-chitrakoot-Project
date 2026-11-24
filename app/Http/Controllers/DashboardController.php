@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AtithiVishramEnquiry;
 use App\Models\Donation;
 use App\Models\OrganizationSetting;
 use App\Models\PoojaBooking;
+use App\Models\TempleBookingEnquiry;
 use App\Models\VolunteerApplication;
 use Illuminate\Http\Request;
 
@@ -25,6 +27,8 @@ class DashboardController extends Controller
             Donation::whereNull('user_id')->where('donor_email', $user->email)->update(['user_id' => $user->id]);
             VolunteerApplication::whereNull('user_id')->where('email', $user->email)->update(['user_id' => $user->id]);
             PoojaBooking::whereNull('user_id')->where('email', $user->email)->update(['user_id' => $user->id]);
+            AtithiVishramEnquiry::whereNull('user_id')->where('email', $user->email)->update(['user_id' => $user->id]);
+            TempleBookingEnquiry::whereNull('user_id')->where('email', $user->email)->update(['user_id' => $user->id]);
         }
 
         // Fetch all donations (by user_id and email)
@@ -59,7 +63,27 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('user.dashboard', compact('user', 'donations', 'volunteerApplications', 'poojaBookings'));
+        // Fetch all atithi vishram accommodation enquiries
+        $atithiEnquiries = AtithiVishramEnquiry::where(function ($q) use ($user): void {
+            $q->where('user_id', $user->id);
+            if (! empty($user->email)) {
+                $q->orWhere('email', $user->email);
+            }
+        })
+            ->latest()
+            ->get();
+
+        // Fetch all temple hall booking proposals
+        $templeBookings = TempleBookingEnquiry::where(function ($q) use ($user): void {
+            $q->where('user_id', $user->id);
+            if (! empty($user->email)) {
+                $q->orWhere('email', $user->email);
+            }
+        })
+            ->latest()
+            ->get();
+
+        return view('user.dashboard', compact('user', 'donations', 'volunteerApplications', 'poojaBookings', 'atithiEnquiries', 'templeBookings'));
     }
 
     /**

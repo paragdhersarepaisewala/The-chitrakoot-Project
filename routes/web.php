@@ -12,6 +12,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationCenterController;
 use App\Http\Controllers\PoojaController;
+use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\SevaController;
 use App\Models\Destination;
 use App\Models\Event;
@@ -40,6 +41,13 @@ Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
 
 // Sacred Pooja & Aarti Booking Routes
+Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
+Route::get('/services/aarti', [ServicesController::class, 'aarti'])->name('services.aarti');
+Route::get('/services/atithi-vishram', [ServicesController::class, 'atithiVishram'])->name('services.atithiVishram');
+Route::post('/services/atithi-vishram', [ServicesController::class, 'submitAtithiVishram'])->name('services.atithiVishram.submit')->middleware('throttle:10,1');
+Route::get('/services/temple-booking', [ServicesController::class, 'templeBooking'])->name('services.templeBooking');
+Route::post('/services/temple-booking', [ServicesController::class, 'submitTempleBooking'])->name('services.templeBooking.submit')->middleware('throttle:10,1');
+
 Route::get('/pooja', [PoojaController::class, 'index'])->name('pooja.index');
 Route::get('/pooja/book', [PoojaController::class, 'bookingForm'])->name('pooja.bookingForm');
 Route::get('/pooja/{slug}', [PoojaController::class, 'show'])->name('pooja.show');
@@ -256,6 +264,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/contact-inquiries', [AdminController::class, 'contactInquiries'])->name('admin.contactInquiries');
         Route::post('/contact-inquiries/{id}/status', [AdminController::class, 'toggleContactInquiryStatus'])->name('admin.contactInquiries.status');
         Route::delete('/contact-inquiries/{id}', [AdminController::class, 'deleteContactInquiry'])->name('admin.contactInquiries.delete');
+
+        // Atithi Vishram (Pilgrim Guest House) Enquiries CMS
+        Route::get('/atithi-vishram', [AdminController::class, 'atithiVishram'])->name('admin.atithiVishram');
+        Route::post('/atithi-vishram/{id}/status', [AdminController::class, 'updateAtithiVishramStatus'])->name('admin.atithiVishram.status');
+        Route::delete('/atithi-vishram/{id}', [AdminController::class, 'deleteAtithiVishramEnquiry'])->name('admin.atithiVishram.delete');
+
+        // Temple Premises & Event Booking Enquiries CMS
+        Route::get('/temple-bookings', [AdminController::class, 'templeBookings'])->name('admin.templeBookings');
+        Route::post('/temple-bookings/{id}/status', [AdminController::class, 'updateTempleBookingStatus'])->name('admin.templeBookings.status');
+        Route::delete('/temple-bookings/{id}', [AdminController::class, 'deleteTempleBookingEnquiry'])->name('admin.templeBookings.delete');
 
         // Leadership & Trustees CMS
         Route::get('/leadership', [AdminController::class, 'leadership'])->name('admin.leadership');

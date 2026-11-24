@@ -9,9 +9,7 @@ class NavigationMenuSeeder extends Seeder
 {
     public function run(): void
     {
-        if (NavigationMenuItem::count() > 0) {
-            return;
-        }
+        NavigationMenuItem::truncate();
 
         $items = [
             [
@@ -54,10 +52,17 @@ class NavigationMenuSeeder extends Seeder
                 ],
             ],
             [
-                'label_en' => 'Pooja & Aarti',
-                'label_hi' => 'पूजा व आरती',
-                'url' => '/pooja/book',
+                'label_en' => 'Services',
+                'label_hi' => 'सेवाएं एवं दर्शन',
+                'url' => '/services',
                 'sort_order' => 5,
+                'children' => [
+                    ['label_en' => 'All Temple Services', 'label_hi' => 'समस्त मंदिर सेवाएं', 'url' => '/services', 'sort_order' => 1],
+                    ['label_en' => 'Online Pooja & Hawan Booking', 'label_hi' => 'पूजा व हवन ऑनलाइन आरक्षण', 'url' => '/pooja/book', 'sort_order' => 2],
+                    ['label_en' => 'Sacred Aarti & Darshan Schedule', 'label_hi' => 'नित्य आरती एवं दर्शन समय सारणी', 'url' => '/services/aarti', 'sort_order' => 3],
+                    ['label_en' => 'Atithi Vishram (Stay Enquiry)', 'label_hi' => 'अतिथि विश्राम गृह पूछताछ', 'url' => '/services/atithi-vishram', 'sort_order' => 4],
+                    ['label_en' => 'Temple Hall & Event Booking Enquiry', 'label_hi' => 'मंदिर परिसर व आयोजन आरक्षण पूछताछ', 'url' => '/services/temple-booking', 'sort_order' => 5],
+                ],
             ],
             [
                 'label_en' => 'Events',

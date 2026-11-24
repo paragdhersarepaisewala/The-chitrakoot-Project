@@ -64,6 +64,16 @@ class User extends Authenticatable
         return $this->hasMany(PoojaBooking::class);
     }
 
+    public function atithiVishramEnquiries()
+    {
+        return $this->hasMany(AtithiVishramEnquiry::class);
+    }
+
+    public function templeBookingEnquiries()
+    {
+        return $this->hasMany(TempleBookingEnquiry::class);
+    }
+
     public function hasRole(string ...$roles): bool
     {
         if ($this->role === 'super_admin') {

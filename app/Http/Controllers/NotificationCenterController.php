@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AtithiVishramEnquiry;
 use App\Models\ContactInquiry;
 use App\Models\Donation;
 use App\Models\NewsletterSubscriber;
 use App\Models\PoojaBooking;
 use App\Models\PostComment;
+use App\Models\TempleBookingEnquiry;
 use App\Models\User;
 use App\Models\VolunteerApplication;
 use Carbon\Carbon;
@@ -146,7 +148,45 @@ class NotificationCenterController extends Controller
                 'icon' => '✉️',
                 'title' => 'नया संपर्क संदेश (New Contact Inquiry)',
                 'description' => $inq->name.': "'.Str::limit($inq->subject ?: $inq->message, 50).'"',
-                'url' => route('admin.contacts'),
+                'url' => route('admin.contactInquiries'),
+                'created_at' => $created->toIso8601String(),
+                'timestamp' => $created->timestamp,
+                'time_ago' => $created->diffForHumans(),
+                'is_unread' => $created->gt($lastSeen),
+            ];
+        }
+
+        // 8. Atithi Vishram Enquiries
+        $atithiEnquiries = AtithiVishramEnquiry::latest()->take(8)->get();
+        foreach ($atithiEnquiries as $ave) {
+            $created = $ave->created_at ?? now();
+            $checkInStr = $ave->check_in_date ? $ave->check_in_date->format('d M') : '';
+            $notifications[] = [
+                'id' => 'atithi_'.$ave->id,
+                'type' => 'atithi_vishram',
+                'icon' => '🏨',
+                'title' => 'नई अतिथि विश्राम पूछताछ (New Guest Stay Enquiry)',
+                'description' => $ave->devotee_name.' ('.$ave->number_of_devotees.' यात्री, आगमन: '.$checkInStr.') &bull; #'.$ave->enquiry_number,
+                'url' => route('admin.atithiVishram'),
+                'created_at' => $created->toIso8601String(),
+                'timestamp' => $created->timestamp,
+                'time_ago' => $created->diffForHumans(),
+                'is_unread' => $created->gt($lastSeen),
+            ];
+        }
+
+        // 9. Temple Premises Booking Enquiries
+        $templeEnquiries = TempleBookingEnquiry::latest()->take(8)->get();
+        foreach ($templeEnquiries as $tbe) {
+            $created = $tbe->created_at ?? now();
+            $propDateStr = $tbe->proposed_date ? $tbe->proposed_date->format('d M') : '';
+            $notifications[] = [
+                'id' => 'temple_booking_'.$tbe->id,
+                'type' => 'temple_booking',
+                'icon' => '🏛️',
+                'title' => 'नया परिसर आरक्षण प्रस्ताव (New Temple Event Enquiry)',
+                'description' => $tbe->devotee_name.' ('.$tbe->getEventTypeLabel().', तिथि: '.$propDateStr.') &bull; #'.$tbe->enquiry_number,
+                'url' => route('admin.templeBookings'),
                 'created_at' => $created->toIso8601String(),
                 'timestamp' => $created->timestamp,
                 'time_ago' => $created->diffForHumans(),
@@ -313,6 +353,64 @@ class NotificationCenterController extends Controller
                 'title' => 'डिजिटल दान रसीद उपलब्ध',
                 'description' => 'समर्पण राशि: ₹'.number_format((float) $d->amount, 0).' &bull; रसीद: '.$d->receipt_number,
                 'url' => url('/receipt/'.$d->receipt_number),
+                'is_urgent' => false,
+                'updated_at' => $updated->toIso8601String(),
+                'timestamp' => $updated->timestamp,
+                'time_ago' => $updated->diffForHumans(),
+                'is_unread' => $updated->gt($lastSeen),
+            ];
+        }
+
+        // 4. Devotee Atithi Vishram Enquiries
+        $userAtithi = AtithiVishramEnquiry::where(function ($q) use ($user): void {
+            $q->where('user_id', $user->id);
+            if (! empty($user->email)) {
+                $q->orWhere('email', $user->email);
+            }
+        })
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
+        foreach ($userAtithi as $ua) {
+            $updated = $ua->updated_at ?? $ua->created_at ?? now();
+            $statusBadge = $ua->getStatusBadge();
+            $notifications[] = [
+                'id' => 'atithi_usr_'.$ua->id,
+                'type' => 'atithi_status',
+                'icon' => '🏨',
+                'title' => 'अतिथि विश्राम स्थिति: '.$statusBadge['label'],
+                'description' => 'संदर्भ: #'.$ua->enquiry_number.' &bull; आगमन: '.optional($ua->check_in_date)->format('d M Y'),
+                'url' => url('/dashboard#tab-atithi'),
+                'is_urgent' => false,
+                'updated_at' => $updated->toIso8601String(),
+                'timestamp' => $updated->timestamp,
+                'time_ago' => $updated->diffForHumans(),
+                'is_unread' => $updated->gt($lastSeen),
+            ];
+        }
+
+        // 5. Devotee Temple Booking Enquiries
+        $userTemple = TempleBookingEnquiry::where(function ($q) use ($user): void {
+            $q->where('user_id', $user->id);
+            if (! empty($user->email)) {
+                $q->orWhere('email', $user->email);
+            }
+        })
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
+        foreach ($userTemple as $ut) {
+            $updated = $ut->updated_at ?? $ut->created_at ?? now();
+            $statusBadge = $ut->getStatusBadge();
+            $notifications[] = [
+                'id' => 'temple_usr_'.$ut->id,
+                'type' => 'temple_status',
+                'icon' => '🏛️',
+                'title' => 'परिसर आयोजन स्थिति: '.$statusBadge['label'],
+                'description' => $ut->getEventTypeLabel().' &bull; संदर्भ: #'.$ut->enquiry_number,
+                'url' => url('/dashboard#tab-temple-bookings'),
                 'is_urgent' => false,
                 'updated_at' => $updated->toIso8601String(),
                 'timestamp' => $updated->timestamp,

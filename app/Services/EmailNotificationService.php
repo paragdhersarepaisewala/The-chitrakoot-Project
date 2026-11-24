@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Mail\TempleNotificationMailable;
+use App\Models\AtithiVishramEnquiry;
 use App\Models\Donation;
 use App\Models\EmailTemplate;
 use App\Models\OrganizationSetting;
 use App\Models\PoojaBooking;
+use App\Models\TempleBookingEnquiry;
 use App\Models\VolunteerApplication;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -227,6 +229,102 @@ class EmailNotificationService
     }
 
     /**
+     * Send Devotee Atithi Vishram Enquiry Received notification & Admin alert.
+     */
+    public static function sendAtithiVishramReceived(AtithiVishramEnquiry $enquiry): bool
+    {
+        $orgSettings = OrganizationSetting::getSettings();
+        $placeholders = [
+            '{enquiry_number}' => $enquiry->enquiry_number,
+            '{name}' => $enquiry->devotee_name,
+            '{phone}' => $enquiry->phone,
+            '{email}' => $enquiry->email,
+            '{city}' => $enquiry->city ?? 'N/A',
+            '{check_in_date}' => $enquiry->check_in_date ? $enquiry->check_in_date->format('d M Y') : '',
+            '{check_out_date}' => $enquiry->check_out_date ? $enquiry->check_out_date->format('d M Y') : '',
+            '{devotees}' => (string) $enquiry->number_of_devotees,
+            '{rooms}' => (string) $enquiry->number_of_rooms,
+            '{room_preference}' => $enquiry->getRoomPreferenceLabel(),
+            '{purpose}' => $enquiry->getPurposeLabel(),
+            '{special_requests}' => $enquiry->special_requests ?: 'कोई विशेष अनुरोध नहीं (None)',
+        ];
+
+        // 1. Send receipt confirmation to Devotee
+        $sentDevotee = self::send('atithi_vishram_received', $enquiry->email, $enquiry->devotee_name, $placeholders);
+
+        // 2. Send operational alert to Temple Administration
+        $adminEmail = $orgSettings->email ?? 'info@kamadgiripeetham.org';
+        self::send('atithi_vishram_admin_alert', $adminEmail, 'Temple Guest Office', $placeholders);
+
+        return $sentDevotee;
+    }
+
+    /**
+     * Send Devotee Atithi Vishram Enquiry Status Update notification.
+     */
+    public static function sendAtithiVishramStatusUpdate(AtithiVishramEnquiry $enquiry): bool
+    {
+        $statusBadge = $enquiry->getStatusBadge();
+
+        return self::send('atithi_vishram_status_update', $enquiry->email, $enquiry->devotee_name, [
+            '{enquiry_number}' => $enquiry->enquiry_number,
+            '{name}' => $enquiry->devotee_name,
+            '{check_in_date}' => $enquiry->check_in_date ? $enquiry->check_in_date->format('d M Y') : '',
+            '{check_out_date}' => $enquiry->check_out_date ? $enquiry->check_out_date->format('d M Y') : '',
+            '{status}' => $statusBadge['label'],
+            '{admin_notes}' => $enquiry->admin_notes ?: 'ट्रस्ट कार्यालय द्वारा आपकी पूछताछ पर आवश्यक व्यवस्था की जा रही है।',
+        ]);
+    }
+
+    /**
+     * Send Devotee Temple Booking Enquiry Received notification & Admin alert.
+     */
+    public static function sendTempleBookingReceived(TempleBookingEnquiry $enquiry): bool
+    {
+        $orgSettings = OrganizationSetting::getSettings();
+        $placeholders = [
+            '{enquiry_number}' => $enquiry->enquiry_number,
+            '{name}' => $enquiry->devotee_name,
+            '{phone}' => $enquiry->phone,
+            '{email}' => $enquiry->email,
+            '{city}' => $enquiry->city ?? 'N/A',
+            '{event_type}' => $enquiry->getEventTypeLabel(),
+            '{event_title}' => $enquiry->event_title ?: $enquiry->getEventTypeLabel(),
+            '{proposed_date}' => $enquiry->proposed_date ? $enquiry->proposed_date->format('d M Y') : '',
+            '{alternate_date}' => $enquiry->alternate_date ? $enquiry->alternate_date->format('d M Y') : 'कोई वैकल्पिक तिथि नहीं (None)',
+            '{gathering}' => (string) $enquiry->expected_gathering,
+            '{duration}' => $enquiry->duration_days.' दिवस (Days)',
+            '{requirements}' => $enquiry->additional_requirements ?: 'मानक मंदिर व्यवस्था (Standard Temple Arrangements)',
+        ];
+
+        // 1. Send receipt confirmation to Devotee
+        $sentDevotee = self::send('temple_booking_received', $enquiry->email, $enquiry->devotee_name, $placeholders);
+
+        // 2. Send operational alert to Temple Administration
+        $adminEmail = $orgSettings->email ?? 'info@kamadgiripeetham.org';
+        self::send('temple_booking_admin_alert', $adminEmail, 'Temple Premises Office', $placeholders);
+
+        return $sentDevotee;
+    }
+
+    /**
+     * Send Devotee Temple Booking Enquiry Status Update notification.
+     */
+    public static function sendTempleBookingStatusUpdate(TempleBookingEnquiry $enquiry): bool
+    {
+        $statusBadge = $enquiry->getStatusBadge();
+
+        return self::send('temple_booking_status_update', $enquiry->email, $enquiry->devotee_name, [
+            '{enquiry_number}' => $enquiry->enquiry_number,
+            '{name}' => $enquiry->devotee_name,
+            '{event_type}' => $enquiry->getEventTypeLabel(),
+            '{proposed_date}' => $enquiry->proposed_date ? $enquiry->proposed_date->format('d M Y') : '',
+            '{status}' => $statusBadge['label'],
+            '{admin_notes}' => $enquiry->admin_notes ?: 'मंदिर व्यवस्थापक समिति द्वारा आपके आयोजन प्रस्ताव की समीक्षा कर ली गई है।',
+        ]);
+    }
+
+    /**
      * Dynamic fallback templates if database record has not yet been seeded.
      */
     protected static function getFallbackTemplate(string $slug, array $p): array
@@ -341,6 +439,122 @@ class EmailNotificationService
                     </div>',
                     'ऑनलाइन दक्षिणा अर्पित करें (Pay Dakshina Online)',
                     $p['{payment_url}'] ?? "{$siteUrl}/dashboard"
+                );
+                break;
+
+            case 'atithi_vishram_received':
+                $subject = 'अतिथि विश्राम गृह पूछताछ प्राप्त हुई: #'.($p['{enquiry_number}'] ?? 'AVE')." — {$siteName}";
+                $body = self::renderTempleCard(
+                    'अतिथि विश्राम पावती · GUEST HOUSE ENQUIRY RECEIVED',
+                    'मंदिर अतिथि विश्राम पूछताछ सफलतापूर्वक दर्ज हुई',
+                    "जय सियाराम, {$name} जी!",
+                    'चित्रकूट धाम तीर्थ यात्रा के दौरान कामदगिरि पीठम् अतिथि विश्राम गृह में प्रवास हेतु आपकी पूछताछ संदर्भ संख्या <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> के साथ प्राप्त हो गई है।',
+                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>पूछताछ संदर्भ:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
+                        <strong>आगमन तिथि (Check-in):</strong> '.($p['{check_in_date}'] ?? '').'<br>
+                        <strong>प्रस्थान तिथि (Check-out):</strong> '.($p['{check_out_date}'] ?? '').'<br>
+                        <strong>भक्त संख्या:</strong> '.($p['{devotees}'] ?? '1').' भक्त &middot; <strong>कक्ष:</strong> '.($p['{rooms}'] ?? '1').'<br>
+                        <strong>कक्ष प्राथमिकता:</strong> '.($p['{room_preference}'] ?? 'Standard').'<br>
+                        <strong>यात्रा उद्देश्य:</strong> '.($p['{purpose}'] ?? 'तीर्थ दर्शन').'<br>
+                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* ध्यान दें: यह विश्राम कक्ष की पूछताछ है। उपलब्धता एवं आश्रम नियमों के अनुसार कार्यालय द्वारा शीघ्र संपर्क कर व्यवस्था सुनिश्चित की जाएगी।</span>
+                    </div>',
+                    'विश्राम स्थिति देखें',
+                    "{$siteUrl}/dashboard"
+                );
+                break;
+
+            case 'atithi_vishram_admin_alert':
+                $subject = '[ADMIN ALERT] नई अतिथि विश्राम पूछताछ: #'.($p['{enquiry_number}'] ?? 'AVE').' — '.$name;
+                $body = self::renderTempleCard(
+                    'प्रबंधन सूचना · ADMIN ATITHI VISHRAM ALERT',
+                    'नई अतिथि विश्राम पूछताछ प्राप्त हुई',
+                    'आदरणीय व्यवस्थापक जी,',
+                    'मंदिर पोर्टल पर भक्त द्वारा तीर्थ विश्राम गृह में ठहरने हेतु नई पूछताछ दर्ज की गई है। विवरण नीचे दिया गया है:',
+                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>संदर्भ संख्या:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
+                        <strong>भक्त नाम:</strong> '.$name.'<br>
+                        <strong>संपर्क:</strong> '.($p['{phone}'] ?? '').' &bull; '.($p['{email}'] ?? '').'<br>
+                        <strong>आगमन / प्रस्थान:</strong> '.($p['{check_in_date}'] ?? '').' से '.($p['{check_out_date}'] ?? '').'<br>
+                        <strong>यात्री संख्या:</strong> '.($p['{devotees}'] ?? '1').' &bull; <strong>कक्ष:</strong> '.($p['{rooms}'] ?? '1').'<br>
+                        <strong>कक्ष प्रकार:</strong> '.($p['{room_preference}'] ?? '').'<br>
+                        <strong>विशेष अनुरोध:</strong> '.($p['{special_requests}'] ?? 'कोई नहीं').'
+                    </div>',
+                    'एडमिन पैनल में समीक्षा करें',
+                    "{$siteUrl}/admin/atithi-vishram"
+                );
+                break;
+
+            case 'atithi_vishram_status_update':
+                $subject = 'अतिथि विश्राम पूछताछ अद्यतन: #'.($p['{enquiry_number}'] ?? 'AVE')." — {$siteName}";
+                $body = self::renderTempleCard(
+                    'विश्राम स्थिति अद्यतन · GUEST STAY STATUS UPDATE',
+                    'अतिथि विश्राम पूछताछ की अद्यतन स्थिति',
+                    "सादर प्रणाम, {$name} जी!",
+                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपकी अतिथि विश्राम गृह पूछताछ संदर्भ <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> की समीक्षा कर ली गई है।',
+                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong style="color: #2e7d32;">वर्तमान स्थिति: '.($p['{status'] ?? 'समीक्षित').'</strong><br>
+                        <strong>आगमन तिथि:</strong> '.($p['{check_in_date}'] ?? '').' &mdash; <strong>प्रस्थान:</strong> '.($p['{check_out_date}'] ?? '').'<br>
+                        <strong>व्यवस्थापक संदेश / निर्देश:</strong> '.($p['{admin_notes}'] ?? 'शीघ्र ही आवश्यक दिशा-निर्देश प्रेषित किए जाएंगे।').'
+                    </div>',
+                    'डैशबोर्ड पर विवरण देखें',
+                    "{$siteUrl}/dashboard"
+                );
+                break;
+
+            case 'temple_booking_received':
+                $subject = 'मंदिर परिसर व आयोजन आरक्षण पूछताछ प्राप्त हुई: #'.($p['{enquiry_number}'] ?? 'TBE')." — {$siteName}";
+                $body = self::renderTempleCard(
+                    'परिसर आरक्षण पावती · TEMPLE PREMISES BOOKING ENQUIRY',
+                    'मंदिर परिसर व धार्मिक आयोजन पूछताछ दर्ज हुई',
+                    "जय सियाराम, {$name} जी!",
+                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट के पावन परिसर में <strong>'.($p['{event_type}'] ?? 'धार्मिक आयोजन').'</strong> के आयोजन हेतु आपकी पूछताछ संदर्भ संख्या <strong>#'.($p['{enquiry_number}'] ?? '').'</strong> के साथ प्राप्त हो गई है।',
+                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>पूछताछ संदर्भ:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
+                        <strong>आयोजन प्रकार:</strong> '.($p['{event_type}'] ?? '').'<br>
+                        <strong>प्रस्तावित तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
+                        <strong>वैकल्पिक तिथि:</strong> '.($p['{alternate_date}'] ?? 'None').'<br>
+                        <strong>अनुमानित उपस्थिति:</strong> लगभग '.($p['{gathering}'] ?? '50').' श्रद्धालु &middot; <strong>अवधि:</strong> '.($p['{duration}'] ?? '1 दिन').'<br>
+                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* कृपया ध्यान दें: यह आयोजन स्थल आरक्षण पूछताछ है, अंतिम बुकिंग नहीं। ट्रस्ट प्रबंधन शुभ मुहूर्त, मंदिर मर्यादा एवं उपलब्धता के आधार पर शीघ्र संपर्क कर परामर्श प्रदान करेगा।</span>
+                    </div>',
+                    'आयोजन पूछताछ विवरण देखें',
+                    "{$siteUrl}/dashboard"
+                );
+                break;
+
+            case 'temple_booking_admin_alert':
+                $subject = '[ADMIN ALERT] नया मंदिर परिसर आयोजन प्रस्ताव: #'.($p['{enquiry_number}'] ?? 'TBE').' — '.$name;
+                $body = self::renderTempleCard(
+                    'प्रबंधन सूचना · ADMIN TEMPLE BOOKING ALERT',
+                    'मंदिर परिसर आयोजन आरक्षण पूछताछ प्राप्त हुई',
+                    'आदरणीय व्यवस्थापक जी,',
+                    'मंदिर परिसर / यज्ञशाला / कथा मंडप आरक्षण हेतु भक्त द्वारा नया आयोजन प्रस्ताव दर्ज किया गया है:',
+                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>संदर्भ संख्या:</strong> #'.($p['{enquiry_number}'] ?? '').'<br>
+                        <strong>आयोजक नाम:</strong> '.$name.'<br>
+                        <strong>संपर्क:</strong> '.($p['{phone}'] ?? '').' &bull; '.($p['{email}'] ?? '').'<br>
+                        <strong>आयोजन:</strong> '.($p['{event_type}'] ?? '').' &bull; <strong>तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
+                        <strong>उपस्थिति:</strong> '.($p['{gathering}'] ?? '').' श्रद्धालु &bull; <strong>अवधि:</strong> '.($p['{duration}'] ?? '').'<br>
+                        <strong>अतिरिक्त आवश्यकताएं:</strong> '.($p['{requirements}'] ?? 'मानक व्यवस्था').'
+                    </div>',
+                    'एडमिन पैनल में समीक्षा करें',
+                    "{$siteUrl}/admin/temple-bookings"
+                );
+                break;
+
+            case 'temple_booking_status_update':
+                $subject = 'मंदिर परिसर आरक्षण पूछताछ अद्यतन: #'.($p['{enquiry_number}'] ?? 'TBE')." — {$siteName}";
+                $body = self::renderTempleCard(
+                    'आयोजन स्थिति अद्यतन · TEMPLE EVENT STATUS UPDATE',
+                    'मंदिर परिसर आरक्षण प्रस्ताव की अद्यतन स्थिति',
+                    "सादर प्रणाम, {$name} जी!",
+                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपके <strong>'.($p['{event_type}'] ?? 'धार्मिक आयोजन').'</strong> प्रस्ताव (संदर्भ <strong>#'.($p['{enquiry_number}'] ?? '').'</strong>) की समीक्षा कर ली गई है।',
+                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong style="color: #2e7d32;">वर्तमान स्थिति: '.($p['{status}'] ?? 'समीक्षित').'</strong><br>
+                        <strong>प्रस्तावित तिथि:</strong> '.($p['{proposed_date}'] ?? '').'<br>
+                        <strong>समिति संदेश व दिशा-निर्देश:</strong> '.($p['{admin_notes}'] ?? 'कार्यालय प्रतिनिधि आपसे विस्तृत व्यवस्था हेतु संपर्क करेंगे।').'
+                    </div>',
+                    'डैशबोर्ड पर विवरण देखें',
+                    "{$siteUrl}/dashboard"
                 );
                 break;
 

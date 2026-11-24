@@ -74,6 +74,30 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>{{ url('/services') }}</loc>
+    <lastmod>{{ now()->toAtomString() }}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>{{ url('/services/aarti') }}</loc>
+    <lastmod>{{ now()->toAtomString() }}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{{ url('/services/atithi-vishram') }}</loc>
+    <lastmod>{{ now()->toAtomString() }}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{{ url('/services/temple-booking') }}</loc>
+    <lastmod>{{ now()->toAtomString() }}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>{{ url('/privacy-policy') }}</loc>
     <lastmod>{{ now()->toAtomString() }}</lastmod>
     <changefreq>yearly</changefreq>

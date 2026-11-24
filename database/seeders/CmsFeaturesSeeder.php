@@ -233,6 +233,134 @@ class CmsFeaturesSeeder extends Seeder
                 ),
                 'is_active' => true,
             ],
+            [
+                'slug' => 'atithi_vishram_received',
+                'name' => 'Atithi Vishram Enquiry Received (Devotee)',
+                'subject' => 'अतिथि विश्राम गृह पूछताछ प्राप्त हुई: #{enquiry_number} — {site_name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'अतिथि विश्राम पावती · GUEST HOUSE ENQUIRY RECEIVED',
+                    'मंदिर अतिथि विश्राम पूछताछ सफलतापूर्वक दर्ज हुई',
+                    'जय सियाराम, {name} जी!',
+                    'चित्रकूट धाम तीर्थ यात्रा के दौरान कामदगिरि पीठम् अतिथि विश्राम गृह में प्रवास हेतु आपकी पूछताछ संदर्भ संख्या <strong>#{enquiry_number}</strong> के साथ प्राप्त हो गई है।',
+                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>पूछताछ संदर्भ:</strong> #{enquiry_number}<br>
+                        <strong>आगमन तिथि (Check-in):</strong> {check_in_date}<br>
+                        <strong>प्रस्थान तिथि (Check-out):</strong> {check_out_date}<br>
+                        <strong>भक्त संख्या:</strong> {devotees} श्रद्धालु &middot; <strong>कक्ष:</strong> {rooms}<br>
+                        <strong>कक्ष प्रकार:</strong> {room_preference}<br>
+                        <strong>यात्रा उद्देश्य:</strong> {purpose}<br>
+                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* ध्यान दें: यह विश्राम कक्ष की पूछताछ है। उपलब्धता एवं आश्रम मर्यादा के अनुसार कार्यालय द्वारा शीघ्र संपर्क कर व्यवस्था सुनिश्चित की जाएगी।</span>
+                    </div>',
+                    'विश्राम स्थिति देखें',
+                    '{site_url}/dashboard'
+                ),
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'atithi_vishram_admin_alert',
+                'name' => 'Atithi Vishram Enquiry Alert (Admin)',
+                'subject' => '[ADMIN ALERT] नई अतिथि विश्राम पूछताछ: #{enquiry_number} — {name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'प्रबंधन सूचना · ADMIN ATITHI VISHRAM ALERT',
+                    'नई अतिथि विश्राम पूछताछ प्राप्त हुई',
+                    'आदरणीय व्यवस्थापक जी,',
+                    'मंदिर पोर्टल पर भक्त द्वारा तीर्थ विश्राम गृह में ठहरने हेतु नई पूछताछ दर्ज की गई है। विवरण नीचे दिया गया है:',
+                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>संदर्भ संख्या:</strong> #{enquiry_number}<br>
+                        <strong>भक्त नाम:</strong> {name}<br>
+                        <strong>संपर्क:</strong> {phone} &bull; {email}<br>
+                        <strong>आगमन / प्रस्थान:</strong> {check_in_date} से {check_out_date}<br>
+                        <strong>यात्री संख्या:</strong> {devotees} &bull; <strong>कक्ष:</strong> {rooms}<br>
+                        <strong>कक्ष प्रकार:</strong> {room_preference}<br>
+                        <strong>विशेष अनुरोध:</strong> {special_requests}
+                    </div>',
+                    'एडमिन पैनल में समीक्षा करें',
+                    '{site_url}/admin/atithi-vishram'
+                ),
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'atithi_vishram_status_update',
+                'name' => 'Atithi Vishram Status Update (Devotee)',
+                'subject' => 'अतिथि विश्राम पूछताछ अद्यतन: #{enquiry_number} — {site_name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'विश्राम स्थिति अद्यतन · GUEST STAY STATUS UPDATE',
+                    'अतिथि विश्राम पूछताछ की अद्यतन स्थिति',
+                    'सादर प्रणाम, {name} जी!',
+                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपकी अतिथि विश्राम गृह पूछताछ संदर्भ <strong>#{enquiry_number}</strong> की समीक्षा कर ली गई है।',
+                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong style="color: #2e7d32;">वर्तमान स्थिति: {status}</strong><br>
+                        <strong>आगमन तिथि:</strong> {check_in_date} &mdash; <strong>प्रस्थान:</strong> {check_out_date}<br>
+                        <strong>व्यवस्थापक संदेश / निर्देश:</strong> {admin_notes}
+                    </div>',
+                    'डैशबोर्ड पर विवरण देखें',
+                    '{site_url}/dashboard'
+                ),
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'temple_booking_received',
+                'name' => 'Temple Booking Enquiry Received (Devotee)',
+                'subject' => 'मंदिर परिसर व आयोजन आरक्षण पूछताछ प्राप्त हुई: #{enquiry_number} — {site_name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'परिसर आरक्षण पावती · TEMPLE PREMISES BOOKING ENQUIRY',
+                    'मंदिर परिसर व धार्मिक आयोजन पूछताछ दर्ज हुई',
+                    'जय सियाराम, {name} जी!',
+                    'श्री कामदगिरि पीठम् सेवा ट्रस्ट के पावन परिसर में <strong>{event_type}</strong> के आयोजन हेतु आपकी पूछताछ संदर्भ संख्या <strong>#{enquiry_number}</strong> के साथ प्राप्त हो गई है।',
+                    '<div style="background: #faf7f0; border: 1px solid #d4ad7d; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>पूछताछ संदर्भ:</strong> #{enquiry_number}<br>
+                        <strong>आयोजन प्रकार:</strong> {event_type}<br>
+                        <strong>प्रस्तावित तिथि:</strong> {proposed_date}<br>
+                        <strong>वैकल्पिक तिथि:</strong> {alternate_date}<br>
+                        <strong>अनुमानित उपस्थिति:</strong> लगभग {gathering} श्रद्धालु &middot; <strong>अवधि:</strong> {duration}<br>
+                        <span style="display: block; margin-top: 8px; color: #b45309; font-size: 12px;">* कृपया ध्यान दें: यह आयोजन स्थल आरक्षण पूछताछ है, अंतिम बुकिंग नहीं। ट्रस्ट प्रबंधन शुभ मुहूर्त, मंदिर मर्यादा एवं उपलब्धता के आधार पर शीघ्र संपर्क कर परामर्श प्रदान करेगा।</span>
+                    </div>',
+                    'आयोजन पूछताछ विवरण देखें',
+                    '{site_url}/dashboard'
+                ),
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'temple_booking_admin_alert',
+                'name' => 'Temple Booking Enquiry Alert (Admin)',
+                'subject' => '[ADMIN ALERT] नया मंदिर परिसर आयोजन प्रस्ताव: #{enquiry_number} — {name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'प्रबंधन सूचना · ADMIN TEMPLE BOOKING ALERT',
+                    'मंदिर परिसर आयोजन आरक्षण पूछताछ प्राप्त हुई',
+                    'आदरणीय व्यवस्थापक जी,',
+                    'मंदिर परिसर / यज्ञशाला / कथा मंडप आरक्षण हेतु भक्त द्वारा नया आयोजन प्रस्ताव दर्ज किया गया है:',
+                    '<div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong>संदर्भ संख्या:</strong> #{enquiry_number}<br>
+                        <strong>आयोजक नाम:</strong> {name}<br>
+                        <strong>संपर्क:</strong> {phone} &bull; {email}<br>
+                        <strong>आयोजन:</strong> {event_type} &bull; <strong>तिथि:</strong> {proposed_date}<br>
+                        <strong>उपस्थिति:</strong> {gathering} श्रद्धालु &bull; <strong>अवधि:</strong> {duration}<br>
+                        <strong>अतिरिक्त आवश्यकताएं:</strong> {requirements}
+                    </div>',
+                    'एडमिन पैनल में समीक्षा करें',
+                    '{site_url}/admin/temple-bookings'
+                ),
+                'is_active' => true,
+            ],
+            [
+                'slug' => 'temple_booking_status_update',
+                'name' => 'Temple Booking Status Update (Devotee)',
+                'subject' => 'मंदिर परिसर आरक्षण पूछताछ अद्यतन: #{enquiry_number} — {site_name}',
+                'content_html' => EmailNotificationService::renderTempleCard(
+                    'आयोजन स्थिति अद्यतन · TEMPLE EVENT STATUS UPDATE',
+                    'मंदिर परिसर आरक्षण प्रस्ताव की अद्यतन स्थिति',
+                    'सादर प्रणाम, {name} जी!',
+                    'कामदगिरि पीठम् सेवा ट्रस्ट द्वारा आपके <strong>{event_type}</strong> प्रस्ताव (संदर्भ <strong>#{enquiry_number}</strong>) की समीक्षा कर ली गई है।',
+                    '<div style="background: #edf7ee; border: 1px solid #a3d9a5; border-radius: 8px; padding: 18px; margin: 20px 0; font-size: 13.5px; line-height: 1.8;">
+                        <strong style="color: #2e7d32;">वर्तमान स्थिति: {status}</strong><br>
+                        <strong>प्रस्तावित तिथि:</strong> {proposed_date}<br>
+                        <strong>समिति संदेश व दिशा-निर्देश:</strong> {admin_notes}
+                    </div>',
+                    'डैशबोर्ड पर विवरण देखें',
+                    '{site_url}/dashboard'
+                ),
+                'is_active' => true,
+            ],
         ];
 
         foreach ($templates as $tmpl) {
