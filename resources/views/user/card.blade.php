@@ -39,9 +39,41 @@
         margin: 12mm;
       }
     }
+
+    @media (max-width: 640px) {
+      .card-section-wrap {
+        padding-top: 96px !important;
+        padding-bottom: 50px !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+      }
+      #printableCard {
+        padding: 20px 16px !important;
+        border-radius: 14px !important;
+      }
+      .card-user-row {
+        gap: 14px !important;
+      }
+      .card-photo-box {
+        width: 72px !important;
+        height: 90px !important;
+      }
+      .card-user-name {
+        font-size: 18px !important;
+      }
+      .card-actions-wrap {
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+      }
+      .card-actions-wrap .btn {
+        width: 100% !important;
+        text-align: center !important;
+      }
+    }
   </style>
 
-  <section class="section" style="padding-top: 150px; background: var(--paper); min-height: 85vh; display: flex; align-items: center;">
+  <section class="section card-section-wrap" style="padding-top: 140px; background: var(--paper); min-height: 85vh; display: flex; align-items: center;">
     <div class="container" style="max-width: 800px;">
 
       @if($cardType === 'none')
@@ -98,9 +130,9 @@
           </div>
 
           <!-- Card Body -->
-          <div style="display: flex; gap: 25px; align-items: center; margin-bottom: 25px;">
+          <div class="card-user-row" style="display: flex; gap: 25px; align-items: center; margin-bottom: 25px;">
             <!-- Profile Photo -->
-            <div style="width: 90px; height: 110px; border-radius: 8px; overflow: hidden; border: 2px solid var(--sand2); background: rgba(0,0,0,.3); flex-shrink: 0;">
+            <div class="card-photo-box" style="width: 90px; height: 110px; border-radius: 8px; overflow: hidden; border: 2px solid var(--sand2); background: rgba(0,0,0,.3); flex-shrink: 0;">
               @if($user->profile?->profile_photo_path)
                 <img src="{{ asset($user->profile->profile_photo_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
               @else
@@ -112,7 +144,7 @@
 
             <!-- Profile Info -->
             <div>
-              <h2 style="font: 600 22px var(--dev); color: #fff; margin: 0 0 6px;">{{ $user->name }}</h2>
+              <h2 class="card-user-name" style="font: 600 22px var(--dev); color: #fff; margin: 0 0 6px;">{{ $user->name }}</h2>
               <p style="font: 500 12px var(--sans); color: var(--sand2); margin: 0 0 10px;">ID: {{ $user->membership?->membership_id ?? ('SKP-SUP-' . $user->id) }}</p>
 
               <div style="font: 400 12px/1.6 var(--sans); color: rgba(255,255,255,.75);">
@@ -142,11 +174,14 @@
         </div>
 
         <!-- Download Actions -->
-        <div style="text-align: center;">
-          <button onclick="window.print()" class="btn primary" style="padding: 14px 28px; font-size: 10px;">
+        <div class="card-actions-wrap" style="text-align: center; display: flex; justify-content: center; gap: 14px; margin-top: 20px;">
+          <button onclick="window.print()" class="btn primary" style="padding: 14px 28px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Print / Download Card
           </button>
+          <a href="{{ url('/dashboard') }}" class="btn dark" style="padding: 14px 24px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">
+            &larr; Return to Dashboard
+          </a>
         </div>
 
       @endif

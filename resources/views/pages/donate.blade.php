@@ -39,7 +39,7 @@
 
     @media (max-width: 640px) {
       .donate-card {
-        padding: 24px 18px !important;
+        padding: 24px 16px !important;
         border-radius: 18px;
       }
 
@@ -54,7 +54,17 @@
       }
 
       .donate-amounts-grid button:last-child {
-        grid-column: span 2;
+        grid-column: span 3;
+      }
+
+      .donor-details-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+
+      .donate-card input,
+      .donate-card select {
+        font-size: 16px !important;
       }
     }
   </style>
@@ -139,7 +149,7 @@
           </div>
 
           <!-- Donor Details -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div class="donor-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
             <div>
               <label
                 style="display: block; font: 700 11px var(--sans); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px; color: #B45309;">दानदाता

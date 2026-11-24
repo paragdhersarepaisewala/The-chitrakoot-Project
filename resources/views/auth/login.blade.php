@@ -82,16 +82,49 @@
     box-shadow: 0 14px 28px rgba(217, 93, 15, 0.38);
     background: linear-gradient(135deg, #E86514 0%, #C25B0E 100%);
   }
+  .btn-auth-submit:active {
+    transform: scale(0.98);
+  }
 
+  @media (max-width: 640px) {
+    .auth-portal-section {
+      padding-top: 96px;
+      padding-bottom: 60px;
+      padding-left: 14px;
+      padding-right: 14px;
+      min-height: calc(100vh - 60px);
+      align-items: flex-start;
+    }
+    .auth-card-glass {
+      padding: 24px 18px;
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(130, 70, 20, 0.09);
+    }
+    .auth-input {
+      font-size: 16px; /* Prevents auto-zoom on iOS */
+      padding: 13px 14px;
+    }
+    .auth-header-emblem {
+      width: 46px !important;
+      height: 46px !important;
+      margin-bottom: 8px !important;
+    }
+    .auth-title {
+      font-size: 22px !important;
+    }
+    .auth-subtitle {
+      font-size: 12.5px !important;
+    }
+  }
 </style>
 
 <section class="auth-portal-section">
   <div class="auth-card-glass">
 
     <!-- Temple Logo / Emblem Header -->
-    <div style="text-align: center; margin-bottom: 28px;">
-      <div style="width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; background: linear-gradient(135deg, #D95D0F, #B45309); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(217,93,15,0.3);">
-        <svg width="26" height="26" viewBox="0 0 50 58" fill="none" stroke="#fff" stroke-width="2.5">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="auth-header-emblem" style="width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; background: linear-gradient(135deg, #D95D0F, #B45309); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(217,93,15,0.3); transition: all .2s ease;">
+        <svg width="24" height="24" viewBox="0 0 50 58" fill="none" stroke="#fff" stroke-width="2.5">
           <path d="M5 51V28L25 7l20 21v23"/>
           <path d="M13 51V31l12-12 12 12v20"/>
           <path d="M20 51V35h10v16"/>
@@ -99,13 +132,13 @@
           <path d="M25 7V2"/>
         </svg>
       </div>
-      <span style="font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #B45309;">
+      <span style="font-size: 10.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #B45309; display: block; margin-bottom: 2px;">
         DEVOTEE & MEMBER ACCESS
       </span>
-      <h1 style="font-size: 26px; font-weight: 700; font-family: var(--dev); color: #2B1A12; margin: 6px 0 4px;">
+      <h1 class="auth-title" style="font-size: 26px; font-weight: 700; font-family: var(--dev); color: #2B1A12; margin: 4px 0 2px;">
         भक्त व सदस्य प्रवेश
       </h1>
-      <p style="font-size: 13.5px; color: rgba(43,26,18,0.7); margin: 0; font-family: var(--dev);">
+      <p class="auth-subtitle" style="font-size: 13.5px; color: rgba(43,26,18,0.7); margin: 0; font-family: var(--dev);">
         श्री कामदगिरि पीठम् सेवा ट्रस्ट · चित्रकूट धाम
       </p>
     </div>

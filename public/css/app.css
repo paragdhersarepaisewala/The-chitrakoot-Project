@@ -2788,5 +2788,32 @@ html, body {
   .fb-lb-next { right: 10px; }
 }
 
+/* Universal Mobile Responsiveness & Touch Ergonomics */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  button, 
+  .btn,
+  a.btn {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+}
+
+
 
 

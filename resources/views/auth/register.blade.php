@@ -89,6 +89,9 @@
     box-shadow: 0 14px 28px rgba(217, 93, 15, 0.38);
     background: linear-gradient(135deg, #E86514 0%, #C25B0E 100%);
   }
+  .btn-reg-submit:active {
+    transform: scale(0.98);
+  }
   .stepper-capsule {
     display: flex;
     align-items: center;
@@ -102,6 +105,69 @@
     background: rgba(180, 83, 9, 0.12);
     border-color: #B45309;
   }
+
+  @media (max-width: 900px) {
+    .register-portal-section {
+      padding-top: 96px;
+      padding-bottom: 60px;
+      padding-left: 14px;
+      padding-right: 14px;
+      align-items: flex-start;
+    }
+    .register-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .register-trust-col {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .register-trust-col h1 {
+      font-size: clamp(22px, 5.5vw, 28px) !important;
+      margin: 0 0 10px !important;
+    }
+    .register-trust-col p {
+      font-size: 13px !important;
+      margin-bottom: 12px !important;
+      line-height: 1.6 !important;
+    }
+    .register-trust-highlights {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      margin-bottom: 14px !important;
+    }
+    .register-trust-badge-pill {
+      font-size: 11.5px !important;
+      padding: 6px 12px !important;
+      background: #FFFDF9 !important;
+      border: 1px solid rgba(180, 83, 9, 0.22) !important;
+      border-radius: 9999px !important;
+      color: #78350F !important;
+      font-family: var(--dev);
+      font-weight: 700;
+    }
+    .register-card-glass {
+      padding: 22px 16px;
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(130, 70, 20, 0.09);
+    }
+    .stepper-capsule {
+      flex: 1;
+      justify-content: center;
+      padding: 7px 4px;
+    }
+    .stepper-capsule span {
+      font-size: 10.5px !important;
+      white-space: nowrap;
+    }
+    .reg-input {
+      font-size: 16px; /* Prevents auto-zoom on iOS */
+      padding: 13px 14px;
+    }
+  }
 </style>
 
 <section class="register-portal-section">
@@ -109,35 +175,35 @@
     <div class="register-grid">
 
       <!-- Left Column: Trust Benefits & Vision -->
-      <div style="color: #2B1A12;">
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(180,83,9,0.12); border: 1px solid rgba(180,83,9,0.25); padding: 5px 14px; border-radius: 9999px; margin-bottom: 16px;">
+      <div class="register-trust-col" style="color: #2B1A12;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(180,83,9,0.12); border: 1px solid rgba(180,83,9,0.25); padding: 5px 14px; border-radius: 9999px; margin-bottom: 14px;">
           <span style="font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #B45309;">JOIN THE SACRED SANKALP</span>
         </div>
 
-        <h1 style="font-size: clamp(30px, 3.8vw, 46px); font-weight: 700; font-family: var(--dev); line-height: 1.25; margin: 0 0 18px; color: #2B1A12;">
+        <h1 style="font-size: clamp(26px, 3.8vw, 46px); font-weight: 700; font-family: var(--dev); line-height: 1.25; margin: 0 0 16px; color: #2B1A12;">
           सनातन संस्कृति एवं तपोभूमि सेवा का पावन संकल्प
         </h1>
 
-        <p style="font-size: 15.5px; line-height: 1.8; color: rgba(43,26,18,0.85); margin-bottom: 28px; font-family: var(--dev);">
+        <p style="font-size: 15px; line-height: 1.8; color: rgba(43,26,18,0.85); margin-bottom: 24px; font-family: var(--dev);">
           श्री कामदगिरि पीठम् सेवा ट्रस्ट से जुड़कर गौसेवा, गुरुकुल शिक्षा, मंदाकिनी स्वच्छता और समाज कल्याण के प्रयासों में अपनी सहभागिता दर्ज करें।
         </p>
 
-        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px;">
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: #2B1A12; font-family: var(--dev);">
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div class="register-trust-highlights" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 26px;">
+          <div class="register-trust-badge-pill" style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #2B1A12; font-family: var(--dev);">
+            <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span>गौवंश संरक्षण, नित्य अन्नक्षेत्र एवं चिकित्सा सेवा</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: #2B1A12; font-family: var(--dev);">
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="register-trust-badge-pill" style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #2B1A12; font-family: var(--dev);">
+            <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span>गुरुकुल वैदिक शिक्षा, संस्कृत संवर्धन एवं संस्कार शाला</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: #2B1A12; font-family: var(--dev);">
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="register-trust-badge-pill" style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #2B1A12; font-family: var(--dev);">
+            <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(180,83,9,0.15); display: grid; place-items: center; flex-shrink: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <span>{{ ($orgSettings->is_80g_enabled ?? false) ? '80G आयकर छूट प्राप्त प्रमाणित डिजिटल दान रसीदें' : 'प्रमाणित डिजिटल दान पावती एवं रसीदें' }}</span>
           </div>

@@ -3,6 +3,47 @@
 @section('title', 'मंदिर परिसर व मंडप आरक्षण पूछताछ | ' . ($orgSettings->org_name ?? 'श्री कामदगिरि पीठम् सेवा ट्रस्ट'))
 @section('meta_description', 'चित्रकूट धाम में विवाह, वैदिक महायज्ञ, श्रीराम कथा, श्रीमद्भागवत एवं महाप्रसाद भंडारे हेतु मंदिर परिसर व यज्ञ मंडप आरक्षण की अग्रिम पूछताछ।')
 
+@section('styles')
+  <style>
+    .services-split-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .services-form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 860px) {
+      .services-split-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+
+      .services-form-grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+
+      .service-form-card {
+        padding: 22px 16px !important;
+        border-radius: 16px !important;
+      }
+
+      .service-form-card input,
+      .service-form-card select,
+      .service-form-card textarea {
+        font-size: 16px !important;
+      }
+    }
+  </style>
+@endsection
+
 @section('content')
 
   <!-- Hero Header -->
@@ -88,10 +129,10 @@
         </div>
       @endif
 
-      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 36px; align-items: start;">
+      <div class="services-split-grid">
 
         <!-- Left Column: The Enquiry Form -->
-        <div
+        <div class="service-form-card"
           style="background: #FFFDFC; border: 1.5px solid rgba(180,83,9,0.2); border-radius: 22px; padding: 36px 32px; box-shadow: 0 8px 30px rgba(0,0,0,0.03);">
 
           <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(180,83,9,0.14);">
@@ -107,7 +148,7 @@
             @csrf
 
             <!-- Devotee Name & Phone -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+            <div class="services-form-grid-2">
               <div>
                 <label style="display: block; font-size: 12.5px; font-weight: 700; color: #2B1A12; margin-bottom: 6px;">
                   आयोजक / यजमान का नाम <span style="color: #dc2626;">*</span>
@@ -127,7 +168,7 @@
             </div>
 
             <!-- Email & City/State -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin-bottom: 18px;">
+            <div class="services-form-grid-2">
               <div>
                 <label style="display: block; font-size: 12.5px; font-weight: 700; color: #2B1A12; margin-bottom: 6px;">
                   ईमेल पता (सूचना व पावती हेतु) <span style="color: #dc2626;">*</span>
@@ -147,7 +188,7 @@
             </div>
 
             <!-- Event Type & Event Title -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+            <div class="services-form-grid-2">
               <div>
                 <label style="display: block; font-size: 12.5px; font-weight: 700; color: #2B1A12; margin-bottom: 6px;">
                   आयोजन का प्रकार (Event Type) <span style="color: #dc2626;">*</span>

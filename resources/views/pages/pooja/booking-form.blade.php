@@ -158,6 +158,13 @@
       .details-row {
         grid-template-columns: 1fr !important;
       }
+
+      .form-input-sacred,
+      select,
+      textarea,
+      input {
+        font-size: 16px !important;
+      }
     }
   </style>
 

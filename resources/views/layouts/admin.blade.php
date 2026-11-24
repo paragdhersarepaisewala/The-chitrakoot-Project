@@ -531,24 +531,26 @@
       font-weight: 500;
     }
 
-    /* Universal CMS Table Card */
-    .cms-table-card {
+    /* Universal CMS Table Card & Responsive Table Wrappers */
+    .cms-table-card, .table-box {
       background: #ffffff;
       border: 1px solid var(--line);
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(43, 35, 29, 0.04);
-      overflow: hidden;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
     }
-    .cms-table {
+    .cms-table, .cms-data-table, .data-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
     }
-    .cms-table thead tr {
+    .cms-table thead tr, .cms-data-table thead tr, .data-table thead tr {
       background: #faf8f5;
       border-bottom: 1px solid var(--line);
     }
-    .cms-table th {
+    .cms-table th, .cms-data-table th, .data-table th {
       padding: 13px 20px;
       font-size: 11px;
       font-weight: 800;
@@ -556,16 +558,20 @@
       letter-spacing: .06em;
       color: var(--brown);
     }
-    .cms-table td {
+    .cms-table td, .cms-data-table td, .data-table td {
       padding: 16px 20px;
       border-bottom: 1px solid var(--line);
       vertical-align: middle;
       font-size: 13px;
     }
-    .cms-table tbody tr:last-child td {
+    .cms-table tbody tr:last-child td,
+    .cms-data-table tbody tr:last-child td,
+    .data-table tbody tr:last-child td {
       border-bottom: none;
     }
-    .cms-table tbody tr:hover {
+    .cms-table tbody tr:hover,
+    .cms-data-table tbody tr:hover,
+    .data-table tbody tr:hover {
       background: rgba(247, 243, 237, 0.5);
     }
 
@@ -647,6 +653,14 @@
     @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     /* Responsive */
+    .mobile-admin-actions-wrap {
+      display: none;
+      position: relative;
+    }
+    .desktop-only-btn {
+      display: inline-flex;
+    }
+
     @media (max-width: 992px) {
       .admin-sidebar {
         position: fixed;
@@ -669,6 +683,66 @@
       .mobile-nav-toggle { display: block; }
       .admin-masthead { padding: 14px 20px; }
       .admin-body { padding: 20px 16px 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .desktop-only-btn {
+        display: none !important;
+      }
+      .mobile-admin-actions-wrap {
+        display: inline-block !important;
+      }
+      .admin-masthead {
+        padding: 10px 14px !important;
+        gap: 10px !important;
+      }
+      .masthead-title {
+        font-size: 16px !important;
+        line-height: 1.2 !important;
+      }
+      .masthead-sub {
+        display: none !important;
+      }
+      .masthead-actions {
+        gap: 6px !important;
+      }
+      .action-btn {
+        padding: 6px 11px !important;
+        font-size: 10.5px !important;
+        border-radius: 9999px !important;
+      }
+      .admin-body {
+        padding: 16px 12px 60px !important;
+      }
+      .cms-table-card, .table-box {
+        border-radius: 12px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        position: relative !important;
+      }
+      .cms-table, .cms-data-table, .data-table {
+        min-width: 580px !important;
+      }
+      .cms-table th, .cms-table td,
+      .cms-data-table th, .cms-data-table td,
+      .data-table th, .data-table td {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+      .stat-card {
+        padding: 12px 14px !important;
+      }
+      .stat-val {
+        font-size: 22px !important;
+      }
+      .form-input, .form-select, textarea {
+        font-size: 16px !important;
+      }
     }
   </style>
   @yield('styles')
@@ -908,19 +982,39 @@
         </div>
 
         @yield('header_actions')
-        <a href="{{ url('/feed.xml') }}" target="_blank" class="action-btn gold">
+        <div class="mobile-admin-actions-wrap" id="mobileAdminActionsWrap">
+          <button type="button" class="action-btn" onclick="toggleMobileAdminDropdown()" aria-label="Quick Actions" style="font-weight: 800; background: #faf8f5;">
+            <span>⚡ Actions</span>
+          </button>
+          <div id="mobileAdminDropdownPanel" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #ffffff; border: 1.5px solid var(--line); border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); min-width: 190px; z-index: 1000; overflow: hidden; flex-direction: column;">
+            <a href="{{ url('/') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--ink);">
+              🌐 View Website
+            </a>
+            <button type="button" onclick="triggerCacheFlush(); toggleMobileAdminDropdown();" style="width: 100%; text-align: left; background: none; border: none; padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--forest); cursor: pointer;">
+              🔄 Flush Cache
+            </button>
+            <a href="{{ url('/sitemap.xml') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); color: var(--ink);">
+              🗺️ Sitemap XML
+            </a>
+            <a href="{{ url('/feed.xml') }}" target="_blank" style="padding: 11px 16px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--gold);">
+              📡 Live RSS Feed
+            </a>
+          </div>
+        </div>
+
+        <a href="{{ url('/feed.xml') }}" target="_blank" class="action-btn gold desktop-only-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
           Live RSS Feed
         </a>
-        <a href="{{ url('/sitemap.xml') }}" target="_blank" class="action-btn">
+        <a href="{{ url('/sitemap.xml') }}" target="_blank" class="action-btn desktop-only-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
           Sitemap XML
         </a>
-        <button type="button" onclick="triggerCacheFlush()" class="action-btn teal">
+        <button type="button" onclick="triggerCacheFlush()" class="action-btn teal desktop-only-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
           Flush Cache
         </button>
-        <a href="{{ url('/') }}" target="_blank" class="action-btn">
+        <a href="{{ url('/') }}" target="_blank" class="action-btn desktop-only-btn">
           View Website &rarr;
         </a>
         <a href="{{ route('admin.blogs.create') }}" class="action-btn primary">
@@ -1120,6 +1214,20 @@
     })
     .catch(() => {});
   }
+
+  function toggleMobileAdminDropdown() {
+    const panel = document.getElementById('mobileAdminDropdownPanel');
+    if (!panel) return;
+    panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('mobileAdminActionsWrap');
+    const panel = document.getElementById('mobileAdminDropdownPanel');
+    if (wrap && panel && !wrap.contains(e.target)) {
+      panel.style.display = 'none';
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', function() {
     fetchAdminNotifications(true);

@@ -83,6 +83,29 @@
     box-shadow: 0 10px 30px rgba(143, 23, 25, 0.32);
     transform: translateY(-1px);
   }
+  .btn-auth-submit:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 640px) {
+    .auth-portal-section {
+      padding-top: 96px;
+      padding-bottom: 60px;
+      padding-left: 14px;
+      padding-right: 14px;
+      min-height: calc(100vh - 60px);
+      align-items: flex-start;
+    }
+    .auth-card-glass {
+      padding: 24px 18px;
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(130, 70, 20, 0.09);
+    }
+    .auth-input {
+      font-size: 16px;
+      padding: 13px 14px;
+    }
+  }
 </style>
 
 <section class="auth-portal-section">

@@ -19,7 +19,26 @@
   }
   @media (max-width: 640px) {
     .dash-stats-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      margin-bottom: 18px !important;
+    }
+    .stat-card {
+      padding: 14px 12px !important;
+      border-radius: 12px !important;
+    }
+    .stat-label {
+      font-size: 9.5px !important;
+      letter-spacing: .04em !important;
+      margin-bottom: 4px !important;
+    }
+    .stat-val {
+      font-size: 20px !important;
+      line-height: 1.15 !important;
+    }
+    .stat-sub {
+      font-size: 10px !important;
+      margin-top: 4px !important;
     }
   }
   .stat-card {
@@ -80,7 +99,27 @@
   }
   @media (max-width: 600px) {
     .quick-cms-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      margin-bottom: 20px !important;
+    }
+    .quick-cms-card {
+      padding: 12px 10px !important;
+      border-radius: 12px !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    .quick-cms-icon {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 8px !important;
+    }
+    .quick-cms-title {
+      font-size: 12px !important;
+    }
+    .quick-cms-desc {
+      font-size: 10px !important;
     }
   }
   .quick-cms-card {

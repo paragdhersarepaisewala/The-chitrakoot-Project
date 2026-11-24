@@ -204,11 +204,77 @@
       transform: translateY(-1px);
     }
 
+    /* Devotee Mobile Segmented Navigation */
+    .devotee-mobile-segment-wrap {
+      display: none;
+    }
+
     /* Mobile Dashboard Enhancements */
-    @media (max-width: 768px) {
+    @media (max-width: 860px) {
+      .devotee-mobile-segment-wrap {
+        display: flex !important;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 18px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .devotee-mobile-segment-wrap::-webkit-scrollbar {
+        display: none;
+      }
+
+      .devotee-segment-btn {
+        flex-shrink: 0;
+        background: #FFFDF9;
+        border: 1.5px solid rgba(180, 83, 9, 0.25);
+        color: #78350F;
+        padding: 9px 16px;
+        border-radius: 9999px;
+        font-size: 13px;
+        font-weight: 700;
+        font-family: var(--dev);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .devotee-segment-btn:active {
+        transform: scale(0.96);
+      }
+
+      .devotee-segment-btn.active {
+        background: #8F1719 !important;
+        color: #ffffff !important;
+        border-color: #8F1719 !important;
+        box-shadow: 0 4px 12px rgba(143, 23, 25, 0.25);
+      }
+
+      .devotee-segment-count {
+        background: rgba(180, 83, 9, 0.15);
+        color: #78350F;
+        padding: 1px 7px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .devotee-segment-btn.active .devotee-segment-count {
+        background: rgba(255, 255, 255, 0.28);
+        color: #ffffff;
+      }
+
       .dashboard-section {
         padding-top: 100px !important;
         padding-bottom: 120px !important;
+      }
+
+      .dashboard-main-content {
+        padding: 18px 14px !important;
       }
 
       .devotee-notif-panel {
@@ -240,16 +306,24 @@
       .dashboard-actions .dashboard-logout-form,
       .dashboard-actions .btn-logout {
         width: 100% !important;
+        min-height: 44px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
         box-sizing: border-box !important;
         margin: 0 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        transition: transform 0.15s ease !important;
       }
 
-      .dashboard-actions .btn-logout {
-        width: 100% !important;
+      .dashboard-actions .btn-card-dl:active,
+      .dashboard-actions .btn-edit-profile:active,
+      .dashboard-actions .btn-logout:active,
+      .dashboard-actions .devotee-notif-btn:active {
+        transform: scale(0.97) !important;
       }
 
       .quotation-alert-card {
@@ -266,6 +340,7 @@
 
       .quotation-alert-btn {
         width: 100% !important;
+        min-height: 44px !important;
         box-sizing: border-box !important;
         text-align: center !important;
         white-space: normal !important;
@@ -308,14 +383,55 @@
         width: 100% !important;
       }
 
+      .donation-receipt-row {
+        background: #FFFFFF !important;
+        border: 1.5px solid rgba(180, 83, 9, 0.16) !important;
+        border-radius: 14px !important;
+        padding: 16px 14px !important;
+        margin-bottom: 14px !important;
+        box-shadow: 0 2px 8px rgba(43, 26, 18, 0.04) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+
+      .donation-receipt-row .donation-row-right {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        margin-top: 4px !important;
+      }
+
+      .donation-receipt-row .btn-receipt-view,
+      .donation-receipt-row .btn.primary {
+        width: 100% !important;
+        min-height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+      }
+
       #profileEditModal {
         padding: 10px !important;
       }
 
-      #profileEditModal>div {
+      #profileEditModal > div {
         padding: 20px 14px !important;
-        border-radius: 14px !important;
+        border-radius: 16px !important;
         max-height: 94vh !important;
+      }
+
+      #profileEditModal input,
+      #profileEditModal select,
+      #profileEditModal textarea {
+        font-size: 16px !important;
       }
 
       .profile-modal-grid {
@@ -323,7 +439,7 @@
         gap: 12px !important;
       }
 
-      .profile-modal-grid>div {
+      .profile-modal-grid > div {
         grid-column: span 1 !important;
       }
 
@@ -438,10 +554,40 @@
       <!-- Real-Time Quotation Dynamic Callout Banner -->
       <div id="devoteeLiveQuotationAlert" style="display: none; margin-bottom: 24px;"></div>
 
+      <!-- Devotee Mobile Segmented Quick View Pills -->
+      <div class="devotee-mobile-segment-wrap" id="devoteeMobileSegmentWrap">
+        <button type="button" class="devotee-segment-btn active" data-target="all" onclick="switchDevoteeMobileSection('all', this)">
+          <span>📋 सभी</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="profile" onclick="switchDevoteeMobileSection('profile', this)">
+          <span>👤 प्रोफाइल</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="tab-donations" onclick="switchDevoteeMobileSection('tab-donations', this)">
+          <span>🙏 दान</span>
+          <span class="devotee-segment-count">{{ $donations->count() }}</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="tab-poojas" onclick="switchDevoteeMobileSection('tab-poojas', this)">
+          <span>🪔 पूजा</span>
+          <span class="devotee-segment-count">{{ $poojaBookings->count() }}</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="tab-atithi" onclick="switchDevoteeMobileSection('tab-atithi', this)">
+          <span>🏨 विश्राम</span>
+          <span class="devotee-segment-count">{{ $atithiEnquiries->count() }}</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="tab-temple-bookings" onclick="switchDevoteeMobileSection('tab-temple-bookings', this)">
+          <span>🏛️ परिसर</span>
+          <span class="devotee-segment-count">{{ $templeBookings->count() }}</span>
+        </button>
+        <button type="button" class="devotee-segment-btn" data-target="tab-volunteers" onclick="switchDevoteeMobileSection('tab-volunteers', this)">
+          <span>🤝 सेवादार</span>
+          <span class="devotee-segment-count">{{ $volunteerApplications->count() }}</span>
+        </button>
+      </div>
+
       <div class="dashboard-grid">
 
         <!-- Personal Profile & Membership Card Summary -->
-        <div class="dashboard-sidebar">
+        <div class="dashboard-sidebar" id="devoteeSidebarSection">
 
           <div class="dashboard-card">
             <div
@@ -500,7 +646,7 @@
         </div>
 
         <!-- Synchronized Devotee History (Donations, Poojas, Volunteering) -->
-        <div class="dashboard-card dashboard-main-content" style="padding: 24px 28px;">
+        <div class="dashboard-card dashboard-main-content" id="devoteeMainSection" style="padding: 24px 28px;">
 
           <!-- Sync Notice -->
           <div
@@ -871,10 +1017,50 @@
               b.style.borderBottomColor = 'transparent';
               b.classList.remove('active-dash-tab');
             });
-            document.getElementById(tabId).style.display = 'block';
-            btn.style.color = '#B45309';
-            btn.style.borderBottomColor = '#B45309';
-            btn.classList.add('active-dash-tab');
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) targetContent.style.display = 'block';
+            if (btn) {
+              btn.style.color = '#B45309';
+              btn.style.borderBottomColor = '#B45309';
+              btn.classList.add('active-dash-tab');
+            }
+
+            // Sync with mobile segment pills
+            document.querySelectorAll('.devotee-segment-btn').forEach(seg => {
+              if (seg.getAttribute('data-target') === tabId) {
+                seg.classList.add('active');
+              } else if (seg.getAttribute('data-target') !== 'all') {
+                seg.classList.remove('active');
+              }
+            });
+          }
+
+          function switchDevoteeMobileSection(targetKey, btn) {
+            document.querySelectorAll('.devotee-segment-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const sidebar = document.getElementById('devoteeSidebarSection');
+            const mainContent = document.getElementById('devoteeMainSection');
+
+            if (targetKey === 'all') {
+              if (sidebar) sidebar.style.display = '';
+              if (mainContent) mainContent.style.display = '';
+              const headerCard = document.querySelector('.dashboard-header-card');
+              if (headerCard) headerCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else if (targetKey === 'profile') {
+              if (sidebar) sidebar.style.display = 'block';
+              if (mainContent) mainContent.style.display = 'none';
+              if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else if (targetKey.startsWith('tab-')) {
+              if (window.innerWidth <= 860) {
+                if (sidebar) sidebar.style.display = 'none';
+              }
+              if (mainContent) mainContent.style.display = 'block';
+              
+              const desktopTabBtn = document.querySelector(`.dash-tab-btn[onclick*="${targetKey}"]`);
+              switchDashTab(targetKey, desktopTabBtn);
+              if (mainContent) mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
           }
 
           function openProfileModal() {
