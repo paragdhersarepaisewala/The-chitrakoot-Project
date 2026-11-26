@@ -19,6 +19,9 @@
 /public/hot
 /public/storage
 /scratch/
+/cloudflared.exe
+/.tmp-cloudflared.log
+/latest-client-link.txt
 /storage/*.key
 /storage/pail
 /vendor
