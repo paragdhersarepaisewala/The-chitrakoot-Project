@@ -51,10 +51,57 @@
                   style="background: rgba(45,106,79,0.1); color: #2D6A4F; border: 1px solid rgba(45,106,79,0.22); padding: 5px 14px; border-radius: 9999px; font-size: 11.5px; font-weight: 700;">आध्यात्मिक
                   पथप्रदर्शक</span>
               </div>
+
+              @php $patronSocials = $patron->getEnabledSocialLinks(); @endphp
+              @if(count($patronSocials) > 0)
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px;">
+                  @foreach($patronSocials as $platformKey => $social)
+                    <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer"
+                      aria-label="{{ $patron->name_hi }} on {{ $social['label'] }}"
+                      style="display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 9999px; background: #FAF4ED; border: 1px solid rgba(180,83,9,0.24); color: #78350F; font-size: 12px; font-weight: 700; text-decoration: none; transition: all 0.2s ease;">
+                      <x-icon name="{{ $platformKey }}" size="15" />
+                      <span>{{ $social['label'] }}</span>
+                    </a>
+                  @endforeach
+                </div>
+              @endif
             </div>
           </div>
         </div>
       @endif
+
+      @php
+        $playlistProfiles = $profiles->filter(fn ($p) => $p->is_youtube_playlist_enabled && $p->getYoutubePlaylistId());
+      @endphp
+      @foreach($playlistProfiles as $plProfile)
+        @php $playlistId = $plProfile->getYoutubePlaylistId(); @endphp
+        <div class="reveal"
+          style="background: #FFFDFC; border: 1px solid rgba(180,83,9,0.18); border-radius: 20px; padding: clamp(20px, 3.5vw, 36px); margin-bottom: 50px; box-shadow: 0 12px 35px rgba(130,70,20,0.05);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+            <div>
+              <h3 style="font: 700 22px var(--dev); color: #2B1A12; margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
+                <span style="color: #B91C1C; display: inline-flex;"><x-icon name="youtube" size="22" /></span>
+                <span>{{ $plProfile->youtube_playlist_title ?: ($plProfile->name_hi . ' — प्रवचन एवं कथा श्रृंखला') }}</span>
+              </h3>
+              <p style="font: 400 13.5px var(--dev); color: #7A4B29; margin: 0;">{{ $plProfile->name_hi }} के पावन प्रवचन, कथा एवं भक्ति वीडियो श्रृंखला।</p>
+            </div>
+            <a href="https://www.youtube.com/playlist?list={{ $playlistId }}" target="_blank" rel="noopener noreferrer"
+              class="btn primary" style="font-size: 12px; padding: 9px 18px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <x-icon name="youtube" size="14" /> Watch on YouTube &rarr;
+            </a>
+          </div>
+          <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; background: #1A120D; border: 1px solid rgba(180,83,9,0.2);">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/videoseries?list={{ $playlistId }}"
+              title="{{ $plProfile->youtube_playlist_title ?: $plProfile->name_hi . ' YouTube Playlist' }}"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"></iframe>
+          </div>
+        </div>
+      @endforeach
 
       <!-- Board of Trustees Grid -->
       <div style="margin-top: 60px;">
@@ -90,6 +137,18 @@
               <p style="font: 400 13.5px/1.7 var(--dev); color: #7A4B29; margin: 0;">
                 {{ $profile->bio_hi ?: 'ट्रस्ट के समस्त कानूनी, प्रशासनिक एवं सेवा प्रकल्पों के सुचारू निष्पादन के लिए समर्पित।' }}
               </p>
+              @php $memberSocials = $profile->getEnabledSocialLinks(); @endphp
+              @if(count($memberSocials) > 0)
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;">
+                  @foreach($memberSocials as $platformKey => $social)
+                    <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer"
+                      aria-label="{{ $profile->name_hi }} on {{ $social['label'] }}"
+                      style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #FAF4ED; border: 1px solid rgba(180,83,9,0.22); color: #78350F; text-decoration: none;">
+                      <x-icon name="{{ $platformKey }}" size="14" />
+                    </a>
+                  @endforeach
+                </div>
+              @endif
             </div>
           @empty
             <div class="reveal"

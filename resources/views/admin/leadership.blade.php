@@ -60,6 +60,7 @@
         <th>Name (Hindi & English)</th>
         <th>Designation / Title</th>
         <th style="width: 140px;">Category</th>
+        <th style="width: 150px;">Socials & Playlist</th>
         <th style="width: 80px; text-align: center;">Order</th>
         <th style="width: 90px; text-align: center;">Status</th>
         <th style="text-align: right; width: 140px;">Actions</th>
@@ -100,6 +101,29 @@
               <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">{{ ucfirst($profile->role_category) }}</span>
             @endif
           </td>
+          <td>
+            @php
+              $activeSocials = $profile->getEnabledSocialLinks();
+              $hasPlaylist = $profile->is_youtube_playlist_enabled && $profile->getYoutubePlaylistId();
+            @endphp
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+              @if(count($activeSocials) > 0)
+                @foreach($activeSocials as $platformKey => $socialData)
+                  <span title="{{ $socialData['label'] }}: {{ $socialData['url'] }}"
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; background: #FAF4ED; border: 1px solid rgba(180,83,9,0.25); color: #92400E;">
+                    <x-icon name="{{ $platformKey }}" size="13" />
+                  </span>
+                @endforeach
+              @else
+                <span style="font-size: 11px; color: #9CA3AF;">No socials</span>
+              @endif
+              @if($hasPlaylist)
+                <span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 10px; display: inline-flex; align-items: center; gap: 3px;">
+                  <x-icon name="youtube" size="10" /> Playlist
+                </span>
+              @endif
+            </div>
+          </td>
           <td style="text-align: center; font-weight: 600; color: var(--deep);">
             {{ $profile->sort_order }}
           </td>
@@ -130,7 +154,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="7" style="text-align: center; padding: 40px; color: #888;">
+          <td colspan="8" style="text-align: center; padding: 40px; color: #888;">
             No leadership or trustee profiles found. Click "+ Add Trustee / Patron" to register trustees.
           </td>
         </tr>
@@ -204,6 +228,51 @@
         <textarea name="bio_hi" id="bio_hi" rows="3" class="form-input" placeholder="Brief spiritual description, duties, or seva contribution in Trust..."></textarea>
       </div>
 
+      <!-- Social Media Links & Per-Platform Toggles -->
+      <div style="margin-bottom: 18px; padding: 16px; background: #FAF7F2; border: 1px solid rgba(180,83,9,0.2); border-radius: 12px;">
+        <div style="font-size: 12.5px; font-weight: 800; color: #78350F; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <x-icon name="globe" size="14" /> Social Media Links (Turn On / Off per Platform)
+        </div>
+        <div style="font-size: 11px; color: #7A4B29; margin-bottom: 12px;">
+          Toggle each platform on or off individually. Only enabled platforms with a valid URL appear on the public Leadership page.
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          @foreach(\App\Models\LeadershipProfile::SOCIAL_PLATFORMS as $platformKey => $meta)
+            <div style="display: grid; grid-template-columns: 160px 1fr; gap: 10px; align-items: center;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--deep); cursor: pointer;">
+                <input type="checkbox" name="socials[{{ $platformKey }}][enabled]" id="social_enabled_{{ $platformKey }}" value="1">
+                <x-icon name="{{ $platformKey }}" size="14" />
+                <span>{{ $meta['label'] }}</span>
+              </label>
+              <input type="url" name="socials[{{ $platformKey }}][url]" id="social_url_{{ $platformKey }}" class="form-input" placeholder="{{ $meta['placeholder'] }}" style="font-size: 12px; padding: 7px 10px;">
+            </div>
+          @endforeach
+        </div>
+      </div>
+
+      <!-- YouTube Playlist Section -->
+      <div style="margin-bottom: 18px; padding: 16px; background: #FFF5F5; border: 1px solid rgba(185,28,28,0.2); border-radius: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+          <div style="font-size: 12.5px; font-weight: 800; color: #991B1B; display: flex; align-items: center; gap: 6px;">
+            <x-icon name="youtube" size="15" /> YouTube Playlist (Under Leadership)
+          </div>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #7F1D1D; cursor: pointer;">
+            <input type="checkbox" name="is_youtube_playlist_enabled" id="is_youtube_playlist_enabled" value="1">
+            <span>Enable Playlist on Public Page</span>
+          </label>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label class="form-label" style="font-size: 11.5px; font-weight: 600;">Playlist Section Title</label>
+            <input type="text" name="youtube_playlist_title" id="youtube_playlist_title" class="form-input" placeholder="e.g. प्रवचन एवं कथा श्रृंखला (Discourse Playlist)">
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 11.5px; font-weight: 600;">YouTube Playlist URL or ID</label>
+            <input type="text" name="youtube_playlist_url" id="youtube_playlist_url" class="form-input" placeholder="https://www.youtube.com/playlist?list=PL...">
+          </div>
+        </div>
+      </div>
+
       <div style="margin-bottom: 20px;">
         <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
           <input type="checkbox" name="is_active" id="is_active" value="1" checked>
@@ -220,6 +289,8 @@
 </div>
 
 <script>
+  const socialPlatforms = @json(array_keys(\App\Models\LeadershipProfile::SOCIAL_PLATFORMS));
+
   function openAddModal() {
     document.getElementById('modalTitle').textContent = 'Add Leadership Profile';
     document.getElementById('formMethod').value = 'POST';
@@ -228,6 +299,13 @@
     document.getElementById('role_category').value = 'trustee';
     document.getElementById('sort_order').value = '0';
     document.getElementById('is_active').checked = true;
+    document.getElementById('is_youtube_playlist_enabled').checked = false;
+    document.getElementById('youtube_playlist_title').value = '';
+    document.getElementById('youtube_playlist_url').value = '';
+    socialPlatforms.forEach(function (platform) {
+      document.getElementById('social_enabled_' + platform).checked = false;
+      document.getElementById('social_url_' + platform).value = '';
+    });
     document.getElementById('submitBtn').textContent = 'Create Profile';
     document.getElementById('leadershipModal').style.display = 'block';
   }
@@ -245,6 +323,15 @@
     document.getElementById('photo_path').value = profile.photo_path || '';
     document.getElementById('bio_hi').value = profile.bio_hi || '';
     document.getElementById('is_active').checked = Boolean(profile.is_active);
+    document.getElementById('is_youtube_playlist_enabled').checked = Boolean(profile.is_youtube_playlist_enabled);
+    document.getElementById('youtube_playlist_title').value = profile.youtube_playlist_title || '';
+    document.getElementById('youtube_playlist_url').value = profile.youtube_playlist_url || '';
+    const socials = profile.social_links || {};
+    socialPlatforms.forEach(function (platform) {
+      const item = socials[platform] || {};
+      document.getElementById('social_enabled_' + platform).checked = Boolean(item.enabled);
+      document.getElementById('social_url_' + platform).value = item.url || '';
+    });
     document.getElementById('submitBtn').textContent = 'Update Profile';
     document.getElementById('leadershipModal').style.display = 'block';
   }

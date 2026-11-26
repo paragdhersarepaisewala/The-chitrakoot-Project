@@ -3402,19 +3402,7 @@ class AdminController extends Controller
 
     public function storeLeadership(Request $request)
     {
-        $validated = $request->validate([
-            'name_hi' => 'required|string|max:255',
-            'name_en' => 'nullable|string|max:255',
-            'title_hi' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
-            'role_category' => 'required|string|in:peethadhishwar,trustee,committee,advisor,other',
-            'photo_path' => 'nullable|string|max:500',
-            'photo_file' => 'nullable|image|mimes:jpeg,jpg,png,webp,svg|max:10240',
-            'bio_hi' => 'nullable|string',
-            'bio_en' => 'nullable|string',
-            'sort_order' => 'nullable|integer',
-            'is_active' => 'nullable',
-        ]);
+        $validated = $this->validateLeadershipRequest($request);
 
         $photoPath = $validated['photo_path'] ?? null;
         if ($request->hasFile('photo_file')) {
@@ -3441,6 +3429,10 @@ class AdminController extends Controller
             'photo_path' => $photoPath,
             'bio_hi' => $validated['bio_hi'] ?? null,
             'bio_en' => $validated['bio_en'] ?? null,
+            'social_links' => $this->buildSocialLinksPayload($request),
+            'youtube_playlist_title' => $validated['youtube_playlist_title'] ?? null,
+            'youtube_playlist_url' => $validated['youtube_playlist_url'] ?? null,
+            'is_youtube_playlist_enabled' => $request->boolean('is_youtube_playlist_enabled'),
             'sort_order' => (int) ($validated['sort_order'] ?? 0),
             'is_active' => $request->boolean('is_active', true),
         ]);
@@ -3454,19 +3446,7 @@ class AdminController extends Controller
     {
         $profile = LeadershipProfile::findOrFail($id);
 
-        $validated = $request->validate([
-            'name_hi' => 'required|string|max:255',
-            'name_en' => 'nullable|string|max:255',
-            'title_hi' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
-            'role_category' => 'required|string|in:peethadhishwar,trustee,committee,advisor,other',
-            'photo_path' => 'nullable|string|max:500',
-            'photo_file' => 'nullable|image|mimes:jpeg,jpg,png,webp,svg|max:10240',
-            'bio_hi' => 'nullable|string',
-            'bio_en' => 'nullable|string',
-            'sort_order' => 'nullable|integer',
-            'is_active' => 'nullable',
-        ]);
+        $validated = $this->validateLeadershipRequest($request);
 
         $photoPath = $profile->photo_path;
         if ($request->hasFile('photo_file')) {
@@ -3495,6 +3475,10 @@ class AdminController extends Controller
             'photo_path' => $photoPath,
             'bio_hi' => $validated['bio_hi'] ?? null,
             'bio_en' => $validated['bio_en'] ?? null,
+            'social_links' => $this->buildSocialLinksPayload($request),
+            'youtube_playlist_title' => $validated['youtube_playlist_title'] ?? null,
+            'youtube_playlist_url' => $validated['youtube_playlist_url'] ?? null,
+            'is_youtube_playlist_enabled' => $request->boolean('is_youtube_playlist_enabled'),
             'sort_order' => (int) ($validated['sort_order'] ?? $profile->sort_order),
             'is_active' => $request->boolean('is_active', true),
         ]);
@@ -3502,6 +3486,58 @@ class AdminController extends Controller
         ActivityLog::log('Leadership CMS', 'update', "Updated leadership profile: {$profile->name_hi}");
 
         return redirect()->route('admin.leadership')->with('success', 'Leadership profile updated successfully.');
+    }
+
+    /**
+     * Validate leadership profile create and update requests.
+     *
+     * @return array<string, mixed>
+     */
+    private function validateLeadershipRequest(Request $request): array
+    {
+        return $request->validate([
+            'name_hi' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'title_hi' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
+            'role_category' => 'required|string|in:peethadhishwar,trustee,committee,advisor,other',
+            'photo_path' => 'nullable|string|max:500',
+            'photo_file' => 'nullable|image|mimes:jpeg,jpg,png,webp,svg|max:10240',
+            'bio_hi' => 'nullable|string',
+            'bio_en' => 'nullable|string',
+            'socials' => 'nullable|array',
+            'socials.*.url' => 'nullable|url|max:500',
+            'socials.*.enabled' => 'nullable',
+            'youtube_playlist_title' => 'nullable|string|max:255',
+            'youtube_playlist_url' => 'nullable|string|max:500',
+            'is_youtube_playlist_enabled' => 'nullable',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+    }
+
+    /**
+     * Normalize social links and per-platform enable flags from request input.
+     *
+     * @return array<string, array{enabled: bool, url: string}>
+     */
+    private function buildSocialLinksPayload(Request $request): array
+    {
+        $rawSocials = $request->input('socials', []);
+        $payload = [];
+
+        foreach (array_keys(LeadershipProfile::SOCIAL_PLATFORMS) as $platform) {
+            $entry = is_array($rawSocials[$platform] ?? null) ? $rawSocials[$platform] : [];
+            $url = trim((string) ($entry['url'] ?? ''));
+            $enabled = filter_var($entry['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            $payload[$platform] = [
+                'enabled' => $enabled,
+                'url' => $url,
+            ];
+        }
+
+        return $payload;
     }
 
     public function deleteLeadership(Request $request, $id)
