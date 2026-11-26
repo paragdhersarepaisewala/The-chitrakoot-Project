@@ -20,7 +20,23 @@
     href="@yield('canonical', (!empty($currentSeo->canonical_url) ? $currentSeo->canonical_url : url()->current()))">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="{{ $siteFavicon ?? asset('favicon.ico') }}">
+  @php
+    $faviconUrl = $siteFavicon ?? asset('favicon-192x192.png');
+    $faviconExt = strtolower(pathinfo(parse_url($faviconUrl, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+    $faviconMime = match ($faviconExt) {
+      'png' => 'image/png',
+      'svg' => 'image/svg+xml',
+      'webp' => 'image/webp',
+      default => 'image/x-icon',
+    };
+  @endphp
+  <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+  <link rel="icon" type="image/png" href="{{ asset('favicon-48x48.png') }}" sizes="48x48">
+  <link rel="icon" type="image/png" href="{{ asset('favicon-192x192.png') }}" sizes="192x192">
+  <link rel="apple-touch-icon" href="{{ asset('favicon-192x192.png') }}">
+  @if(!empty($siteFavicon))
+    <link rel="icon" type="{{ $faviconMime }}" href="{{ $siteFavicon }}">
+  @endif
 
   <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="@yield('og_type', 'website')">
