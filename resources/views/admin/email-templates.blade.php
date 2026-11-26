@@ -470,7 +470,8 @@
     <!-- 2. Master Killswitch Status Bar -->
     <div class="killswitch-banner {{ $stats['is_sending_enabled'] ? 'killswitch-active' : 'killswitch-stopped' }}">
       <div style="display: flex; align-items: center; gap: 14px;">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ $stats['is_sending_enabled'] ? '#16a34a' : '#dc2626' }}; display: inline-block; flex-shrink: 0;"></span>
+        <span
+          style="width: 14px; height: 14px; border-radius: 50%; background: {{ $stats['is_sending_enabled'] ? '#16a34a' : '#dc2626' }}; display: inline-block; flex-shrink: 0;"></span>
         <div>
           <div style="font-size: 14px; font-weight: 800;">
             {{ $stats['is_sending_enabled'] ? 'AUTOMATIC EMAIL SERVICES: ACTIVE & RUNNING' : 'AUTOMATIC EMAIL SERVICES: PAUSED / STOPPED' }}
@@ -479,7 +480,7 @@
             {{ $stats['is_sending_enabled']
     ? 'All transactional receipts, OTPs, booking confirmations, and volunteer notices are being automatically dispatched.'
     : 'Master Killswitch is engaged. All automated outgoing email dispatches are safely paused and recorded in audit log without sending.' 
-            }}
+              }}
           </div>
         </div>
       </div>
@@ -568,27 +569,33 @@
             All Causes & Triggers ({{ $stats['total_templates'] }})
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'donations']) }}"
-            class="cat-pill {{ $category === 'donations' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'donations' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="heart-handshake" size="13" /> Donations & Receipts
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'services']) }}"
-            class="cat-pill {{ $category === 'services' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'services' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="flame" size="13" /> Pooja & Services
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'auth']) }}"
-            class="cat-pill {{ $category === 'auth' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'auth' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="lock" size="13" /> Accounts & OTP
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'volunteers']) }}"
-            class="cat-pill {{ $category === 'volunteers' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'volunteers' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="users" size="13" /> Seva Dal & Volunteers
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'inquiries']) }}"
-            class="cat-pill {{ $category === 'inquiries' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'inquiries' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="mail" size="13" /> Contact Inquiries
           </a>
           <a href="{{ route('admin.emailTemplates', ['category' => 'newsletter']) }}"
-            class="cat-pill {{ $category === 'newsletter' ? 'active' : '' }}" style="display: inline-flex; align-items: center; gap: 5px;">
+            class="cat-pill {{ $category === 'newsletter' ? 'active' : '' }}"
+            style="display: inline-flex; align-items: center; gap: 5px;">
             <x-icon name="file-text" size="13" /> Newsletter & Journal
           </a>
         </div>
@@ -1165,17 +1172,21 @@
         @if($settings->isSmtpConfigured())
           <div
             style="background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="width: 12px; height: 12px; border-radius: 50%; background: #16a34a; display: inline-block; flex-shrink: 0;"></span>
+            <span
+              style="width: 12px; height: 12px; border-radius: 50%; background: #16a34a; display: inline-block; flex-shrink: 0;"></span>
             <div>
-              <strong>Live SMTP Server Active:</strong> Outgoing emails, verification OTP codes, and donation receipts are delivered directly to devotees' inboxes.
+              <strong>Live SMTP Server Active:</strong> Outgoing emails, verification OTP codes, and donation receipts are
+              delivered directly to devotees' inboxes.
             </div>
           </div>
         @else
           <div
             style="background: #fffbeb; border: 1.5px dashed #f59e0b; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="width: 12px; height: 12px; border-radius: 50%; background: #d97706; display: inline-block; flex-shrink: 0;"></span>
+            <span
+              style="width: 12px; height: 12px; border-radius: 50%; background: #d97706; display: inline-block; flex-shrink: 0;"></span>
             <div>
-              <strong>Outgoing SMTP Not Configured:</strong> Outgoing SMTP credentials are not yet saved. Saving valid SMTP credentials below activates live email delivery.
+              <strong>Outgoing SMTP Not Configured:</strong> Outgoing SMTP credentials are not yet saved. Saving valid SMTP
+              credentials below activates live email delivery.
             </div>
           </div>
         @endif
@@ -1588,17 +1599,24 @@
           const container = document.getElementById('diagResultsContainer');
           container.style.display = 'block';
 
+          const escDiagHtml = (str) => String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
           const badge = document.getElementById('diagOverallBadge');
           if (data.success) {
             badge.style.background = '#f0fdf4';
             badge.style.color = '#166534';
             badge.style.border = '1px solid #86efac';
-            badge.innerHTML = data.message;
+            badge.textContent = data.message;
           } else {
             badge.style.background = '#fef2f2';
             badge.style.color = '#991b1b';
             badge.style.border = '1px solid #fca5a5';
-            badge.innerHTML = data.message;
+            badge.textContent = data.message;
           }
 
           const stepsList = document.getElementById('diagStepsList');
@@ -1610,15 +1628,15 @@
               const div = document.createElement('div');
               div.className = `diag-step-row ${isPassed ? 'diag-step-passed' : 'diag-step-failed'}`;
               div.innerHTML = `
-              <div>
-                <div style="font-weight: 700; color: ${isPassed ? '#166534' : '#991b1b'}; display: flex; align-items: center; gap: 8px;">
-                  <span>${isPassed ? '✓' : '✕'}</span>
-                  <span>${s.step}</span>
+                <div>
+                  <div style="font-weight: 700; color: ${isPassed ? '#166534' : '#991b1b'}; display: flex; align-items: center; gap: 8px;">
+                    <span>${isPassed ? '✓' : '✕'}</span>
+                    <span>${escDiagHtml(s.step)}</span>
+                  </div>
+                  <div style="font-size: 12px; color: #555; margin-top: 2px;">${escDiagHtml(s.detail)}</div>
                 </div>
-                <div style="font-size: 12px; color: #555; margin-top: 2px;">${s.detail}</div>
-              </div>
-              <div style="font-family: monospace; font-size: 11px; color: #777;">${s.time_ms ? s.time_ms + 'ms' : ''}</div>
-            `;
+                <div style="font-family: monospace; font-size: 11px; color: #777;">${s.time_ms ? escDiagHtml(s.time_ms) + 'ms' : ''}</div>
+              `;
               stepsList.appendChild(div);
             });
           }

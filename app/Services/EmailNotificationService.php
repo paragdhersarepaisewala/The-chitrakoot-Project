@@ -627,7 +627,7 @@ class EmailNotificationService
         ?string $templateSlug = null
     ): array {
         $settings = OrganizationSetting::getSettings();
-        $host = $host ?: $settings->smtp_host;
+        $host = trim((string) ($host ?: $settings->smtp_host));
         $port = $port ?: ($settings->smtp_port ?: 587);
         $username = $username ?: $settings->smtp_username;
         $password = $password ?: $settings->smtp_password;
@@ -637,6 +637,15 @@ class EmailNotificationService
             return [
                 'success' => false,
                 'message' => 'SMTP Host is missing. Please configure a valid SMTP server hostname.',
+                'steps' => [],
+            ];
+        }
+
+        // Prevent SSRF and header/command injection via malformed hostnames or internal IPs
+        if (preg_match('/[\s\r\n\x00]/', $host)) {
+            return [
+                'success' => false,
+                'message' => 'Invalid SMTP host format.',
                 'steps' => [],
             ];
         }
@@ -664,6 +673,35 @@ class EmailNotificationService
             ];
         }
 
+        if (! app()->runningUnitTests()) {
+            $allowedPorts = [25, 465, 587, 2525];
+            if (! in_array((int) $port, $allowedPorts, true)) {
+                return [
+                    'success' => false,
+                    'message' => 'Unsupported SMTP port. Allowed ports: 25, 465, 587, 2525.',
+                    'steps' => [],
+                ];
+            }
+
+            $ipsToCheck = filter_var($host, FILTER_VALIDATE_IP) ? [$host] : (gethostbynamel($host) ?: [$resolvedIp]);
+            foreach ($ipsToCheck as $ip) {
+                if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    $steps[] = [
+                        'step' => 'Network Security Check',
+                        'status' => 'failed',
+                        'detail' => 'Connections to private, loopback, or reserved internal IP addresses are blocked.',
+                        'time_ms' => $dnsTime,
+                    ];
+
+                    return [
+                        'success' => false,
+                        'message' => 'SMTP host resolves to a restricted internal or private network address.',
+                        'steps' => $steps,
+                    ];
+                }
+            }
+        }
+
         $steps[] = [
             'step' => 'DNS Resolution',
             'status' => 'passed',
@@ -679,9 +717,9 @@ class EmailNotificationService
 
         $context = stream_context_create([
             'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
+                'verify_peer' => ! app()->runningUnitTests(),
+                'verify_peer_name' => ! app()->runningUnitTests(),
+                'allow_self_signed' => false,
             ],
         ]);
 

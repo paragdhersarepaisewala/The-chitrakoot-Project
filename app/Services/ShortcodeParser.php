@@ -17,11 +17,17 @@ class ShortcodeParser
         // 1. Single Inline Image: [image src="..." width="50%" align="center" caption="..." alt="..."]
         $content = preg_replace_callback('/\[image\s+([^\]]+)\]/i', function ($matches) {
             $attrs = static::parseAttributes($matches[1]);
-            $src = htmlspecialchars($attrs['src'] ?? '', ENT_QUOTES, 'UTF-8');
-            $width = htmlspecialchars($attrs['width'] ?? '100%', ENT_QUOTES, 'UTF-8');
-            $align = htmlspecialchars($attrs['align'] ?? 'center', ENT_QUOTES, 'UTF-8');
+            $rawSrc = static::sanitizeUrl($attrs['src'] ?? '');
+            if ($rawSrc === '') {
+                return '';
+            }
+            $src = htmlspecialchars($rawSrc, ENT_QUOTES, 'UTF-8');
+            $rawWidth = trim($attrs['width'] ?? '100%');
+            $width = preg_match('/^\d+(?:\.\d+)?(?:%|px|rem|em|vw)$/', $rawWidth) ? $rawWidth : '100%';
+            $rawAlign = strtolower(trim($attrs['align'] ?? 'center'));
+            $align = in_array($rawAlign, ['left', 'right', 'center'], true) ? $rawAlign : 'center';
             $caption = htmlspecialchars($attrs['caption'] ?? '', ENT_QUOTES, 'UTF-8');
-            $alt = htmlspecialchars($attrs['alt'] ?? $caption, ENT_QUOTES, 'UTF-8');
+            $alt = htmlspecialchars($attrs['alt'] ?? ($attrs['caption'] ?? ''), ENT_QUOTES, 'UTF-8');
 
             $margin = '24px auto';
             $float = 'none';
@@ -34,7 +40,7 @@ class ShortcodeParser
             }
 
             return '<figure class="article-figure" style="max-width: '.$width.'; margin: '.$margin.'; float: '.$float.'; text-align: center;">'
-                .'<img src="'.$src.'" alt="'.$alt.'" class="zoomable-image" loading="lazy" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); cursor: pointer;" onclick="openSingleImageLightbox(\''.$src.'\', \''.$caption.'\')">'
+                .'<img src="'.$src.'" alt="'.$alt.'" data-lightbox-src="'.$src.'" data-lightbox-caption="'.$caption.'" class="zoomable-image" loading="lazy" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); cursor: pointer;" onclick="openSingleImageLightbox(this.getAttribute(\'data-lightbox-src\'), this.getAttribute(\'data-lightbox-caption\'))">'
                 .($caption ? '<figcaption style="font-size: 13px; color: var(--sand, #b98550); font-style: italic; margin-top: 8px; font-family: var(--dev, serif);">'.$caption.'</figcaption>' : '')
                 .'</figure>';
         }, $content);
@@ -57,15 +63,22 @@ class ShortcodeParser
             foreach ($rawUrls as $url) {
                 if (is_numeric($url)) {
                     $media = MediaFile::find($url);
-                    $url = $media ? $media->url : $url;
+                    $url = $media ? $media->url : '';
                 }
-                $urls[] = $url;
+                $safeUrl = static::sanitizeUrl($url);
+                if ($safeUrl !== '') {
+                    $urls[] = $safeUrl;
+                }
+            }
+
+            if (empty($urls)) {
+                return '';
             }
 
             $count = count($urls);
             $layoutClass = 'count-'.min($count, 5);
             $galleryId = 'fb_gal_'.substr(md5(implode('|', $urls)), 0, 8);
-            $jsonUrls = htmlspecialchars(json_encode($urls), ENT_QUOTES, 'UTF-8');
+            $jsonUrls = htmlspecialchars(json_encode($urls, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8');
 
             $html = '<div class="fb-mosaic-wrapper magazine-gallery-wrap">';
             $html .= '<div class="fb-mosaic-container '.$layoutClass.'" id="'.$galleryId.'" data-gallery-images="'.$jsonUrls.'">';
@@ -110,17 +123,16 @@ class ShortcodeParser
         // 4. Video & Audio Player: [video src="..." caption="..."]
         $content = preg_replace_callback('/\[video\s+([^\]]+)\]/i', function ($matches) {
             $attrs = static::parseAttributes($matches[1]);
-            $src = htmlspecialchars($attrs['src'] ?? '', ENT_QUOTES, 'UTF-8');
+            $rawSrc = static::sanitizeUrl($attrs['src'] ?? '');
             $caption = htmlspecialchars($attrs['caption'] ?? '', ENT_QUOTES, 'UTF-8');
 
-            if (empty($src)) {
+            if (empty($rawSrc)) {
                 return '';
             }
 
             // Check if YouTube
-            if (str_contains($src, 'youtube.com') || str_contains($src, 'youtu.be')) {
-                preg_match('/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=))([\w-]{11})/', $src, $yt);
-                $ytId = $yt[1] ?? '';
+            if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=))([\w-]{11})/i', $rawSrc, $yt)) {
+                $ytId = $yt[1];
                 $embedUrl = 'https://www.youtube.com/embed/'.$ytId;
 
                 return '<div class="article-video-wrap" style="margin: 28px 0; clear: both;">'
@@ -130,6 +142,8 @@ class ShortcodeParser
                     .($caption ? '<div style="font-size: 13px; color: #7a6e65; text-align: center; margin-top: 8px;">'.$caption.'</div>' : '')
                     .'</div>';
             }
+
+            $src = htmlspecialchars($rawSrc, ENT_QUOTES, 'UTF-8');
 
             return '<div class="article-video-wrap" style="margin: 28px 0; clear: both; text-align: center;">'
                 .'<video src="'.$src.'" controls playsinline style="width: 100%; max-height: 480px; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.1);"></video>'
@@ -261,6 +275,13 @@ class ShortcodeParser
                     const total = counts.reduce((a, b) => a + b, 0);
 
                     barsContainer.innerHTML = "";
+                    const escPollHtml = (str) => String(str)
+                      .replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/\x27/g, "&#039;");
+
                     options.forEach((opt, idx) => {
                       const count = counts[idx];
                       const pct = Math.round((count / total) * 100);
@@ -275,7 +296,7 @@ class ShortcodeParser
                         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: ${isUserChoice ? "700" : "500"}; color: #2b1a12;">
                           <div style="display: flex; align-items: center; gap: 8px;">
                             ${isUserChoice ? "<span style=\'color: #059669; font-weight: 800;\'>✓</span>" : ""}
-                            <span>${opt}</span>
+                            <span>${escPollHtml(opt)}</span>
                             ${isUserChoice ? "<span style=\'font-size: 10px; background: #059669; color: #fff; padding: 1px 7px; border-radius: 9999px; font-weight: 700;\'>आपका मत</span>" : ""}
                           </div>
                           <span style="font-weight: 800; color: ${isUserChoice ? "#8f1719" : "#b98550"};">${pct}% (${count})</span>
@@ -302,7 +323,8 @@ class ShortcodeParser
         }, $content);
 
         // 6. River Mandakini Gauge Widget: [widget:mandakini_gauge]
-        $content = preg_replace('/\[widget:mandakini_gauge\]/i',
+        $content = preg_replace(
+            '/\[widget:mandakini_gauge\]/i',
             '<div class="article-widget river-gauge-card" style="margin: 32px 0; background: linear-gradient(135deg, #140e0b, #2b231d); color: #ffffff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">'
             .'<div style="font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: #f4a900; margin-bottom: 6px;">RAMGHAT LIVE STATUS</div>'
             .'<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">'
@@ -364,5 +386,26 @@ class ShortcodeParser
         }
 
         return $attributes;
+    }
+
+    /**
+     * Validate and sanitize a media URL to allow only safe HTTP(S) or root-relative paths.
+     */
+    protected static function sanitizeUrl(?string $url): string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return '';
+        }
+
+        // Decode any obfuscated entities/whitespace before checking scheme
+        $decoded = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $normalized = preg_replace('/[\x00-\x20]+/', '', $decoded);
+
+        if (preg_match('/^(?:https?:\/\/|\/(?!\/))/i', (string) $normalized)) {
+            return $url;
+        }
+
+        return '';
     }
 }

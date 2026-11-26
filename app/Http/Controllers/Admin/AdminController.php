@@ -37,6 +37,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
@@ -108,10 +109,10 @@ class AdminController extends Controller
         }
 
         if ($request->filled('financial_year')) {
-            $parts = explode('-', (string) $request->query('financial_year'));
-            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-                $start = $parts[0].'-04-01 00:00:00';
-                $end = $parts[1].'-03-31 23:59:59';
+            $fy = (string) $request->query('financial_year');
+            if (preg_match('/^(\d{4})-(\d{4})$/', $fy, $parts)) {
+                $start = $parts[1].'-04-01 00:00:00';
+                $end = $parts[2].'-03-31 23:59:59';
                 $query->whereBetween('created_at', [$start, $end]);
             }
         }
@@ -125,7 +126,16 @@ class AdminController extends Controller
 
         ActivityLog::log(auth()->user()?->name ?? 'Admin', 'export_csv', 'Exported '.$donations->count().' donations for 80G filing.');
 
-        $callback = function () use ($donations) {
+        $sanitizeCsvCell = static function (mixed $value): string {
+            $str = (string) $value;
+            if ($str !== '' && preg_match('/^[=+\-@\t\r]/', $str)) {
+                return "'".$str;
+            }
+
+            return $str;
+        };
+
+        $callback = function () use ($donations, $sanitizeCsvCell) {
             $file = fopen('php://output', 'w');
             fwrite($file, "\xEF\xBB\xBF"); // UTF-8 BOM for Microsoft Excel
 
@@ -145,17 +155,17 @@ class AdminController extends Controller
 
             foreach ($donations as $donation) {
                 fputcsv($file, [
-                    $donation->receipt_number ?: ($donation->receipt?->receipt_number ?: 'N/A'),
-                    $donation->paid_at ? $donation->paid_at->format('Y-m-d H:i') : $donation->created_at->format('Y-m-d H:i'),
-                    $donation->donor_name ?: ($donation->user?->name ?: 'Devotee Supporter'),
-                    $donation->donor_email ?: ($donation->user?->email ?: 'N/A'),
-                    $donation->donor_phone ?: ($donation->user?->phone ?: 'N/A'),
+                    $sanitizeCsvCell($donation->receipt_number ?: ($donation->receipt?->receipt_number ?: 'N/A')),
+                    $sanitizeCsvCell($donation->paid_at ? $donation->paid_at->format('Y-m-d H:i') : $donation->created_at->format('Y-m-d H:i')),
+                    $sanitizeCsvCell($donation->donor_name ?: ($donation->user?->name ?: 'Devotee Supporter')),
+                    $sanitizeCsvCell($donation->donor_email ?: ($donation->user?->email ?: 'N/A')),
+                    $sanitizeCsvCell($donation->donor_phone ?: ($donation->user?->phone ?: 'N/A')),
                     number_format($donation->amount, 2, '.', ''),
-                    $donation->cause?->title ?: 'General Seva',
-                    $donation->donation_type ?: 'General',
-                    $donation->payment_gateway ?: 'Razorpay',
-                    $donation->gateway_payment_id ?: 'N/A',
-                    ucfirst($donation->status),
+                    $sanitizeCsvCell($donation->cause?->title ?: 'General Seva'),
+                    $sanitizeCsvCell($donation->donation_type ?: 'General'),
+                    $sanitizeCsvCell($donation->payment_gateway ?: 'Razorpay'),
+                    $sanitizeCsvCell($donation->gateway_payment_id ?: 'N/A'),
+                    $sanitizeCsvCell(ucfirst($donation->status)),
                 ]);
             }
 
@@ -173,8 +183,10 @@ class AdminController extends Controller
             ActivityLog::log('System Admin', 'cache_flush', 'Flushed server cache & compiled view blades.');
 
             return response()->json(['success' => true, 'message' => 'Server cache and views flushed successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            Log::error('Cache flush failed: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Failed to flush server cache.'], 500);
         }
     }
 
@@ -405,6 +417,10 @@ class AdminController extends Controller
             'approval_status' => 'required|in:pending,approved,rejected',
         ]);
 
+        if ((int) $user->id === (int) $request->user()->id && ($request->role !== 'super_admin' || $request->approval_status !== 'approved')) {
+            return back()->withErrors(['role' => 'आप अपनी स्वयं की Super Admin भूमिका या स्वीकृति स्थिति को अवनत नहीं कर सकते।']);
+        }
+
         $oldRole = $user->role;
         $user->update([
             'role' => $request->role,
@@ -463,12 +479,27 @@ class AdminController extends Controller
             'privacy_policy_content',
         ]);
 
+        // Preserve existing secrets if omitted or submitted blank
+        if (empty($data['razorpay_key_secret'])) {
+            unset($data['razorpay_key_secret']);
+        }
+        if (empty($data['smtp_password'])) {
+            unset($data['smtp_password']);
+        }
+
         $data['is_80g_enabled'] = $request->boolean('is_80g_enabled');
 
         $request->validate([
-            'logo_file' => 'nullable|file|max:10240',
-            'favicon_file' => 'nullable|file|max:5120',
-            'default_og_image_file' => 'nullable|file|max:10240',
+            'email' => 'nullable|email|max:180',
+            'smtp_port' => 'nullable|integer|min:1|max:65535',
+            'instagram_url' => 'nullable|url|max:500',
+            'facebook_url' => 'nullable|url|max:500',
+            'youtube_url' => 'nullable|url|max:500',
+            'whatsapp_url' => 'nullable|url|max:500',
+            'ga4_report_url' => 'nullable|url|max:500',
+            'logo_file' => 'nullable|file|mimes:jpeg,jpg,png,webp,svg,ico,gif|max:10240',
+            'favicon_file' => 'nullable|file|mimes:jpeg,jpg,png,webp,svg,ico,gif|max:5120',
+            'default_og_image_file' => 'nullable|file|mimes:jpeg,jpg,png,webp,svg,gif|max:10240',
         ]);
 
         $allowedExtensions = ['jpeg', 'jpg', 'png', 'webp', 'svg', 'ico', 'gif'];
@@ -491,6 +522,9 @@ class AdminController extends Controller
             $ext = strtolower($file->getClientOriginalExtension()) ?: 'png';
             $filename = 'site-logo-'.time().'.'.$ext;
             $file->move($destinationDir, $filename);
+            if ($ext === 'svg') {
+                $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+            }
             $data['logo_path'] = '/uploads/'.$filename;
 
             MediaFile::create([
@@ -508,6 +542,9 @@ class AdminController extends Controller
             $ext = strtolower($file->getClientOriginalExtension()) ?: 'ico';
             $filename = 'site-favicon-'.time().'.'.$ext;
             $file->move($destinationDir, $filename);
+            if ($ext === 'svg') {
+                $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+            }
             $data['favicon_path'] = '/uploads/'.$filename;
 
             MediaFile::create([
@@ -525,6 +562,9 @@ class AdminController extends Controller
             $ext = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
             $filename = 'og-image-'.time().'.'.$ext;
             $file->move($destinationDir, $filename);
+            if ($ext === 'svg') {
+                $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+            }
             $data['default_og_image'] = '/uploads/'.$filename;
 
             MediaFile::create([
@@ -1332,6 +1372,9 @@ class AdminController extends Controller
 
                 $filename = str_replace('_file', '', $fileKey).'-'.time().'.'.$ext;
                 $file->move($destinationDir, $filename);
+                if ($ext === 'svg') {
+                    $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+                }
                 $url = '/uploads/'.$filename;
                 HomepageSetting::set($settingKey, $url);
 
@@ -1685,6 +1728,9 @@ class AdminController extends Controller
                 File::makeDirectory($destinationDir, 0755, true, true);
             }
             $file->move($destinationDir, $filename);
+            if ($ext === 'svg') {
+                $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+            }
             $photoUrl = '/uploads/'.$filename;
         }
 
@@ -1702,6 +1748,9 @@ class AdminController extends Controller
                 if (in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'svg'], true)) {
                     $filename = "mission-{$i}-".time().'.'.$ext;
                     $file->move(public_path('uploads'), $filename);
+                    if ($ext === 'svg') {
+                        $this->sanitizeSvgFile(public_path('uploads/'.$filename));
+                    }
                     HomepageSetting::set($imgKey, '/uploads/'.$filename);
                 }
             } elseif ($request->filled($imgKey)) {
@@ -1792,14 +1841,14 @@ class AdminController extends Controller
     public function uploadMedia(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpeg,jpg,png,webp,svg,gif,mp4,webm,mov,avi,mkv,pdf|max:102400', // max 100MB
+            'file' => 'required|file|mimes:jpeg,jpg,png,webp,svg,gif,mp4,webm,mov,avi,mkv|max:102400', // max 100MB
         ]);
 
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $extension = strtolower($file->getClientOriginalExtension());
-        $mime = $file->getClientMimeType() ?: 'application/octet-stream';
-        $isVideo = str_starts_with($mime, 'video/') || in_array($extension, ['mp4', 'webm', 'mov', 'avi', 'mkv']);
+        $extension = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension());
+        $mime = $file->getMimeType() ?: ($file->getClientMimeType() ?: 'application/octet-stream');
+        $isVideo = str_starts_with($mime, 'video/') || in_array($extension, ['mp4', 'webm', 'mov', 'avi', 'mkv'], true);
 
         $destinationDir = public_path('uploads');
         if (! File::isDirectory($destinationDir)) {
@@ -1872,6 +1921,9 @@ class AdminController extends Controller
                     // Direct storage without GD
                     $finalFilename = $safeBase.'-'.time().'.'.$extension;
                     $file->move($destinationDir, $finalFilename);
+                    if ($extension === 'svg') {
+                        $this->sanitizeSvgFile($destinationDir.'/'.$finalFilename);
+                    }
                     $finalPath = '/uploads/'.$finalFilename;
                     $fileSize = filesize($destinationDir.'/'.$finalFilename);
                     $imgInfo = @getimagesize($destinationDir.'/'.$finalFilename);
@@ -2928,6 +2980,9 @@ class AdminController extends Controller
                         File::makeDirectory($destDir, 0755, true, true);
                     }
                     $file->move($destDir, $filename);
+                    if ($ext === 'svg') {
+                        $this->sanitizeSvgFile($destDir.'/'.$filename);
+                    }
                     $ogImage = '/uploads/og/'.$filename;
                 }
             } elseif (! empty($fields['remove_og_image'])) {
@@ -3014,6 +3069,9 @@ class AdminController extends Controller
                 File::makeDirectory($destinationDir, 0755, true, true);
             }
             $file->move($destinationDir, $filename);
+            if ($ext === 'svg') {
+                $this->sanitizeSvgFile($destinationDir.'/'.$filename);
+            }
             $entry->og_image = '/uploads/og/'.$filename;
             $entry->save();
         } elseif ($validated['action'] === 'set_url') {
@@ -3722,5 +3780,26 @@ class AdminController extends Controller
         ActivityLog::log('Temple Booking CMS', 'delete', "Deleted temple booking enquiry #{$number}");
 
         return redirect()->back()->with('success', "Booking enquiry #{$number} deleted successfully.");
+    }
+
+    /**
+     * Strip dangerous script elements, event handlers, and javascript: URIs from uploaded SVGs.
+     */
+    private function sanitizeSvgFile(string $path): void
+    {
+        if (! File::exists($path)) {
+            return;
+        }
+
+        $svg = File::get($path);
+        // Remove <script>, <foreignObject>, and XML processing instructions that could execute scripts
+        $svg = preg_replace('/<\s*(script|foreignObject)\b[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $svg) ?? $svg;
+        $svg = preg_replace('/<\s*(script|foreignObject)\b[^>]*\/?\s*>/is', '', $svg) ?? $svg;
+        // Strip inline event handlers (onload, onerror, onclick, etc.)
+        $svg = preg_replace('/\s+on[a-z]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/is', '', $svg) ?? $svg;
+        // Strip javascript: and data:text/html URIs in href/xlink:href/src
+        $svg = preg_replace('/\b(xlink:href|href|src)\s*=\s*(?:"\s*(?:javascript|vbscript|data:text\/html)[^"]*"|\'\s*(?:javascript|vbscript|data:text\/html)[^\']*\')/is', '', $svg) ?? $svg;
+
+        File::put($path, $svg);
     }
 }

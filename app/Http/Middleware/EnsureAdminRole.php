@@ -13,7 +13,7 @@ class EnsureAdminRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
@@ -25,10 +25,20 @@ class EnsureAdminRole
             return redirect()->route('login')->withErrors(['email' => 'Please login to access the administration portal.']);
         }
 
-        // Verify if the user possesses an administrative role
-        $adminRoles = ['super_admin', 'content_admin', 'donation_admin', 'membership_admin', 'media_editor'];
+        if ($user->is_active === false || $user->approval_status === 'rejected') {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Forbidden. Account is inactive or suspended.'], 403);
+            }
 
-        if (! $user->hasRole(...$adminRoles)) {
+            abort(403, 'खाता निष्क्रिय या निलंबित है। (Access denied: Account is inactive.)');
+        }
+
+        // Verify if the user possesses one of the required administrative roles
+        $allowedRoles = ! empty($roles)
+            ? $roles
+            : ['super_admin', 'content_admin', 'donation_admin', 'membership_admin', 'media_editor'];
+
+        if (! $user->hasRole(...$allowedRoles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Forbidden. Administrative credentials required.'], 403);
             }

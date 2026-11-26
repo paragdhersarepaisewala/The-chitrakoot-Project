@@ -104,7 +104,7 @@ class DonationController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unable to establish secure connection with payment gateway: '.$e->getMessage(),
+                    'message' => 'Unable to establish secure connection with payment gateway. Please try again later.',
                 ], 502);
             }
         }
@@ -122,21 +122,46 @@ class DonationController extends Controller
 
     public function verifyPayment(Request $request, MembershipService $membershipService)
     {
-        $request->validate([
+        $validated = $request->validate([
             'donation_id' => 'required|exists:donations,id',
-            'razorpay_payment_id' => 'required|string',
-            'razorpay_order_id' => 'nullable|string',
-            'razorpay_signature' => 'nullable|string',
+            'razorpay_payment_id' => 'required|string|max:100',
+            'razorpay_order_id' => 'nullable|string|max:100',
+            'razorpay_signature' => 'nullable|string|max:256',
+            'donor_name' => 'nullable|string|max:255',
+            'donor_email' => 'nullable|email|max:180',
+            'donor_phone' => 'nullable|string|min:10|max:20',
         ]);
 
-        $donation = Donation::findOrFail($request->donation_id);
+        $donation = Donation::findOrFail($validated['donation_id']);
 
         if ($donation->status === 'verified') {
             return response()->json(['success' => true, 'receipt_url' => url('/receipt/'.$donation->receipt_number)]);
         }
 
+        // Prevent order-swap attacks: submitted order ID must match the server-bound gateway_order_id
+        if ($request->filled('razorpay_order_id') && ! empty($donation->gateway_order_id) && ! hash_equals((string) $donation->gateway_order_id, (string) $request->razorpay_order_id)) {
+            Log::warning('Razorpay order ID mismatch detected for Donation #'.$donation->id);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Order reference mismatch. Possible payload tampering.',
+            ], 400);
+        }
+
+        // Prevent payment ID replay across multiple donations
+        if (Donation::where('gateway_payment_id', $validated['razorpay_payment_id'])->where('id', '!=', $donation->id)->exists()) {
+            Log::warning('Razorpay payment ID replay attempt detected for Donation #'.$donation->id);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'This payment reference has already been used for another donation.',
+            ], 400);
+        }
+
         $orgSettings = OrganizationSetting::getSettings();
         $razorpayKeySecret = $orgSettings->razorpay_key_secret ?: config('services.razorpay.secret');
+        $orderId = $donation->gateway_order_id ?: $request->razorpay_order_id;
+        $paymentId = $validated['razorpay_payment_id'];
 
         // Cryptographic HMAC SHA256 Signature Verification
         if (! app()->runningUnitTests()) {
@@ -149,8 +174,8 @@ class DonationController extends Controller
                 ], 500);
             }
 
-            if (! $request->filled('razorpay_signature')) {
-                Log::warning('Razorpay verification attempt missing signature for Donation #'.$donation->id);
+            if (empty($orderId) || ! $request->filled('razorpay_signature')) {
+                Log::warning('Razorpay verification attempt missing order or signature for Donation #'.$donation->id);
 
                 return response()->json([
                     'success' => false,
@@ -158,8 +183,6 @@ class DonationController extends Controller
                 ], 422);
             }
 
-            $orderId = $request->razorpay_order_id ?: $donation->gateway_order_id;
-            $paymentId = $request->razorpay_payment_id;
             $expectedSignature = hash_hmac('sha256', $orderId.'|'.$paymentId, $razorpayKeySecret);
 
             if (! hash_equals($expectedSignature, (string) $request->razorpay_signature)) {
@@ -171,8 +194,6 @@ class DonationController extends Controller
                 ], 400);
             }
         } elseif (! empty($razorpayKeySecret) && $request->filled('razorpay_signature')) {
-            $orderId = $request->razorpay_order_id ?: $donation->gateway_order_id;
-            $paymentId = $request->razorpay_payment_id;
             $expectedSignature = hash_hmac('sha256', $orderId.'|'.$paymentId, $razorpayKeySecret);
 
             if (! hash_equals($expectedSignature, (string) $request->razorpay_signature)) {
@@ -188,16 +209,16 @@ class DonationController extends Controller
         // Generate receipt number with high-entropy cryptographic token to prevent enumeration (IDOR)
         $receiptNum = 'SKP-'.date('Ymd').'-'.sprintf('%04d', $donation->id).'-'.strtoupper(Str::random(6));
 
-        $donorName = $request->donor_name ?: ($donation->donor_name ?: (auth()->user()?->name ?: 'Generous Supporter'));
-        $donorEmail = $request->donor_email ?: ($donation->donor_email ?: auth()->user()?->email);
-        $donorPhone = $request->donor_phone ?: ($donation->donor_phone ?: (auth()->user()?->phone ?: auth()->user()?->profile?->phone));
+        $donorName = $validated['donor_name'] ?? ($donation->donor_name ?: (auth()->user()?->name ?: 'Generous Supporter'));
+        $donorEmail = $validated['donor_email'] ?? ($donation->donor_email ?: auth()->user()?->email);
+        $donorPhone = $validated['donor_phone'] ?? ($donation->donor_phone ?: (auth()->user()?->phone ?: auth()->user()?->profile?->phone));
 
         $donation->update([
             'status' => 'verified',
             'donor_name' => $donorName,
             'donor_email' => $donorEmail,
             'donor_phone' => $donorPhone,
-            'gateway_payment_id' => $request->razorpay_payment_id,
+            'gateway_payment_id' => $paymentId,
             'gateway_signature' => $request->razorpay_signature ?? 'signature_verified',
             'receipt_number' => $receiptNum,
             'paid_at' => now(),
@@ -218,9 +239,10 @@ class DonationController extends Controller
             'issued_at' => now(),
         ]);
 
-        // If logged in user, handle membership streak update
-        if (auth()->check()) {
-            $membershipService->recordSustainingDonation(auth()->user(), $donation);
+        // Only award membership streak if authenticated user owns this donation
+        $authUser = auth()->user();
+        if ($authUser && ($donation->user_id === $authUser->id || ($donation->user_id === null && ! empty($donorEmail) && strcasecmp($donorEmail, $authUser->email) === 0))) {
+            $membershipService->recordSustainingDonation($authUser, $donation);
         }
 
         // Send official donation receipt email (to guest or logged-in devotee)
@@ -244,7 +266,7 @@ class DonationController extends Controller
     /**
      * Razorpay Server Webhook Receiver with Cryptographic HMAC-SHA256 Verification.
      */
-    public function handleWebhook(Request $request)
+    public function handleWebhook(Request $request, MembershipService $membershipService)
     {
         $payload = $request->getContent();
         $signature = $request->header('X-Razorpay-Signature');
@@ -290,6 +312,19 @@ class DonationController extends Controller
             if ($orderId) {
                 $donation = Donation::where('gateway_order_id', $orderId)->first();
                 if ($donation && $donation->status !== 'verified') {
+                    // Verify captured amount and currency match the donation record
+                    $expectedPaise = (int) round((float) $donation->amount * 100);
+                    if (isset($payment['amount']) && (int) $payment['amount'] < $expectedPaise) {
+                        Log::warning("Razorpay webhook amount mismatch for Donation #{$donation->id}: expected {$expectedPaise}, got {$payment['amount']}");
+
+                        return response()->json(['message' => 'Amount mismatch'], 400);
+                    }
+                    if (isset($payment['currency']) && strtoupper((string) $payment['currency']) !== strtoupper((string) ($donation->currency ?: 'INR'))) {
+                        Log::warning("Razorpay webhook currency mismatch for Donation #{$donation->id}");
+
+                        return response()->json(['message' => 'Currency mismatch'], 400);
+                    }
+
                     $receiptNum = 'SKP-'.date('Ymd').'-'.sprintf('%04d', $donation->id).'-'.strtoupper(Str::random(6));
                     $donation->update([
                         'status' => 'verified',
@@ -314,6 +349,10 @@ class DonationController extends Controller
                             'issued_at' => now(),
                         ]
                     );
+
+                    if ($donation->user) {
+                        $membershipService->recordSustainingDonation($donation->user, $donation);
+                    }
 
                     EmailNotificationService::sendDonationReceipt($donation);
                     Log::info("Donation #{$donation->id} verified asynchronously via Razorpay Webhook.");

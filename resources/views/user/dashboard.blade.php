@@ -966,7 +966,7 @@
         padding: 0 !important;
       }
 
-      #profileEditModal > div {
+      #profileEditModal>div {
         padding: 16px 18px 28px !important;
         border-radius: 22px 22px 0 0 !important;
         max-height: 88vh !important;
@@ -995,7 +995,7 @@
         gap: 12px !important;
       }
 
-      .profile-modal-grid > div {
+      .profile-modal-grid>div {
         grid-column: span 1 !important;
       }
 
@@ -1053,7 +1053,8 @@
                 </span>
                 <span>
                   <x-icon name="id-card" size="13" />
-                  ID: {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}
+                  ID:
+                  {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}
                 </span>
               </div>
             </div>
@@ -1071,7 +1072,8 @@
 
               <div class="devotee-notif-panel" id="devoteeNotifPanel">
                 <div class="devotee-notif-header">
-                  <div style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev); display: flex; align-items: center; gap: 6px;">
+                  <div
+                    style="font-size: 13px; font-weight: 800; color: #78350F; font-family: var(--dev); display: flex; align-items: center; gap: 6px;">
                     <x-icon name="bell" size="14" /> Notifications
                   </div>
                   <button type="button" onclick="markDevoteeNotifSeen()"
@@ -1171,31 +1173,37 @@
 
       <!-- Devotee Mobile Segmented Quick View Pills -->
       <div class="devotee-mobile-segment-wrap" id="devoteeMobileSegmentWrap">
-        <button type="button" class="devotee-segment-btn active" data-target="profile" onclick="switchDevoteeMobileSection('profile', this)">
+        <button type="button" class="devotee-segment-btn active" data-target="profile"
+          onclick="switchDevoteeMobileSection('profile', this)">
           <x-icon name="user" size="14" />
           <span>प्रोफाइल</span>
         </button>
-        <button type="button" class="devotee-segment-btn" data-target="tab-donations" onclick="switchDevoteeMobileSection('tab-donations', this)">
+        <button type="button" class="devotee-segment-btn" data-target="tab-donations"
+          onclick="switchDevoteeMobileSection('tab-donations', this)">
           <x-icon name="heart-handshake" size="14" />
           <span>दान</span>
           <span class="devotee-segment-count">{{ $donations->count() }}</span>
         </button>
-        <button type="button" class="devotee-segment-btn" data-target="tab-poojas" onclick="switchDevoteeMobileSection('tab-poojas', this)">
+        <button type="button" class="devotee-segment-btn" data-target="tab-poojas"
+          onclick="switchDevoteeMobileSection('tab-poojas', this)">
           <x-icon name="flame" size="14" />
           <span>पूजा</span>
           <span class="devotee-segment-count">{{ $poojaBookings->count() }}</span>
         </button>
-        <button type="button" class="devotee-segment-btn" data-target="tab-atithi" onclick="switchDevoteeMobileSection('tab-atithi', this)">
+        <button type="button" class="devotee-segment-btn" data-target="tab-atithi"
+          onclick="switchDevoteeMobileSection('tab-atithi', this)">
           <x-icon name="building" size="14" />
           <span>विश्राम</span>
           <span class="devotee-segment-count">{{ $atithiEnquiries->count() }}</span>
         </button>
-        <button type="button" class="devotee-segment-btn" data-target="tab-temple-bookings" onclick="switchDevoteeMobileSection('tab-temple-bookings', this)">
+        <button type="button" class="devotee-segment-btn" data-target="tab-temple-bookings"
+          onclick="switchDevoteeMobileSection('tab-temple-bookings', this)">
           <x-icon name="landmark" size="14" />
           <span>परिसर</span>
           <span class="devotee-segment-count">{{ $templeBookings->count() }}</span>
         </button>
-        <button type="button" class="devotee-segment-btn" data-target="tab-volunteers" onclick="switchDevoteeMobileSection('tab-volunteers', this)">
+        <button type="button" class="devotee-segment-btn" data-target="tab-volunteers"
+          onclick="switchDevoteeMobileSection('tab-volunteers', this)">
           <x-icon name="users" size="14" />
           <span>सेवादार</span>
           <span class="devotee-segment-count">{{ $volunteerApplications->count() }}</span>
@@ -1215,7 +1223,8 @@
                   <h3 class="sacred-card-title">व्यक्तिगत विवरण</h3>
                 </div>
               </div>
-              <button type="button" onclick="openProfileModal()" class="btn-micro-edit" style="display: inline-flex; align-items: center; gap: 5px;">
+              <button type="button" onclick="openProfileModal()" class="btn-micro-edit"
+                style="display: inline-flex; align-items: center; gap: 5px;">
                 <x-icon name="edit" size="12" /> Edit
               </button>
             </div>
@@ -1278,10 +1287,11 @@
               <div class="royal-card-top-row">
                 <div class="royal-chip-icon">
                   <svg width="28" height="22" viewBox="0 0 36 28" fill="none">
-                    <rect width="36" height="28" rx="4" fill="#F59E0B" fill-opacity="0.25" stroke="#F59E0B" stroke-width="1.5"/>
-                    <line x1="12" y1="0" x2="12" y2="28" stroke="#F59E0B" stroke-width="1.2"/>
-                    <line x1="24" y1="0" x2="24" y2="28" stroke="#F59E0B" stroke-width="1.2"/>
-                    <line x1="0" y1="14" x2="36" y2="14" stroke="#F59E0B" stroke-width="1.2"/>
+                    <rect width="36" height="28" rx="4" fill="#F59E0B" fill-opacity="0.25" stroke="#F59E0B"
+                      stroke-width="1.5" />
+                    <line x1="12" y1="0" x2="12" y2="28" stroke="#F59E0B" stroke-width="1.2" />
+                    <line x1="24" y1="0" x2="24" y2="28" stroke="#F59E0B" stroke-width="1.2" />
+                    <line x1="0" y1="14" x2="36" y2="14" stroke="#F59E0B" stroke-width="1.2" />
                   </svg>
                 </div>
                 <span class="royal-tier-badge">
@@ -1299,14 +1309,16 @@
               <div class="royal-card-meta">
                 <div>
                   <div class="royal-devotee-name">{{ $user->name }}</div>
-                  <div class="royal-devotee-id">ID: {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}</div>
+                  <div class="royal-devotee-id">ID:
+                    {{ $user->membership?->membership_id ?? ('SKP-MEM-' . strtoupper(substr(md5($user->id . 'salt'), 0, 6))) }}
+                  </div>
                 </div>
                 <div class="royal-qr-stub">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4B996" stroke-width="1.5">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
                   </svg>
                 </div>
               </div>
@@ -1314,8 +1326,8 @@
             <a href="{{ url('/user/card') }}" class="btn-royal-view">
               <span>पहचान पत्र देखें (View Digital Card)</span>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
               </svg>
             </a>
           </div>
@@ -1456,7 +1468,9 @@
                       style="background: #FFF7ED; border: 1.5px dashed #D97706; border-radius: 8px; padding: 10px 14px; margin-top: 8px; font-size: 13px; color: #9A3412;">
                       <strong>स्वीकृत दक्षिणा:</strong> <span
                         style="font-size: 16px; font-weight: 800; color: #8F1719;">₹{{ number_format((float) $booking->quotation_amount, 2) }}</span>
-                      &bull; <span style="font-size: 11.5px; color: #B45309; display: inline-flex; align-items: center; gap: 4px;"><x-icon name="clock" size="12" /> वैधता:
+                      &bull; <span
+                        style="font-size: 11.5px; color: #B45309; display: inline-flex; align-items: center; gap: 4px;"><x-icon
+                          name="clock" size="12" /> वैधता:
                         {{ $booking->quotation_expires_at ? $booking->quotation_expires_at->diffForHumans() : 'सीमित समय' }}</span>
                       @if($booking->quotation_notes)
                         <div style="margin-top: 4px; font-size: 12px; color: #78350F;">{{ $booking->quotation_notes }}</div>
@@ -1489,7 +1503,8 @@
                   @if($booking->isQuotationActive())
                     <a href="{{ $booking->getQuotationPaymentUrl() }}" class="btn primary"
                       style="font-size: 11px; padding: 9px 18px; border-radius: 8px; background: #B45309; color: #fff; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px rgba(180,83,9,0.25); white-space: nowrap; display: inline-flex; align-items: center; gap: 5px;">
-                      <x-icon name="lock" size="12" /> Pay Online (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
+                      <x-icon name="lock" size="12" /> Pay Online
+                      (₹{{ number_format((float) $booking->quotation_amount, 0) }}) &rarr;
                     </a>
                   @endif
 
@@ -1520,7 +1535,8 @@
             @if($volunteerApplications->count() > 0)
               <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
                 <a href="{{ url('/volunteer') }}" class="btn primary"
-                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Join Volunteer Seva</a>
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap;">+ Join Volunteer
+                  Seva</a>
               </div>
             @endif
 
@@ -1582,7 +1598,8 @@
             @if($atithiEnquiries->count() > 0)
               <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
                 <a href="{{ route('services.atithiVishram') }}" class="btn primary"
-                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #2D6A4F; border-color: #2D6A4F;">+ New Stay Enquiry</a>
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #2D6A4F; border-color: #2D6A4F;">+
+                  New Stay Enquiry</a>
               </div>
             @endif
 
@@ -1590,7 +1607,8 @@
               <div class="donation-receipt-row">
                 <div class="donation-row-left">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
+                    <span
+                      style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
                       <x-icon name="building" size="15" /> {{ $enq->getPurposeLabel() }}
                     </span>
                     @php $badge = $enq->getStatusBadge(); @endphp
@@ -1642,7 +1660,8 @@
             @if($templeBookings->count() > 0)
               <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
                 <a href="{{ route('services.templeBooking') }}" class="btn primary"
-                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #8F1719; border-color: #8F1719;">+ New Hall Proposal</a>
+                  style="font-size: 11.5px; padding: 7px 18px; border-radius: 9999px; white-space: nowrap; background: #8F1719; border-color: #8F1719;">+
+                  New Hall Proposal</a>
               </div>
             @endif
 
@@ -1650,7 +1669,8 @@
               <div class="donation-receipt-row">
                 <div class="donation-row-left">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
+                    <span
+                      style="font-size: 13.5px; font-weight: 700; color: #2B1A12; display: inline-flex; align-items: center; gap: 6px;">
                       <x-icon name="landmark" size="15" /> {{ $tb->getEventTypeLabel() }}
                       @if($tb->event_title) - "{{ $tb->event_title }}" @endif
                     </span>
@@ -1738,7 +1758,7 @@
             } else if (targetKey.startsWith('tab-')) {
               if (sidebar) sidebar.style.display = 'none';
               if (mainContent) mainContent.style.display = 'block';
-              
+
               const desktopTabBtn = document.querySelector(`.dash-tab-btn[onclick*="${targetKey}"]`);
               switchDashTab(targetKey, desktopTabBtn);
               if (mainContent) mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1942,6 +1962,20 @@
       return svgs[type] || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
     }
 
+    function escDevoteeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function safeDevoteeUrl(url) {
+      const raw = String(url ?? '').trim();
+      return /^(https?:\/\/|\/(?!\/))/i.test(raw) ? escDevoteeHtml(raw) : '#';
+    }
+
     function showDevoteeToast(type, title, desc, url = null) {
       playDevoteeNotificationChime();
       const container = document.getElementById('devoteeToastContainer');
@@ -1950,14 +1984,14 @@
       const toast = document.createElement('div');
       toast.className = 'devotee-live-toast';
       toast.innerHTML = `
-          <div style="flex-shrink: 0; display: grid; place-items: center;">${getDevoteeNotifSvg(type)}</div>
-          <div style="flex: 1; min-width: 0;">
-            <div style="font: 700 13.5px var(--dev); color: #78350F; line-height: 1.3;">${title}</div>
-            <div style="font-size: 12px; color: #4B5563; margin-top: 3px; line-height: 1.4;">${desc}</div>
-            ${url ? `<a href="${url}" style="display: inline-block; margin-top: 6px; font-size: 11.5px; font-weight: 700; color: #B45309; text-decoration: underline;">विवरण देखें &rarr;</a>` : ''}
-          </div>
-          <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: #9CA3AF; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
-        `;
+            <div style="flex-shrink: 0; display: grid; place-items: center;">${getDevoteeNotifSvg(type)}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font: 700 13.5px var(--dev); color: #78350F; line-height: 1.3;">${escDevoteeHtml(title)}</div>
+              <div style="font-size: 12px; color: #4B5563; margin-top: 3px; line-height: 1.4;">${escDevoteeHtml(desc)}</div>
+              ${url ? `<a href="${safeDevoteeUrl(url)}" style="display: inline-block; margin-top: 6px; font-size: 11.5px; font-weight: 700; color: #B45309; text-decoration: underline;">विवरण देखें &rarr;</a>` : ''}
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: #9CA3AF; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+          `;
 
       container.appendChild(toast);
       setTimeout(() => {
@@ -2035,22 +2069,22 @@
             if (data.active_quotations_count > 0 && quotationItem) {
               callout.style.display = 'block';
               callout.innerHTML = `
-                <div class="quotation-alert-card">
-                  <div class="quotation-alert-left">
-                    <div style="flex-shrink: 0; width: 42px; height: 42px; border-radius: 10px; background: rgba(180, 83, 9, 0.14); display: grid; place-items: center;">${getDevoteeNotifSvg('quotation')}</div>
-                    <div style="flex: 1; min-width: 0;">
-                      <div style="font: 700 16px var(--dev); color: #92400E; line-height: 1.3;">पूजा दक्षिणा कोटेशन उपलब्ध (Quotation Received & Ready for Payment)</div>
-                      <div style="font-size: 13.5px; color: #78350F; margin-top: 4px; line-height: 1.4; word-break: break-word;">
-                        ${quotationItem.description}
+                  <div class="quotation-alert-card">
+                    <div class="quotation-alert-left">
+                      <div style="flex-shrink: 0; width: 42px; height: 42px; border-radius: 10px; background: rgba(180, 83, 9, 0.14); display: grid; place-items: center;">${getDevoteeNotifSvg('quotation')}</div>
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="font: 700 16px var(--dev); color: #92400E; line-height: 1.3;">पूजा दक्षिणा कोटेशन उपलब्ध (Quotation Received & Ready for Payment)</div>
+                        <div style="font-size: 13.5px; color: #78350F; margin-top: 4px; line-height: 1.4; word-break: break-word;">
+                          ${escDevoteeHtml(quotationItem.description)}
+                        </div>
                       </div>
                     </div>
+                    <a href="${safeDevoteeUrl(quotationItem.url)}" class="quotation-alert-btn">
+                      <span>अभी दक्षिणा अर्पित करें</span>
+                      <span>&rarr;</span>
+                    </a>
                   </div>
-                  <a href="${quotationItem.url}" class="quotation-alert-btn">
-                    <span>अभी दक्षिणा अर्पित करें</span>
-                    <span>&rarr;</span>
-                  </a>
-                </div>
-              `;
+                `;
             } else {
               callout.style.display = 'none';
             }
@@ -2065,15 +2099,15 @@
               data.notifications.forEach((item) => {
                 const isUnread = item.is_unread;
                 html += `
-                  <a href="${item.url}" class="devotee-notif-item ${isUnread ? 'unread' : ''}">
-                    <div style="flex-shrink: 0; margin-top: 2px;">${getDevoteeNotifSvg(item.type)}</div>
-                    <div style="flex: 1; min-width: 0;">
-                      <div style="font: 700 13px var(--dev); color: #78350F;">${item.title}</div>
-                      <div style="font-size: 11.5px; color: #4B5563; line-height: 1.4; margin-top: 2px;">${item.description}</div>
-                      <div style="font-size: 10px; color: #9CA3AF; margin-top: 4px;">${item.time_ago}</div>
-                    </div>
-                  </a>
-                `;
+                    <a href="${safeDevoteeUrl(item.url)}" class="devotee-notif-item ${isUnread ? 'unread' : ''}">
+                      <div style="flex-shrink: 0; margin-top: 2px;">${getDevoteeNotifSvg(item.type)}</div>
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="font: 700 13px var(--dev); color: #78350F;">${escDevoteeHtml(item.title)}</div>
+                        <div style="font-size: 11.5px; color: #4B5563; line-height: 1.4; margin-top: 2px;">${escDevoteeHtml(item.description)}</div>
+                        <div style="font-size: 10px; color: #9CA3AF; margin-top: 4px;">${escDevoteeHtml(item.time_ago)}</div>
+                      </div>
+                    </a>
+                  `;
 
                 // If newly arrived in background poll, show toast feedback
                 if (!isInitial && isUnread && !devoteeKnownNotificationIds.has(item.id)) {

@@ -211,8 +211,8 @@ class PoojaController extends Controller
         }
 
         $orgSettings = OrganizationSetting::getSettings();
-        $razorpayKeyId = $orgSettings->razorpay_key_id ?: config('services.razorpay.key') ?: env('RAZORPAY_KEY') ?: env('RAZORPAY_KEY_ID');
-        $razorpayKeySecret = $orgSettings->razorpay_key_secret ?: config('services.razorpay.secret') ?: env('RAZORPAY_SECRET');
+        $razorpayKeyId = $orgSettings->razorpay_key_id ?: config('services.razorpay.key');
+        $razorpayKeySecret = $orgSettings->razorpay_key_secret ?: config('services.razorpay.secret');
 
         $gatewayOrderId = 'order_pb_'.Str::random(14);
 
@@ -236,11 +236,28 @@ class PoojaController extends Controller
                     $gatewayOrderId = $orderData['id'];
                 } else {
                     Log::error('Razorpay Pooja Order Creation Failed: '.$response->body());
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'भुगतान गेटवे आदेश सृजित करने में त्रुटि हुई। कृपया पुनः प्रयास करें।',
+                    ], 502);
                 }
             } catch (\Throwable $e) {
                 Log::error('Razorpay Pooja Order Exception: '.$e->getMessage());
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'भुगतान गेटवे से सुरक्षित संपर्क स्थापित नहीं हो सका। कृपया पुनः प्रयास करें।',
+                ], 502);
             }
+        } elseif (! app()->runningUnitTests()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ऑनलाइन भुगतान गेटवे अभी कॉन्फ़िगर नहीं है।',
+            ], 500);
         }
+
+        $booking->update(['quotation_order_id' => $gatewayOrderId]);
 
         return response()->json([
             'success' => true,
@@ -264,6 +281,18 @@ class PoojaController extends Controller
     {
         $booking = PoojaBooking::where('quotation_token', $token)->firstOrFail();
 
+        if ($booking->payment_status === 'paid') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'इस अनुष्ठान की दक्षिणा पहले ही सत्यापित की जा चुकी है।',
+                    'redirect_url' => route('pooja.confirmation', ['bookingNumber' => $booking->booking_number]),
+                ]);
+            }
+
+            return redirect()->route('pooja.confirmation', ['bookingNumber' => $booking->booking_number]);
+        }
+
         if ($booking->isQuotationExpired()) {
             if ($request->wantsJson()) {
                 return response()->json([
@@ -276,15 +305,53 @@ class PoojaController extends Controller
         }
 
         $paymentId = $request->input('razorpay_payment_id') ?: $request->input('payment_id');
-        $orderId = $request->input('razorpay_order_id');
+        $orderId = $request->input('razorpay_order_id') ?: $booking->quotation_order_id;
         $signature = $request->input('razorpay_signature');
 
-        $orgSettings = OrganizationSetting::getSettings();
-        $razorpayKeySecret = $orgSettings->razorpay_key_secret ?: config('services.razorpay.secret') ?: env('RAZORPAY_SECRET');
+        // Prevent order-swap attacks against server-bound quotation order ID
+        if (! empty($booking->quotation_order_id) && $request->filled('razorpay_order_id') && ! hash_equals((string) $booking->quotation_order_id, (string) $request->input('razorpay_order_id'))) {
+            Log::warning('Razorpay quotation order ID mismatch for Pooja Booking #'.$booking->id);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ऑर्डर संदर्भ असंगत है (Order reference mismatch)।',
+                ], 422);
+            }
 
-        // Strictly enforce Razorpay online payment verification; offline/direct payments can only be confirmed by an administrator
+            return back()->with('error', 'भुगतान ऑर्डर संदर्भ अमान्य है। कृपया पुनः प्रयास करें।');
+        }
+
+        // Prevent payment ID replay across bookings
+        if (! empty($paymentId) && PoojaBooking::where('payment_id', $paymentId)->where('id', '!=', $booking->id)->exists()) {
+            Log::warning('Razorpay payment ID replay attempt for Pooja Booking #'.$booking->id);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'यह भुगतान पहचान संख्या पहले ही किसी अन्य बुकिंग में प्रयुक्त हो चुकी है।',
+                ], 422);
+            }
+
+            return back()->with('error', 'यह भुगतान पहचान संख्या पहले ही प्रयुक्त हो चुकी है।');
+        }
+
+        $orgSettings = OrganizationSetting::getSettings();
+        $razorpayKeySecret = $orgSettings->razorpay_key_secret ?: config('services.razorpay.secret');
+
+        // Strictly enforce Razorpay online payment verification (fail-closed in production)
         if (! app()->runningUnitTests()) {
-            if (empty($paymentId) || empty($orderId) || empty($signature)) {
+            if (empty($razorpayKeySecret)) {
+                Log::error('Razorpay quotation verification failed: secret key is not configured on the server.');
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Payment gateway secret is not configured on the server.',
+                    ], 500);
+                }
+
+                return back()->with('error', 'भुगतान गेटवे सुरक्षा कुंजी सर्वर पर कॉन्फ़िगर नहीं है।');
+            }
+
+            if (empty($paymentId) || empty($orderId) || empty($booking->quotation_order_id) || empty($signature)) {
                 if ($request->wantsJson()) {
                     return response()->json([
                         'success' => false,
@@ -295,19 +362,17 @@ class PoojaController extends Controller
                 return back()->with('error', 'भुगतान सत्यापन विवरण अपूर्ण है। कृपया पुनः प्रयास करें।');
             }
 
-            if (! empty($razorpayKeySecret)) {
-                $expectedSignature = hash_hmac('sha256', $orderId.'|'.$paymentId, $razorpayKeySecret);
-                if (! hash_equals($expectedSignature, (string) $signature)) {
-                    Log::warning('Razorpay payment signature mismatch for Pooja Booking #'.$booking->id);
-                    if ($request->wantsJson()) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'भुगतान सुरक्षा सत्यापन विफल (Invalid payment signature)।',
-                        ], 422);
-                    }
-
-                    return back()->with('error', 'भुगतान सुरक्षा सत्यापन विफल रहा। कृपया पुनः प्रयास करें।');
+            $expectedSignature = hash_hmac('sha256', $orderId.'|'.$paymentId, $razorpayKeySecret);
+            if (! hash_equals($expectedSignature, (string) $signature)) {
+                Log::warning('Razorpay payment signature mismatch for Pooja Booking #'.$booking->id);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'भुगतान सुरक्षा सत्यापन विफल (Invalid payment signature)।',
+                    ], 422);
                 }
+
+                return back()->with('error', 'भुगतान सुरक्षा सत्यापन विफल रहा। कृपया पुनः प्रयास करें।');
             }
         } else {
             // Unit test environment verification
@@ -324,7 +389,7 @@ class PoojaController extends Controller
 
             if (! empty($signature) && ! empty($orderId) && ! empty($razorpayKeySecret)) {
                 $expectedSignature = hash_hmac('sha256', $orderId.'|'.$paymentId, $razorpayKeySecret);
-                if (! hash_equals($expectedSignature, (string) $signature) && $signature !== 'verified_test_sig') {
+                if (! hash_equals($expectedSignature, (string) $signature)) {
                     if ($request->wantsJson()) {
                         return response()->json([
                             'success' => false,

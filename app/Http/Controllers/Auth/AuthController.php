@@ -14,6 +14,7 @@ use App\Services\EmailNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -31,13 +32,21 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
             $user = Auth::user();
 
-            // Link any previous guest history matching devotee's email
-            $this->linkGuestHistory($user);
+            if ($user->is_active === false || $user->approval_status === 'rejected') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors(['email' => 'आपका खाता निष्क्रिय या निलंबित कर दिया गया है। कृपया ट्रस्ट कार्यालय से संपर्क करें।']);
+            }
+
+            $request->session()->regenerate();
 
             if ($user->hasRole('super_admin', 'content_admin', 'donation_admin', 'membership_admin', 'media_editor')) {
+                $this->linkGuestHistory($user);
+
                 return redirect()->intended('/admin');
             }
 
@@ -46,6 +55,9 @@ class AuthController extends Controller
                 return redirect('/register?step=2&email='.urlencode($user->email))
                     ->with('warning', 'डैशबोर्ड में प्रवेश करने से पूर्व कृपया अपने ईमेल पर प्राप्त 6-अंकीय OTP सत्यापित करें। (Please verify your email OTP before accessing dashboard).');
             }
+
+            // Link any previous guest history matching verified devotee's email
+            $this->linkGuestHistory($user);
 
             return redirect()->intended('/dashboard');
         }
@@ -74,6 +86,7 @@ class AuthController extends Controller
             'email_otp_expires_at' => now()->addMinutes(15),
         ]);
 
+        RateLimiter::clear('reset-otp:'.strtolower($user->email));
         EmailNotificationService::sendPasswordResetOtp($user, $otp);
 
         return redirect('/reset-password?email='.urlencode($user->email))
@@ -96,20 +109,35 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->firstOrFail();
+        $limiterKey = 'reset-otp:'.strtolower($user->email);
 
-        if ($user->email_otp_expires_at && now()->isAfter($user->email_otp_expires_at)) {
+        if (RateLimiter::tooManyAttempts($limiterKey, 5)) {
+            $user->update(['email_otp' => null, 'email_otp_expires_at' => null]);
+
+            return back()->withErrors(['otp' => 'अत्यधिक असफल प्रयासों के कारण यह OTP अमान्य कर दिया गया है। कृपया नया OTP अनुरोध करें।']);
+        }
+
+        if (empty($user->email_otp_expires_at) || now()->isAfter($user->email_otp_expires_at)) {
             return back()->withErrors(['otp' => 'OTP कोड की समय सीमा समाप्त हो गई है। कृपया पुनः अनुरोध करें।']);
         }
 
         if (empty($user->email_otp) || ! hash_equals((string) $user->email_otp, (string) $request->otp)) {
+            RateLimiter::hit($limiterKey, 900);
+            if (RateLimiter::tooManyAttempts($limiterKey, 5)) {
+                $user->update(['email_otp' => null, 'email_otp_expires_at' => null]);
+            }
+
             return back()->withErrors(['otp' => 'प्रविष्ट किया गया OTP कोड अमान्य है।']);
         }
 
-        $user->update([
+        RateLimiter::clear($limiterKey);
+
+        $user->forceFill([
             'password' => Hash::make($request->password),
             'email_otp' => null,
             'email_otp_expires_at' => null,
-        ]);
+            'remember_token' => Str::random(60),
+        ])->save();
 
         EmailNotificationService::sendPasswordChangedAlert($user);
 
@@ -184,19 +212,35 @@ class AuthController extends Controller
             return redirect('/login');
         }
 
-        if ($user->email_otp_expires_at && now()->isAfter($user->email_otp_expires_at)) {
+        $limiterKey = 'verify-otp:'.$user->id;
+        if (RateLimiter::tooManyAttempts($limiterKey, 5)) {
+            $user->update(['email_otp' => null, 'email_otp_expires_at' => null]);
+
+            return back()->withErrors(['otp' => 'अत्यधिक असफल प्रयासों के कारण यह OTP अमान्य कर दिया गया है। कृपया नया OTP अनुरोध करें।']);
+        }
+
+        if (empty($user->email_otp_expires_at) || now()->isAfter($user->email_otp_expires_at)) {
             return back()->withErrors(['otp' => 'OTP कोड की समय सीमा समाप्त हो गई है। कृपया पुनः अनुरोध करें। (OTP has expired.)']);
         }
 
         if (empty($user->email_otp) || ! hash_equals((string) $user->email_otp, (string) $request->otp)) {
+            RateLimiter::hit($limiterKey, 900);
+            if (RateLimiter::tooManyAttempts($limiterKey, 5)) {
+                $user->update(['email_otp' => null, 'email_otp_expires_at' => null]);
+            }
+
             return back()->withErrors(['otp' => 'Invalid OTP code. Please check and try again.']);
         }
+
+        RateLimiter::clear($limiterKey);
 
         $user->update([
             'email_verified_at' => now(),
             'email_otp' => null,
             'email_otp_expires_at' => null,
         ]);
+
+        $this->linkGuestHistory($user);
 
         return redirect('/register?step=3')->with('success', 'Email verified successfully! Now complete your profile details.');
     }
@@ -225,6 +269,7 @@ class AuthController extends Controller
             'email_otp_expires_at' => now()->addMinutes(15),
         ]);
 
+        RateLimiter::clear('verify-otp:'.$user->id);
         EmailNotificationService::sendRegistrationOtp($user, $otp);
 
         return redirect('/register?step=2&email='.urlencode($user->email))

@@ -52,8 +52,8 @@ Route::get('/pooja', [PoojaController::class, 'index'])->name('pooja.index');
 Route::get('/pooja/book', [PoojaController::class, 'bookingForm'])->name('pooja.bookingForm');
 Route::get('/pooja/{slug}', [PoojaController::class, 'show'])->name('pooja.show');
 Route::post('/pooja/book', [PoojaController::class, 'book'])->name('pooja.book')->middleware('throttle:10,1');
-Route::get('/pooja/confirmation/{bookingNumber}', [PoojaController::class, 'confirmation'])->name('pooja.confirmation');
-Route::get('/pooja/quotation/{token}', [PoojaController::class, 'showQuotation'])->name('pooja.quotation.pay');
+Route::get('/pooja/confirmation/{bookingNumber}', [PoojaController::class, 'confirmation'])->name('pooja.confirmation')->middleware('throttle:60,1');
+Route::get('/pooja/quotation/{token}', [PoojaController::class, 'showQuotation'])->name('pooja.quotation.pay')->middleware('throttle:30,1');
 Route::post('/pooja/quotation/{token}/create-order', [PoojaController::class, 'createQuotationOrder'])->name('pooja.quotation.createOrder')->middleware('throttle:30,1');
 Route::post('/api/pooja/quotation/{token}/create-order', [PoojaController::class, 'createQuotationOrder'])->middleware('throttle:30,1');
 Route::post('/pooja/quotation/{token}/verify', [PoojaController::class, 'verifyQuotationPayment'])->name('pooja.quotation.verify')->middleware('throttle:30,1');
@@ -108,7 +108,7 @@ Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index
 
 // Donation & Receipts Routes
 Route::get('/donate', [DonationController::class, 'index'])->name('donate');
-Route::get('/receipt/{receiptNumber}', [DonationController::class, 'showReceipt'])->name('receipt.show');
+Route::get('/receipt/{receiptNumber}', [DonationController::class, 'showReceipt'])->name('receipt.show')->middleware('throttle:60,1');
 
 // API Endpoints for Razorpay Checkout
 Route::post('/api/donations/create-order', [DonationController::class, 'createOrder'])->middleware('throttle:30,1');
@@ -148,8 +148,43 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/notifications/poll', [NotificationCenterController::class, 'adminPoll'])->name('admin.notifications.poll');
         Route::post('/api/notifications/mark-seen', [NotificationCenterController::class, 'adminMarkSeen'])->name('admin.notifications.markSeen');
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
-        Route::get('/donations/export-csv', [AdminController::class, 'exportDonationsCsv'])->name('admin.donations.exportCsv');
-        Route::post('/flush-cache', [AdminController::class, 'flushCache'])->name('admin.flushCache');
+
+        // Financial & Donation Management (Super Admin & Donation Admin)
+        Route::middleware('admin:super_admin,donation_admin')->group(function () {
+            Route::get('/donations/export-csv', [AdminController::class, 'exportDonationsCsv'])->name('admin.donations.exportCsv');
+            Route::get('/causes', [AdminController::class, 'causes'])->name('admin.causes');
+            Route::post('/causes', [AdminController::class, 'storeCause']);
+            Route::put('/causes/{id}', [AdminController::class, 'updateCause'])->name('admin.causes.update');
+            Route::delete('/causes/{id}', [AdminController::class, 'deleteCause']);
+            Route::get('/pooja-bookings', [AdminController::class, 'poojaBookings'])->name('admin.poojaBookings');
+            Route::post('/pooja-bookings/{id}/confirm', [AdminController::class, 'confirmPoojaBooking'])->name('admin.poojaBookings.confirm');
+            Route::post('/pooja-bookings/{id}/quotation', [AdminController::class, 'sendPoojaQuotation'])->name('admin.poojaBookings.quotation');
+            Route::post('/pooja-bookings/{id}/status', [AdminController::class, 'updatePoojaBookingStatus'])->name('admin.poojaBookings.status');
+        });
+
+        // Super Admin Exclusive Controls (Users, Settings, Secrets, SMTP, Cache)
+        Route::middleware('admin:super_admin')->group(function () {
+            Route::post('/flush-cache', [AdminController::class, 'flushCache'])->name('admin.flushCache');
+
+            Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+            Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole']);
+
+            Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+            Route::post('/settings', [AdminController::class, 'updateSettings']);
+
+            // Email SMTP & Template Manager
+            Route::get('/email-templates', [AdminController::class, 'emailTemplates'])->name('admin.emailTemplates');
+            Route::post('/email-templates', [AdminController::class, 'storeEmailTemplate'])->name('admin.storeEmailTemplate');
+            Route::get('/email-templates/{id}/preview', [AdminController::class, 'previewEmailTemplate'])->name('admin.previewEmailTemplate');
+            Route::put('/email-templates/{id}', [AdminController::class, 'updateEmailTemplate'])->name('admin.updateEmailTemplate');
+            Route::delete('/email-templates/{id}', [AdminController::class, 'destroyEmailTemplate'])->name('admin.destroyEmailTemplate');
+            Route::post('/email-templates/toggle-service', [AdminController::class, 'toggleEmailSending'])->name('admin.toggleEmailSending');
+            Route::post('/email-templates/{id}/toggle', [AdminController::class, 'toggleTemplateStatus'])->name('admin.toggleTemplateStatus');
+            Route::post('/email-templates/smtp-config', [AdminController::class, 'updateSmtpConfig'])->name('admin.updateSmtpConfig');
+            Route::post('/email-templates/test-smtp', [AdminController::class, 'testSmtpConnection'])->name('admin.testSmtpConnection');
+            Route::get('/email-templates/logs', [AdminController::class, 'emailLogs'])->name('admin.emailLogs');
+            Route::delete('/email-templates/logs/clear', [AdminController::class, 'clearEmailLogs'])->name('admin.clearEmailLogs');
+        });
 
         Route::get('/sevas', [AdminController::class, 'sevas'])->name('admin.sevas');
         Route::post('/sevas', [AdminController::class, 'storeSeva']);
@@ -184,20 +219,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/comments/{id}/reject', [AdminController::class, 'rejectComment'])->name('admin.rejectComment');
         Route::delete('/comments/{id}', [AdminController::class, 'deleteComment'])->name('admin.deleteComment');
 
-        Route::get('/causes', [AdminController::class, 'causes'])->name('admin.causes');
-        Route::post('/causes', [AdminController::class, 'storeCause']);
-        Route::put('/causes/{id}', [AdminController::class, 'updateCause'])->name('admin.causes.update');
-        Route::delete('/causes/{id}', [AdminController::class, 'deleteCause']);
-
         Route::get('/gallery', [AdminController::class, 'gallery'])->name('admin.gallery');
         Route::post('/gallery', [AdminController::class, 'storeGalleryItem']);
         Route::delete('/gallery/{id}', [AdminController::class, 'deleteGalleryItem']);
-
-        Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
-        Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole']);
-
-        Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
-        Route::post('/settings', [AdminController::class, 'updateSettings']);
 
         // Homepage Layout & Components Editor (Screenshot 2)
         Route::get('/homepage-layout', [AdminController::class, 'homepageLayout'])->name('admin.homepageLayout');
@@ -221,19 +245,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/media-gallery/{id}', [AdminController::class, 'deleteMedia'])->name('admin.deleteMedia');
         Route::get('/api/media-list', [AdminController::class, 'apiMediaList'])->name('admin.apiMediaList');
 
-        // Email SMTP & Template Manager
-        Route::get('/email-templates', [AdminController::class, 'emailTemplates'])->name('admin.emailTemplates');
-        Route::post('/email-templates', [AdminController::class, 'storeEmailTemplate'])->name('admin.storeEmailTemplate');
-        Route::get('/email-templates/{id}/preview', [AdminController::class, 'previewEmailTemplate'])->name('admin.previewEmailTemplate');
-        Route::put('/email-templates/{id}', [AdminController::class, 'updateEmailTemplate'])->name('admin.updateEmailTemplate');
-        Route::delete('/email-templates/{id}', [AdminController::class, 'destroyEmailTemplate'])->name('admin.destroyEmailTemplate');
-        Route::post('/email-templates/toggle-service', [AdminController::class, 'toggleEmailSending'])->name('admin.toggleEmailSending');
-        Route::post('/email-templates/{id}/toggle', [AdminController::class, 'toggleTemplateStatus'])->name('admin.toggleTemplateStatus');
-        Route::post('/email-templates/smtp-config', [AdminController::class, 'updateSmtpConfig'])->name('admin.updateSmtpConfig');
-        Route::post('/email-templates/test-smtp', [AdminController::class, 'testSmtpConnection'])->name('admin.testSmtpConnection');
-        Route::get('/email-templates/logs', [AdminController::class, 'emailLogs'])->name('admin.emailLogs');
-        Route::delete('/email-templates/logs/clear', [AdminController::class, 'clearEmailLogs'])->name('admin.clearEmailLogs');
-
         // Events & Utsavs CMS
         Route::get('/events', [AdminController::class, 'events'])->name('admin.events');
         Route::post('/events', [AdminController::class, 'storeEvent'])->name('admin.events.store');
@@ -250,10 +261,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/poojas/aarti-timetable', [AdminController::class, 'updateAartiTimetable'])->name('admin.poojas.updateAartiTimetable');
         Route::post('/pooja-slots', [AdminController::class, 'storePoojaSlot'])->name('admin.poojaSlots.store');
         Route::delete('/pooja-slots/{id}', [AdminController::class, 'deletePoojaSlot'])->name('admin.poojaSlots.delete');
-        Route::get('/pooja-bookings', [AdminController::class, 'poojaBookings'])->name('admin.poojaBookings');
-        Route::post('/pooja-bookings/{id}/confirm', [AdminController::class, 'confirmPoojaBooking'])->name('admin.poojaBookings.confirm');
-        Route::post('/pooja-bookings/{id}/quotation', [AdminController::class, 'sendPoojaQuotation'])->name('admin.poojaBookings.quotation');
-        Route::post('/pooja-bookings/{id}/status', [AdminController::class, 'updatePoojaBookingStatus'])->name('admin.poojaBookings.status');
 
         // Volunteer Seva Applications CMS
         Route::get('/volunteers', [AdminController::class, 'volunteers'])->name('admin.volunteers');

@@ -27,6 +27,7 @@ class PoojaBooking extends Model
         'quotation_amount',
         'quotation_notes',
         'quotation_token',
+        'quotation_order_id',
         'quotation_expires_at',
         'quoted_at',
         'payment_status',

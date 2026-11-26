@@ -27,12 +27,14 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'email_otp',
+        'email_otp_expires_at',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'email_otp_expires_at' => 'datetime',
             'declaration_accepted_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
