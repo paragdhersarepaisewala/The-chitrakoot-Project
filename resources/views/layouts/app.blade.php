@@ -49,7 +49,8 @@
 
   <!-- Google Search Console Verification -->
   @if(!empty($googleSiteVerification))
-    <meta name="google-site-verification" content="{{ str_replace('google-site-verification=', '', $googleSiteVerification) }}">
+    <meta name="google-site-verification"
+      content="{{ str_replace('google-site-verification=', '', $googleSiteVerification) }}">
   @endif
 
   <!-- Google Analytics 4 (GA4) -->
@@ -326,392 +327,356 @@
         @endauth
 
         <a class="donate-btn" href="{{ url('/donate') }}">Donate</a>
-        <button class="mobile-toggle" id="openMenu" aria-label="Open menu"><svg viewBox="0 0 24 24">
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg></button>
+        <button class="mobile-toggle" id="openMenu" type="button" aria-label="Open menu" aria-expanded="false"
+          aria-controls="mobileMenu">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- Fullscreen Mobile Menu Overlay -->
-  <!-- Fullscreen Mobile Menu Overlay -->
-  <!-- Backdrop Overlay for Mobile Drawer -->
-  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+  @php
+    $normalizePath = static function (?string $targetUrl): string {
+      if (empty($targetUrl) || $targetUrl === '#') {
+        return '';
+      }
+      $parsedPath = parse_url($targetUrl, PHP_URL_PATH);
+      return trim((string) $parsedPath, '/');
+    };
 
-  <!-- Animated Subdivided Mobile Menu Drawer -->
+    $isMobileLinkActive = static function (?string $targetUrl, bool $matchDescendants = false) use ($normalizePath): bool {
+      $normalized = $normalizePath($targetUrl);
+      if ($normalized === '') {
+        return $targetUrl === url('/') || $targetUrl === '/' ? request()->is('/') : false;
+      }
+      if ($matchDescendants) {
+        return request()->is($normalized) || request()->is($normalized . '/*');
+      }
+      return request()->is($normalized);
+    };
+
+    $renderMobileNavIcon = static function (?string $url, ?string $label = ''): string {
+      $haystack = strtolower(trim(($url ?? '') . ' ' . ($label ?? '')));
+      $svgOpen = '<svg class="mobile-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+
+      if ($url === '/' || $url === url('/') || str_contains($haystack, 'home')) {
+        return $svgOpen . '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6.5h-5V21H4a1 1 0 0 1-1-1v-9.5z"/></svg>';
+      }
+      if (str_contains($haystack, 'about') || str_contains($haystack, 'leadership') || str_contains($haystack, 'trust')) {
+        return $svgOpen . '<path d="M3 21h18"/><path d="M5 21V11l7-7 7 7v10"/><path d="M9 21v-5a3 3 0 0 1 6 0v5"/><path d="M12 4V2"/></svg>';
+      }
+      if (str_contains($haystack, 'seva') || str_contains($haystack, 'gurukul') || str_contains($haystack, 'gaushala')) {
+        return $svgOpen . '<path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7z"/></svg>';
+      }
+      if (str_contains($haystack, 'chitrakoot') || str_contains($haystack, 'parikrama') || str_contains($haystack, 'ramghat')) {
+        return $svgOpen . '<path d="M8 3l4 8 5-5 5 15H2L8 3z"/></svg>';
+      }
+      if (str_contains($haystack, 'service') || str_contains($haystack, 'pooja') || str_contains($haystack, 'aarti')) {
+        return $svgOpen . '<path d="M12 2c1.8 3.2 4.5 5.4 4.5 9.2a4.5 4.5 0 1 1-9 0C7.5 7.4 10.2 5.2 12 2z"/><path d="M5 19h14"/><path d="M7 22h10"/></svg>';
+      }
+      if (str_contains($haystack, 'event') || str_contains($haystack, 'utsav')) {
+        return $svgOpen . '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      }
+      if (str_contains($haystack, 'blog') || str_contains($haystack, 'article') || str_contains($haystack, 'news')) {
+        return $svgOpen . '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="16" y2="7"/><line x1="9" y1="11" x2="16" y2="11"/></svg>';
+      }
+      if (str_contains($haystack, 'gallery') || str_contains($haystack, 'photo')) {
+        return $svgOpen . '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+      }
+      if (str_contains($haystack, 'volunteer')) {
+        return $svgOpen . '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+      }
+      if (str_contains($haystack, 'contact')) {
+        return $svgOpen . '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+      }
+      if (str_contains($haystack, 'donate')) {
+        return $svgOpen . '<path d="M12 21s-7-4.6-9-9.2C1.2 7.8 3.4 5 6.4 5c2 0 3.5 1.1 5.6 3.1C14.1 6.1 15.6 5 17.6 5 20.6 5 22.8 7.8 21 11.8 19 16.4 12 21 12 21z"/></svg>';
+      }
+
+      return $svgOpen . '<circle cx="12" cy="12" r="9"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>';
+    };
+
+    $mobileNavTree = [];
+    if (isset($headerNavItems) && $headerNavItems->count() > 0) {
+      foreach ($headerNavItems as $navItem) {
+        $children = [];
+        $seenUrls = [];
+        foreach ($navItem->children as $subItem) {
+          $subUrl = $subItem->resolved_url;
+          if (isset($seenUrls[$subUrl])) {
+            continue;
+          }
+          $seenUrls[$subUrl] = true;
+          $children[] = [
+            'label_en' => $subItem->label_en,
+            'label_hi' => $subItem->label_hi,
+            'url' => $subUrl,
+            'target' => $subItem->target ?: '_self',
+          ];
+        }
+        $mobileNavTree[] = [
+          'label_en' => $navItem->label_en,
+          'label_hi' => $navItem->label_hi,
+          'url' => $navItem->resolved_url,
+          'target' => $navItem->target ?: '_self',
+          'children' => $children,
+        ];
+      }
+    } else {
+      $mobileNavTree = [
+        ['label_en' => 'Home', 'label_hi' => 'मुख्य पृष्ठ', 'url' => url('/'), 'target' => '_self', 'children' => []],
+        [
+          'label_en' => 'About',
+          'label_hi' => 'ट्रस्ट परिचय',
+          'url' => url('/about'),
+          'target' => '_self',
+          'children' => [
+            ['label_en' => 'About the Trust', 'label_hi' => 'ट्रस्ट के विषय में', 'url' => url('/about'), 'target' => '_self'],
+            ['label_en' => 'Leadership & Trustees', 'label_hi' => 'संरक्षक व न्यासी मंडल', 'url' => url('/leadership'), 'target' => '_self'],
+          ],
+        ],
+        [
+          'label_en' => 'Seva',
+          'label_hi' => 'सेवा व गुरुकुल',
+          'url' => url('/seva'),
+          'target' => '_self',
+          'children' => [
+            ['label_en' => 'Vedic Sanskrit Vidyalaya', 'label_hi' => 'ऋषिकुल संस्कृत विद्यालय', 'url' => url('/seva/sanskrit-gurukul'), 'target' => '_self'],
+            ['label_en' => 'Gaushala & Cow Care', 'label_hi' => 'कामदगिरि गौशाला', 'url' => url('/seva/gaushala-protection'), 'target' => '_self'],
+            ['label_en' => 'All Seva Projects', 'label_hi' => 'समस्त सेवा प्रकल्प', 'url' => url('/seva'), 'target' => '_self'],
+          ],
+        ],
+        [
+          'label_en' => 'Chitrakoot',
+          'label_hi' => 'चित्रकूट दर्शन',
+          'url' => url('/chitrakoot'),
+          'target' => '_self',
+          'children' => [
+            ['label_en' => 'Sacred Places Guide', 'label_hi' => 'समस्त तीर्थ स्थल', 'url' => url('/chitrakoot'), 'target' => '_self'],
+            ['label_en' => 'Kamadgiri Parikrama', 'label_hi' => 'कामदगिरि परिक्रमा', 'url' => url('/chitrakoot/kamadgiri-parikrama'), 'target' => '_self'],
+            ['label_en' => 'Ramghat', 'label_hi' => 'रामघाट एवं मंदाकिनी', 'url' => url('/chitrakoot/ramghat'), 'target' => '_self'],
+          ],
+        ],
+        [
+          'label_en' => 'Services',
+          'label_hi' => 'मंदिर सेवाएं व दर्शन',
+          'url' => route('services.index'),
+          'target' => '_self',
+          'children' => [
+            ['label_en' => 'All Services Overview', 'label_hi' => 'समस्त मंदिर सेवाएं', 'url' => route('services.index'), 'target' => '_self'],
+            ['label_en' => 'Book Pooja / Hawan Slot', 'label_hi' => 'पूजा व हवन आरक्षण', 'url' => route('pooja.bookingForm'), 'target' => '_self'],
+            ['label_en' => 'All Pooja & Archana Services', 'label_hi' => 'समस्त पूजा एवं अर्चना', 'url' => route('pooja.index'), 'target' => '_self'],
+            ['label_en' => 'Daily Aarti & Darshan Schedule', 'label_hi' => 'नित्य आरती व दर्शन सारणी', 'url' => route('services.aarti'), 'target' => '_self'],
+            ['label_en' => 'Guest House Stay Enquiry', 'label_hi' => 'अतिथि विश्राम गृह पूछताछ', 'url' => route('services.atithiVishram'), 'target' => '_self'],
+            ['label_en' => 'Premises Booking Enquiry', 'label_hi' => 'मंदिर परिसर व आयोजन पूछताछ', 'url' => route('services.templeBooking'), 'target' => '_self'],
+          ],
+        ],
+        ['label_en' => 'Events', 'label_hi' => 'उत्सव व कार्यक्रम', 'url' => url('/events'), 'target' => '_self', 'children' => []],
+        ['label_en' => 'Blog', 'label_hi' => 'समाचार व आलेख', 'url' => url('/blog'), 'target' => '_self', 'children' => []],
+        ['label_en' => 'Gallery', 'label_hi' => 'चित्र दीर्घा', 'url' => url('/gallery'), 'target' => '_self', 'children' => []],
+        ['label_en' => 'Contact', 'label_hi' => 'संपर्क', 'url' => url('/contact'), 'target' => '_self', 'children' => []],
+      ];
+    }
+  @endphp
+
+  <!-- Backdrop Overlay for Mobile Drawer -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
+
+  <!-- Mobile Navigation Drawer -->
   <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
-    <!-- Top Header inside Menu -->
-    <div
-      style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(180,83,9,0.18);">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div
-          style="width: 32px; height: 32px; border-radius: 8px; background: rgba(217,93,15,0.12); display: grid; place-items: center; color: #D95D0F;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 51V28L25 7l20 21v23" />
-            <path d="M13 51V31l12-12 12 12v20" />
-            <path d="M20 51V35h10v16" />
-            <path d="M2 52h46" />
-            <path d="M25 7V2" />
-          </svg>
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-brand">
+        <div class="mobile-menu-brand-mark">
+          @if(!empty($orgSettings->logo_path))
+            <img src="{{ $siteLogoUrl }}" alt="{{ $orgSettings->org_name ?? 'Logo' }}">
+          @else
+            <svg viewBox="0 0 50 58" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M5 51V28L25 7l20 21v23" />
+              <path d="M13 51V31l12-12 12 12v20" />
+              <path d="M20 51V35h10v16" />
+              <path d="M2 52h46" />
+              <path d="M25 7V2" />
+            </svg>
+          @endif
         </div>
-        <div>
+        <div class="mobile-menu-brand-text">
           <span
-            style="color: #92400E; font-weight: 800; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; display: block; line-height: 1.2;">
-            {{ $orgSettings->org_name ?? 'Shri Kamadgiri Peetham' }}
-          </span>
-          <span style="font-size: 10.5px; color: #7A4B29; font-weight: 600;">चित्रकूट धाम • सेवा ट्रस्ट</span>
+            class="mobile-menu-brand-title">{{ $orgSettings->org_name ?? 'Shri Kamadgiri Peetham Sewa Trust' }}</span>
+          <span class="mobile-menu-brand-sub">{{ $siteTagline ?? 'Sewa Trust • Chitrakoot Dham' }}</span>
         </div>
       </div>
-      <button class="mobile-menu-close" id="closeMenu" aria-label="Close Mobile Navigation">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
+      <button class="mobile-menu-close" id="closeMenu" type="button" aria-label="Close Mobile Navigation">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
     </div>
 
-    <!-- Quick Navigation Pill Bar (Top 4 shortcuts) -->
-    <div class="menu-quick-grid">
-      <a href="{{ url('/') }}" class="menu-quick-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-        <span>होम</span>
-      </a>
-      <a href="{{ url('/#aarti-timings') }}" class="menu-quick-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-        <span>आरती समय</span>
-      </a>
-      <a href="{{ url('/chitrakoot/kamadgiri-parikrama') }}" class="menu-quick-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="12 2 2 22 22 22 12 2" />
-        </svg>
-        <span>परिक्रमा</span>
-      </a>
-      <a href="{{ url('/contact') }}" class="menu-quick-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path
-            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-        </svg>
-        <span>संपर्क</span>
-      </a>
-    </div>
+    <div class="mobile-menu-body">
+      <nav class="mobile-nav-list" aria-label="Mobile Primary Navigation">
+        @foreach($mobileNavTree as $navEntry)
+          @php
+            $hasChildren = !empty($navEntry['children']);
+            $hasActiveChild = false;
+            if ($hasChildren) {
+              foreach ($navEntry['children'] as $childCheck) {
+                if ($isMobileLinkActive($childCheck['url'], false)) {
+                  $hasActiveChild = true;
+                  break;
+                }
+              }
+            }
+            $isGroupActive = $hasChildren && ($hasActiveChild || $isMobileLinkActive($navEntry['url'], true));
+            $isEntryActive = !$hasChildren && $isMobileLinkActive($navEntry['url'], true);
+          @endphp
 
-    <!-- Submenu Accordion Container -->
-    <div class="menu-accordion-container" id="menuAccordions">
-
-      <!-- SUBMENU 1: ABOUT TRUST & HERITAGE -->
-      <div class="menu-accordion-card">
-        <button type="button" class="menu-accordion-header" onclick="toggleMenuAccordion(this)" aria-expanded="false">
-          <div class="menu-accordion-title-wrap">
-            <div class="menu-accordion-icon">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 21h18" />
-                <path d="M5 21V11l7-7 7 7v10" />
-                <path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" />
-                <circle cx="12" cy="7" r="1" />
+          @if($hasChildren)
+            <div class="mobile-nav-group {{ $isGroupActive ? 'active' : '' }}">
+              <button type="button" class="mobile-nav-accordion-btn {{ $isGroupActive ? 'is-active' : '' }}"
+                onclick="toggleMenuAccordion(this)" aria-expanded="{{ $isGroupActive ? 'true' : 'false' }}">
+                <span class="mobile-nav-icon">
+                  {!! $renderMobileNavIcon($navEntry['url'], $navEntry['label_en']) !!}
+                </span>
+                <span class="mobile-nav-text">
+                  <span class="mobile-nav-label">{{ $navEntry['label_en'] }}</span>
+                  @if(!empty($navEntry['label_hi']) && $navEntry['label_hi'] !== $navEntry['label_en'])
+                    <span class="mobile-nav-sub">{{ $navEntry['label_hi'] }}</span>
+                  @endif
+                </span>
+                <svg class="mobile-nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div class="mobile-nav-sublist">
+                @foreach($navEntry['children'] as $subEntry)
+                  @php
+                    $isSubActive = $isMobileLinkActive($subEntry['url'], false);
+                  @endphp
+                  <a href="{{ $subEntry['url'] }}" target="{{ $subEntry['target'] }}" @if($subEntry['target'] === '_blank')
+                  rel="noopener noreferrer" @endif class="mobile-nav-sublink {{ $isSubActive ? 'is-active' : '' }}"
+                    @if($isSubActive) aria-current="page" @endif>
+                    <span class="mobile-nav-sublink-text">
+                      <span class="mobile-nav-sublink-title">{{ $subEntry['label_en'] }}</span>
+                      @if(!empty($subEntry['label_hi']) && $subEntry['label_hi'] !== $subEntry['label_en'])
+                        <span class="mobile-nav-sublink-hi">{{ $subEntry['label_hi'] }}</span>
+                      @endif
+                    </span>
+                    <svg class="mobile-nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </a>
+                @endforeach
+              </div>
+            </div>
+          @else
+            <a href="{{ $navEntry['url'] }}" target="{{ $navEntry['target'] }}" @if($navEntry['target'] === '_blank')
+            rel="noopener noreferrer" @endif class="mobile-nav-link {{ $isEntryActive ? 'is-active' : '' }}"
+              @if($isEntryActive) aria-current="page" @endif>
+              <span class="mobile-nav-icon">
+                {!! $renderMobileNavIcon($navEntry['url'], $navEntry['label_en']) !!}
+              </span>
+              <span class="mobile-nav-text">
+                <span class="mobile-nav-label">{{ $navEntry['label_en'] }}</span>
+                @if(!empty($navEntry['label_hi']) && $navEntry['label_hi'] !== $navEntry['label_en'])
+                  <span class="mobile-nav-sub">{{ $navEntry['label_hi'] }}</span>
+                @endif
+              </span>
+              <svg class="mobile-nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
-            <div>
-              <span class="menu-accordion-label">ट्रस्ट परिचय</span>
-              <span class="menu-accordion-sub">About the Trust & Heritage</span>
-            </div>
-          </div>
-          <div class="menu-accordion-meta">
-            <span class="menu-item-count-badge">3 उप-खंड</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        <div class="menu-accordion-body">
-          <a href="{{ url('/about') }}" class="menu-sub-link">
-            <span>ट्रस्ट के विषय में एवं इतिहास</span>
-            <span class="menu-sub-link-sub">About Trust &rarr;</span>
-          </a>
-          <a href="{{ url('/leadership') }}" class="menu-sub-link">
-            <span>संरक्षक व न्यासी मंडल</span>
-            <span class="menu-sub-link-sub">Leadership & Trustees &rarr;</span>
-          </a>
-          <a href="{{ url('/#about-deity') }}" class="menu-sub-link">
-            <span>कामदगिरि महिमा व उद्देश्य</span>
-            <span class="menu-sub-link-sub">Sanctum Heritage &rarr;</span>
-          </a>
-        </div>
-      </div>
+            </a>
+          @endif
+        @endforeach
+      </nav>
 
-      <!-- SUBMENU 2: SEVA & GURUKUL MISSIONS -->
-      <div class="menu-accordion-card">
-        <button type="button" class="menu-accordion-header" onclick="toggleMenuAccordion(this)" aria-expanded="false">
-          <div class="menu-accordion-title-wrap">
-            <div class="menu-accordion-icon" style="color: #2D6A4F; background: rgba(45,106,79,0.1);">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
-            </div>
-            <div>
-              <span class="menu-accordion-label">सेवा व गुरुकुल</span>
-              <span class="menu-accordion-sub">Seva Missions & Sanskrit Gurukul</span>
-            </div>
-          </div>
-          <div class="menu-accordion-meta">
-            <span class="menu-item-count-badge" style="color: #2D6A4F;">4 प्रकल्प</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        <div class="menu-accordion-body">
-          <a href="{{ url('/seva/sanskrit-gurukul') }}" class="menu-sub-link">
-            <span>ऋषिकुल संस्कृत गुरुकुल एवं विद्यालय</span>
-            <span class="menu-sub-link-sub">Gurukul &rarr;</span>
-          </a>
-          <a href="{{ url('/seva/gaushala-protection') }}" class="menu-sub-link">
-            <span>कामदगिरि गौशाला (गौ संरक्षण सेवा)</span>
-            <span class="menu-sub-link-sub">Gaushala &rarr;</span>
-          </a>
-          <a href="{{ url('/seva/religious-events') }}" class="menu-sub-link">
-            <span>धार्मिक एवं सांस्कृतिक सेवा प्रकल्प</span>
-            <span class="menu-sub-link-sub">Cultural &rarr;</span>
-          </a>
-          <a href="{{ url('/seva') }}" class="menu-sub-link">
-            <span>समस्त सेवा प्रकल्प एवं अन्नक्षेत्र</span>
-            <span class="menu-sub-link-sub">All Sevas &rarr;</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- SUBMENU 3: CHITRAKOOT SACRED DHAM -->
-      <div class="menu-accordion-card">
-        <button type="button" class="menu-accordion-header" onclick="toggleMenuAccordion(this)" aria-expanded="false">
-          <div class="menu-accordion-title-wrap">
-            <div class="menu-accordion-icon" style="color: #B45309; background: rgba(180,83,9,0.1);">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M8 3l4 8 5-5 5 15H2L8 3z" />
-              </svg>
-            </div>
-            <div>
-              <span class="menu-accordion-label">चित्रकूट दर्शन</span>
-              <span class="menu-accordion-sub">Sacred Pilgrimage & Tirth Guide</span>
-            </div>
-          </div>
-          <div class="menu-accordion-meta">
-            <span class="menu-item-count-badge">3 तीर्थ</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        <div class="menu-accordion-body">
-          <a href="{{ url('/chitrakoot') }}" class="menu-sub-link">
-            <span>समस्त तीर्थ स्थल दर्शिका</span>
-            <span class="menu-sub-link-sub">Places Guide &rarr;</span>
-          </a>
-          <a href="{{ url('/chitrakoot/kamadgiri-parikrama') }}" class="menu-sub-link">
-            <span>कामदगिरि परिक्रमा पथ एवं मंदिर</span>
-            <span class="menu-sub-link-sub">Parikrama &rarr;</span>
-          </a>
-          <a href="{{ url('/chitrakoot/ramghat') }}" class="menu-sub-link">
-            <span>रामघाट एवं पवित्र मंदाकिनी तट</span>
-            <span class="menu-sub-link-sub">Ramghat &rarr;</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- SUBMENU 4: TEMPLE SERVICES & DARSHAN -->
-      <div class="menu-accordion-card">
-        <button type="button" class="menu-accordion-header" onclick="toggleMenuAccordion(this)" aria-expanded="false">
-          <div class="menu-accordion-title-wrap">
-            <div class="menu-accordion-icon" style="color: #EA580C; background: rgba(234,88,12,0.1);">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2c1.5 3 4 5 4 9a6 6 0 1 1-12 0c0-4 2.5-6 4-9 1 2 2 3 4 0z" />
-              </svg>
-            </div>
-            <div>
-              <span class="menu-accordion-label">मंदिर सेवाएं व दर्शन</span>
-              <span class="menu-accordion-sub">Temple Services, Stay & Pooja</span>
-            </div>
-          </div>
-          <div class="menu-accordion-meta">
-            <span class="menu-item-count-badge" style="color: #EA580C;">5 सेवाएं</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        <div class="menu-accordion-body">
-          <a href="{{ route('services.index') }}" class="menu-sub-link"
-            style="background: rgba(234,88,12,0.06); border-radius: 6px; font-weight: 700;">
-            <span style="color: #C2410C;">★ समस्त मंदिर सेवाएं एवं सुविधा केंद्र</span>
-            <span class="menu-sub-link-sub">All Services &rarr;</span>
-          </a>
-          <a href="{{ route('pooja.bookingForm') }}" class="menu-sub-link">
-            <span>पूजा व हवन ऑनलाइन आरक्षण (स्लॉट बुक करें)</span>
-            <span class="menu-sub-link-sub">Book Pooja &rarr;</span>
-          </a>
-          <a href="{{ route('services.aarti') }}" class="menu-sub-link">
-            <span>नित्य महाआरती व दर्शन समय सारणी</span>
-            <span class="menu-sub-link-sub">Aarti Timetable &rarr;</span>
-          </a>
-          <a href="{{ route('services.atithiVishram') }}" class="menu-sub-link">
-            <span>अतिथि विश्राम गृह पूछताछ (तीर्थ प्रवास)</span>
-            <span class="menu-sub-link-sub">Atithi Stay &rarr;</span>
-          </a>
-          <a href="{{ route('services.templeBooking') }}" class="menu-sub-link">
-            <span>मंदिर परिसर व आयोजन आरक्षण पूछताछ (विवाह, हवन, कथा)</span>
-            <span class="menu-sub-link-sub">Event Booking &rarr;</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- SUBMENU 5: MEDIA, EVENTS & COMMUNITY -->
-      <div class="menu-accordion-card">
-        <button type="button" class="menu-accordion-header" onclick="toggleMenuAccordion(this)" aria-expanded="false">
-          <div class="menu-accordion-title-wrap">
-            <div class="menu-accordion-icon" style="color: #7A4B29; background: rgba(122,75,41,0.1);">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <div>
-              <span class="menu-accordion-label">उत्सव, साहित्य व दीर्घा</span>
-              <span class="menu-accordion-sub">Events, Blog, Gallery & Volunteers</span>
-            </div>
-          </div>
-          <div class="menu-accordion-meta">
-            <span class="menu-item-count-badge">4 अनुभाग</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-        <div class="menu-accordion-body">
-          <a href="{{ url('/events') }}" class="menu-sub-link">
-            <span>आगामी धार्मिक उत्सव व कार्यक्रम</span>
-            <span class="menu-sub-link-sub">Events &rarr;</span>
-          </a>
-          <a href="{{ url('/blog') }}" class="menu-sub-link">
-            <span>धार्मिक समाचार, आलेख व कथा साहित्य</span>
-            <span class="menu-sub-link-sub">Spiritual Blog &rarr;</span>
-          </a>
-          <a href="{{ url('/gallery') }}" class="menu-sub-link">
-            <span>चित्र एवं वीडियो दीर्घा</span>
-            <span class="menu-sub-link-sub">Gallery &rarr;</span>
-          </a>
-          <a href="{{ url('/volunteer') }}" class="menu-sub-link">
-            <span>स्वयंसेवक पंजीयन (Volunteer Seva)</span>
-            <span class="menu-sub-link-sub">Volunteer &rarr;</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- DIRECT LINK CARD: CONTACT -->
-      <a href="{{ url('/contact') }}" class="menu-direct-card">
-        <div class="menu-accordion-title-wrap">
-          <div class="menu-accordion-icon">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-          </div>
-          <div>
-            <span class="menu-accordion-label">मार्गदर्शन एवं संपर्क</span>
-            <span class="menu-accordion-sub">Contact Us & Temple Office</span>
-          </div>
-        </div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D95D0F" stroke-width="2.2">
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-      </a>
-
-    </div>
-
-    <!-- High-Prominence Donation CTA Button inside Mobile Menu -->
-    <div style="margin: 20px 0 16px;">
-      <a href="{{ url('/donate') }}"
-        style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: linear-gradient(135deg, #D95D0F 0%, #EA580C 100%); color: #ffffff; font-weight: 800; font-size: 15px; padding: 13px 18px; border-radius: 9999px; text-decoration: none; box-shadow: 0 4px 18px rgba(217,93,15,0.35); transition: transform 0.2s;"
-        onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path
-            d="M12 21s-7-4.6-9-9.2C1.2 7.8 3.4 5 6.4 5c2 0 3.5 1.1 5.6 3.1C14.1 6.1 15.6 5 17.6 5 20.6 5 22.8 7.8 21 11.8 19 16.4 12 21 12 21z" />
-        </svg>
-        <span>दान एवं सहयोग (Donate Now) &rarr;</span>
-      </a>
-    </div>
-
-    <!-- Account & User Auth Section at Bottom -->
-    <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(180,83,9,0.18);">
-      @auth
-        <div
-          style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 12px 14px; background: #FFFDFC; border: 1px solid rgba(180,83,9,0.2); border-radius: 12px;">
-          <div
-            style="width: 38px; height: 38px; border-radius: 50%; background: #FAF4ED; border: 1px solid rgba(180,83,9,0.25); color: #D95D0F; display: grid; place-items: center; font-weight: 800; font-size: 15px;">
-            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-          </div>
-          <div style="flex: 1; overflow: hidden;">
-            <div
-              style="font-weight: 700; font-size: 14px; color: #2B1A12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-              {{ auth()->user()->name }}</div>
-            <div style="font-size: 11px; color: #7A4B29;">{{ auth()->user()->email }}</div>
-          </div>
-        </div>
-
-        <a href="{{ url('/dashboard') }}"
-          style="display: flex; align-items: center; gap: 10px; padding: 12px 0; color: #2B1A12; font-size: 14px; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(180,83,9,0.12);">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
+      <!-- Primary Donation CTA -->
+      <div class="mobile-menu-cta-wrap">
+        <a href="{{ url('/donate') }}" class="mobile-menu-donate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path
+              d="M12 21s-7-4.6-9-9.2C1.2 7.8 3.4 5 6.4 5c2 0 3.5 1.1 5.6 3.1C14.1 6.1 15.6 5 17.6 5 20.6 5 22.8 7.8 21 11.8 19 16.4 12 21 12 21z" />
           </svg>
-          My Account & Receipts (मेरा खाता व रसीदें)
+          <span>Donate Now</span>
         </a>
+      </div>
 
-        @if(auth()->user()->hasRole('super_admin', 'content_admin', 'donation_admin', 'membership_admin', 'media_editor'))
-          <a href="{{ url('/admin') }}"
-            style="display: flex; align-items: center; gap: 10px; padding: 12px 0; color: #B45309; font-size: 14px; font-weight: 700; text-decoration: none; border-bottom: 1px solid rgba(180,83,9,0.12);">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
-            CMS Admin Panel (एडमिन डैशबोर्ड)
-          </a>
-        @endif
+      <!-- Account Section -->
+      <div class="mobile-menu-account">
+        @auth
+          <div class="mobile-menu-user-card">
+            <div class="mobile-menu-user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+            <div class="mobile-menu-user-info">
+              <div class="mobile-menu-user-name">{{ auth()->user()->name }}</div>
+              <div class="mobile-menu-user-email">{{ auth()->user()->email }}</div>
+            </div>
+          </div>
 
-        <form action="{{ url('/logout') }}" method="POST" style="margin-top: 14px;">
-          @csrf
-          <button type="submit"
-            style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: rgba(220,53,69,0.08); border: 1px solid rgba(220,53,69,0.3); color: #dc3545; font-size: 14px; padding: 11px 16px; cursor: pointer; border-radius: 9999px; font-weight: 700;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+          <a href="{{ url('/dashboard') }}" class="mobile-menu-account-link">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
-            Logout (लॉगआउट)
-          </button>
-        </form>
-      @else
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <a href="{{ url('/login') }}"
-            style="display: flex; align-items: center; justify-content: center; padding: 12px; background: #FFFDFC; color: #2B1A12; font-size: 14px; font-weight: 700; text-decoration: none; border: 1.5px solid rgba(180,83,9,0.25); border-radius: 9999px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-            Login (लॉगिन)
+            <span>My Account &amp; Receipts</span>
           </a>
-          <a href="{{ url('/register') }}"
-            style="display: flex; align-items: center; justify-content: center; padding: 12px; background: linear-gradient(135deg, #D95D0F 0%, #EA580C 100%); color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; border-radius: 9999px; text-align: center; box-shadow: 0 4px 14px rgba(217,93,15,0.3);">
-            Register (पंजीकरण)
-          </a>
-        </div>
-      @endauth
+
+          @if(auth()->user()->hasRole('super_admin', 'content_admin', 'donation_admin', 'membership_admin', 'media_editor'))
+            <a href="{{ url('/admin') }}" class="mobile-menu-account-link is-admin">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              <span>Admin Panel</span>
+            </a>
+          @endif
+
+          <form action="{{ url('/logout') }}" method="POST" class="mobile-menu-logout-form">
+            @csrf
+            <button type="submit" class="mobile-menu-logout-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </form>
+        @else
+          <div class="mobile-menu-auth-grid">
+            <a href="{{ url('/login') }}" class="mobile-menu-auth-btn is-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              <span>Login</span>
+            </a>
+            <a href="{{ url('/register') }}" class="mobile-menu-auth-btn is-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <line x1="20" y1="8" x2="20" y2="14" />
+                <line x1="23" y1="11" x2="17" y2="11" />
+              </svg>
+              <span>Register</span>
+            </a>
+          </div>
+        @endauth
+      </div>
     </div>
   </div>
 
@@ -866,50 +831,60 @@
       menu?.classList.remove('open');
       backdrop?.classList.remove('open');
       document.body.classList.remove('menu-open');
+      openMenu?.setAttribute('aria-expanded', 'false');
     };
 
     openMenu?.addEventListener('click', () => {
       menu?.classList.add('open');
       backdrop?.classList.add('open');
       document.body.classList.add('menu-open');
+      openMenu.setAttribute('aria-expanded', 'true');
     });
     closeMenu?.addEventListener('click', hideMenu);
     backdrop?.addEventListener('click', hideMenu);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menu?.classList.contains('open')) hideMenu();
+      if (e.key === 'Escape' && menu?.classList.contains('open')) {
+        hideMenu();
+        openMenu?.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1280 && menu?.classList.contains('open')) {
+        hideMenu();
+      }
     });
     menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', hideMenu));
 
     window.toggleMenuAccordion = function (btn) {
-      const card = btn.closest('.menu-accordion-card');
-      if (!card) return;
-      const wasActive = card.classList.contains('active');
+      const group = btn.closest('.mobile-nav-group');
+      if (!group) return;
+      const wasActive = group.classList.contains('active');
 
       // Close sibling accordions for clean accordion UX
-      document.querySelectorAll('.menu-accordion-card.active').forEach(c => {
-        if (c !== card) {
+      document.querySelectorAll('.mobile-nav-group.active').forEach(c => {
+        if (c !== group) {
           c.classList.remove('active');
-          c.querySelector('.menu-accordion-header')?.setAttribute('aria-expanded', 'false');
+          c.querySelector('.mobile-nav-accordion-btn')?.setAttribute('aria-expanded', 'false');
         }
       });
 
       if (!wasActive) {
-        card.classList.add('active');
+        group.classList.add('active');
         btn.setAttribute('aria-expanded', 'true');
         if (typeof anime !== 'undefined' && anime.animate) {
-          const links = card.querySelectorAll('.menu-sub-link');
+          const links = group.querySelectorAll('.mobile-nav-sublink');
           if (links.length > 0) {
             anime.animate(links, {
-              translateX: [-10, 0],
+              translateX: [-8, 0],
               opacity: [0, 1],
-              delay: anime.stagger(30),
-              duration: 320,
+              delay: anime.stagger(25),
+              duration: 260,
               ease: 'outQuad'
             });
           }
         }
       } else {
-        card.classList.remove('active');
+        group.classList.remove('active');
         btn.setAttribute('aria-expanded', 'false');
       }
     };
@@ -1162,24 +1137,13 @@
       const openMenuBtn = document.getElementById('openMenu');
       if (mobileMenuEl && openMenuBtn) {
         openMenuBtn.addEventListener('click', () => {
-          const quickChips = mobileMenuEl.querySelectorAll('.menu-quick-chip');
-          if (quickChips.length > 0) {
-            animate(quickChips, {
-              translateY: [12, 0],
+          const menuItems = mobileMenuEl.querySelectorAll('.mobile-nav-link, .mobile-nav-group');
+          if (menuItems.length > 0) {
+            animate(menuItems, {
+              translateX: [14, 0],
               opacity: [0, 1],
-              delay: stagger(35, { start: 120 }),
-              duration: 380,
-              ease: 'outQuad'
-            });
-          }
-
-          const menuCards = mobileMenuEl.querySelectorAll('.menu-accordion-card, .menu-direct-card');
-          if (menuCards.length > 0) {
-            animate(menuCards, {
-              translateX: [20, 0],
-              opacity: [0, 1],
-              delay: stagger(40, { start: 180 }),
-              duration: 420,
+              delay: stagger(25, { start: 80 }),
+              duration: 300,
               ease: 'outQuad'
             });
           }
